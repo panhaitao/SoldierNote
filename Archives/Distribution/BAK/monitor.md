@@ -1,0 +1,19 @@
+# 运维套件
+
+* 报警
+  * nagios
+  * nagios-plugins
+* 数据收集
+  * collectd
+  * nagios-nrpe
+  * nagios-ncpa
+* 数据存储
+  * InfluxDB
+* 可视化
+  * Grafana
+  * cacti   
+  * RRDTools
+* 配置管理
+  * Ansible
+* 日志分析                 
+  * loganalyzer
