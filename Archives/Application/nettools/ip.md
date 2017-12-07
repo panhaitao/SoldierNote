@@ -1,5 +1,26 @@
 
 深度服务器操作系统中管理员用户可使用ip、dhclient、route三个工具程序对ip进行管理。
+
+
+网卡上增加一个IP：
+ifconfig eth0:1 192.168.0.1 netmask 255.255.255.0
+删除网卡的第二个IP地址:
+ip addr del 192.168.0.1 dev eth0
+这种方式增加的虚拟IP，可以通过ifconfig查看
+
+ 
+
+另一种增加虚拟IP的方法（ifconfig查看不到）：
+
+增加虚拟IP：
+ip -f inet addr add 192.168.146.229/32 brd 192.168.146.229 dev eth0
+
+查看虚拟IP：
+ip -f inet addr
+
+删除虚拟IP：
+ip -f inet addr delete 192.168.146.229/32 brd 192.168.146.229 dev eth0
+
  
 ip工具程序
 ip命令用来显示或操纵Linux主机的路由、网络设备、策略路由和隧道，是Linux下较新的功能强大的网络配置工具。特别的，不赞成使用的linux网络命令有 arp, ifconfig, iptunnel,nameif, netstat, route。这些程序包含在net-tools软件包，但该软件包已经多年不被维护了。他们中的许多基本功能能够用iproute2软件包中一些套件替代，其中最著名的就是新的ip命令。下面我们先介绍ip的语法，再介绍ip与上述命令的对比。

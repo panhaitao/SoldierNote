@@ -1,50 +1,108 @@
-### 制作 debian-installer
+制作 debian-installer
+---------------------
 
-安装编译依赖包 apt-get build-dep debian-installer -y 编译安装器
+1\. 安装编译依赖包 apt-get build-dep debian-installer -y
 
-`   git clone git@bj.git.sndu.cn:server-dev/debian-installer.git    cd debian-installer`\
-`   git checkout -b deepin-server-2015 origin/deepin-server-2015`
+2\. 获取安装器源码 apt-get source debian-installer
 
-创建配置文件 debian-installer/build/sources.list.udeb 添加如下内容
+3\. 编译安装器，进入 /home/deepin/debian-installer-20170615+deb9u2/build
+目录，创建配置文件 sources.list.udeb 添加如下内容
 
-`   deb [trusted=yes] copy:/data/codes/project/debian-installer/build/ localudebs/`\
-`   deb `[`http://10.1.10.21/server-dev`](http://10.1.10.21/server-dev)` kui main/debian-installer`
+`   deb [trusted=yes] copy:/home/deepin/debian-installer-20170615+deb9u2/build localudebs/`\
+`   deb  `[`http://mirrors.tuna.tsinghua.edu.cn/debian/`](http://mirrors.tuna.tsinghua.edu.cn/debian/)` stretch main/debian-installer`
 
-其中 /data/codes/project/debian-installer/build/
-请根据实际位置对应修改，执行 build.sh 完成编译，将 build/dest/
-目录下全部文件复制到 /data/debian-installer-latest/dest/ 以备后续使用
-(参见 /etc/isobuilder.conf 中配置项 DI\_FILE)
+4\. 在 /home/deepin/debian-installer-20170615+deb9u2/build
+目录执行如下命令
 
-编译结果清单如下：
+`   make build_cdrom_gtk`
 
-`   cdrom           用于光盘安装，U盘安装 kernel, initrd 等文件`\
-`   netboot         用于网络安装的 kernel, initrd 等文件`\
-`   MANIFEST        编译结果清单列表`\
-`   MANIFEST.udebs  构建initrd用到的udeb包列表清单`
+5\. /home/deepin/debian-installer-20170615+deb9u2/build/dest
 
-    debootstrap --no-check-gpg --include=locales,busybox,initramfs-tools,sudo,vim,psmisc,ssh,iptables,linux-image-4.9.0-2-amd64-unsigned,grub-pc,grub-efi --components=main,non-free,contrib --arch=amd64 kui /tmp/rootfs http://10.1.10.21/server-dev/dsce-15-amd64/
-    wget http://10.1.10.21/server-dev/dsce-15-amd64/dists/kui/main/debian-installer/binary-amd64/Packages.gz
+    MANIFEST                            编译结果清单列表 
+    MANIFEST.udebs                      构建initrd用到的udeb包列表清单 
+    cdrom/gtk/vmlinuz                   用于光盘安装的 kernel
+    cdrom/gtk/initrd.gz                 用于光盘安装的 initrd 等文件 
+    cdrom/gtk/debian-cd_info.tar.gz     和启动引导相关的文件
+
+创建一个用于生成ISO的模板目录
+-----------------------------
+
+    cd /home/deepin/debian-installer-20170615+deb9u2/
+    mkdir -pv isotree/
+    mkdir -pv isotree/{boot,efi,isolinux,installer,.disk}
+    mkdir -pv isotree/efi/boot/
+    touch     isotree/.disk/{base_components,base_installable,cd_type,info,udeb_include}
+
+将安装器相关的启动文件解压到模板目录中
+--------------------------------------
+
+    cd /home/deepin/debian-installer-20170615+deb9u2/
+    mkdir tmp && tar -xvpf build/dest/cdrom/gtk/debian-cd_info.tar.gz -C tmp
+    cp -av    build/dest/cdrom/gtk/{vmlinuz,initrd.gz}    isotree/installer            
+      
+    mcopy     -i tmp/grub/efi.img ::efi/boot/bootx64.efi isotree/efi/boot/bootx64.efi
+    mv        tmp/grub/                                  isotree/boot/
+    cp -av    tmp/*                                      isotree/isolinux/
+    cp        /usr/lib/ISOLINUX/isolinux.bin             isotree/isolinux/
+    cp        /usr/lib/syslinux/modules/bios/{ldlinux.c32,libcom32.c32,libutil.c32,vesamenu.c32} isotree/isolinux/
+
+修改 isotree/isolinux/txt.cfg
+
+    label install
+            menu label ^Install
+            kernel /installer/vmlinuz
+            append initrd=/installer/initrd.gz file=/cdrom/preseed.cfg vga=788 --- quiet 
+
+修改 isotree/boot/grub/grub.cfg
+
+    menuentry 'Install' {
+        set background_color=black
+        linux    /installer/vmlinuz  vga=788 file=/cdrom/preseed.cfg --- quiet 
+        initrd   /installer/initrd.gz
+    }
+
+获取cdrom需要的deb包和udeb包
+----------------------------
+
+    export repo_url=http://mirrors.tuna.tsinghua.edu.cn/debian/
+    export codename=stretch
+
+    mkdir tmp/rootfs
+    debootstrap --no-check-gpg --include=locales,busybox,initramfs-tools,sudo,vim,psmisc,ssh,iptables,linux-image-amd64,grub-pc,grub-efi --components=main,non-free,contrib --arch=amd64 $codename tmp/rootfs $repo_url  
+
+    wget $repo_url/dists/$codename/main/debian-installer/binary-amd64/Packages.gz
     zcat Packages.gz | grep Filename | awk  '{print $2}' > all_udeb.list
-    sed -i "s@^@http://10.1.10.21/server-dev/dsce-15-amd64/@g" all_udeb.list  
-    wget -i all_udeb.list -P udeb/
+    sed -i "s@^@$repo_url/@g" all_udeb.list  
+    mkdir -pv tmp/udeb/ && wget -i all_udeb.list -P tmp/udeb/
 
-    echo "Deepin Community Linux Server ${BuildID}" > kui-15-build/.disk/info
+    cd isotree/ && mkdir conf
+    cat > conf/distributions << EOF
+    Codename: $codename 
+    Description: official main repository
+    Architectures: i386 amd64
+    Components: main contrib non-free
+    UDebComponents: main
+    Contents: .gz
+    Suite: stable
+    EOF
+    reprepro includedeb $codename ../tmp/rootfs/var/cache/apt/archives/*.deb
+    reprepro includeudeb $codename ../tmp/udeb/*.udeb
 
-    cd kui-15-build/
-    reprepro includedeb kui /tmp/rootfs/var/cache/apt/archives/*.deb
-    reprepro includeudeb kui ../udeb/*.udeb
-    rm -rvf /tmp/rootfs/var/cache/apt/archives/*.deb
-    mksquashfs /tmp/rootfs/kui-15-build/live/filesystem.suqashfs
+    echo "Debian Custom" > .disk/info
     find . -type f | grep -v -e ^\./\.disk -e ^\./dists | xargs md5sum >> md5sum.txt
 
-    cd ../
-    xorriso -as mkisofs -r -V 'Deepin Community Linux Server'                                                 \
+    cd /home/deepin/debian-installer-20170615+deb9u2/
+
+    xorriso -as mkisofs -r -V 'Debian Custom '                                                                \
         -J -isohybrid-mbr /usr/lib/ISOLINUX/isohdpfx.bin                                                      \
         -J -joliet-long                                                                                       \
         -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot                                           \
         -boot-load-size 4 -boot-info-table -eltorito-alt-boot                                                 \
-        -e boot/grub/efi.img -no-emul-boot -isohybrid-gpt-basdat -isohybrid-apm-hfsplus kui-15-build/         \
-        -o deepin-community-server-minimal-amd64-${BuildID}.iso
+        -e boot/grub/efi.img -no-emul-boot -isohybrid-gpt-basdat -isohybrid-apm-hfsplus isotree/              \
+        -o debian-custom-minimal-amd64.iso
+
+    rm -rvf /tmp/rootfs/var/cache/apt/archives/*.deb
+    mksquashfs /tmp/rootfs/ kui-15-build/live/filesystem.suqashfs
 
 迁移原debian8版本已经完成的工作
 
