@@ -378,3 +378,8 @@ $ sudo. /ovs-docker del-port br0 eth0 <CONTAINER_ID>
 
 
 
+* Kubernetes     入门    : http://www.cnblogs.com/suolu/p/6734528.html
+* Kubernetes     组件原理： http://www.cnblogs.com/suolu/p/6771627.html
+* Kubelet运行机制与安全机制： http://www.cnblogs.com/suolu/p/6841848.html
+* Kubernetes     网络原理： http://www.cnblogs.com/suolu/p/6842771.html
+* Kubernetes     运维技巧： http://www.cnblogs.com/suolu/p/6844414.html
