@@ -75,8 +75,11 @@ root@deepin-server:~ # ansible web -m ping
     "ping": "pong"
 }
 ```
-4. 上述命令各个参数解析，web是选择的ip分组， -m ping 是调用ansible内置的ping模块，-u root 是指明以root身份执行
-5. 其他几个常用的操作参考：
+5. 上述命令各个参数解析，web是选择的ip分组， -m ping 是调用ansible内置的ping模块，-u root 是指明以root身份执行
+
+6. 其他几个常用的操作参考：
+* web分组主机执行w命令(-m command可以省略就表示默认使用命名模块): 
+    ansible web -m command -a 'w' 
 * 将hosts文件分发到目标主机/etc/hosts
     ansible web -u root -m copy -a "src=hosts dest=/etc/hosts"
 * 在目标主机安装当前仓库最新版本的httpd软件包
