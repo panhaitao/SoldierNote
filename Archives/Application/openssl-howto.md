@@ -1,4 +1,4 @@
-OpenSSL组件
+## OpenSSL组件
 -----------
 
 OpenSSL 是一个开源项目，其组成主要包括一下三个组件：
@@ -9,7 +9,7 @@ OpenSSL 是一个开源项目，其组成主要包括一下三个组件：
 
 openssl可以实现：秘钥证书管理、对称加密和非对称加密 。
 
-术语
+## 术语
 ----
 
 openssl中有如下约定熟成的后缀名称：
@@ -20,13 +20,13 @@ openssl中有如下约定熟成的后缀名称：
     * .crl：   证书吊销列表，Certificate Revocation List的缩写
     * .pem：用于导出，导入证书时候的证书的格式，有证书开头，结尾的格式
 
-加密和签名
+## 公钥私钥的核心功能
 ----------
 
 -   加密: 公钥用于对数据进行加密，私钥用于对数据进行解密
 -   签名: 私钥用于对数据进行签名，公钥用于对签名进行验证
 
-Openssl 操作指南
+## Openssl 操作指南
 ----------------
 
 ### 生成密钥
@@ -34,30 +34,34 @@ Openssl 操作指南
 -   生成私钥: openssl genrsa -out private.key 2048
 -   到出公钥: openssl rsa -in private.key -pubout -out public.key
 
-<!-- -->
-
-    genrsa       产生RSA密钥命令。
-    -aes256      使用AES算法（256位密钥）对产生的私钥加密。可选算法包括DES，DESede，IDEA和AES。
-    -out         输出路径,这里指private/server.key.pem。
-    2048         指RSA密钥长度位数，默认长度为512位。
-
+```
+genrsa       产生RSA密钥命令。
+-out         输出路径,这里指private/server.key.pem。
+2048         指RSA密钥长度位数，默认长度为512位。
+```
 ### 创建CA
 
 CA是专门签发证书的权威机构，处于证书的最顶端。自签是用自己的私钥给证书签名，CA签发则是用CA的私钥给自己的证书签名来保证证书的可靠性
+
 CA根证书的生成步骤：
 生成CA私钥（.key）--&gt;生成CA证书请求（.csr）--&gt;自签名得到根证书（.crt）（CA给自已颁发的证书）。
 
-`   openssl genrsa -out ca.key 2048     `\
-`   openssl req -new -key ca.key -out ca.csr    `\
-`   openssl x509 -req -days 365 -in ca.csr -signkey ca.key -out ca.crt  `\
-`   `\
-`  以上操作合并操作如下：`\
-`   openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ca.key -out ca.crt`
+* 生成私钥:   openssl genrsa -out ca.key 2048    
+* 生成证书请求: openssl req -new -key ca.key -out ca.csr   
+* 自签名:  openssl x509 -req -days 365 -in ca.csr -signkey ca.key -out ca.crt
 
-    req
-    -x509
-    -nodes 本option被set的话,生成的私有密钥文件将不会被加密
-    -days 365 
+以上操作合并操作如下：
+
+    openssl req -x509 -nodes -days 365    \
+    -newkey rsa:2048 -keyout ca.key -out ca.crt
+    
+
+其中重要参数含义如下：
+
+     req
+     -x509
+     -nodes 本option被set的话,生成的私有密钥文件将不会被加密
+     -days 365 
 
 -   查看自签名CA证书：openssl x509 -text -in ca.cert
 
