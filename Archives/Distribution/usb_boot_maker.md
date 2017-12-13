@@ -6,13 +6,13 @@
 * 在U盘上创建GPT类型的分区
 ------------------------
 
-  分区     文件系统类型   大小      启动标志    分区标签
-  -------- -------------- --------- ----------- --------------------
-  分区一   fat32          4M        bios-grub   
-  分区二   fat32          64M       boot esp    
-  分区三   ext4           &gt; 5G               CentOS\x207\x20x86_64
+|分区                 |  文件系统类型  |  大小     | 启动标志  |  分区标签|
+| ------------- |:-------:| ---------:|-------------------|----------|
+|分区一             | fat32    |  4M          |   bios-grub            |                  |
+|分区二             | fat32    |  64M       |    boot esp             |                   |
+|分区三             | ext4      |  &gt; 5G  |     | CentOS\x207\x20x86_64 |
 
-* grub 引导程序安装到U盘上
+*  将grub 引导程序安装到U盘上
 ---------------------------
 
     mount /dev/sdb3 /mnt/
@@ -21,11 +21,14 @@
 
 安装EFI引导文件，操作参考如下，需要使用grub-efi软件包提供的命令：
 
-    grub-install --target=x86_64-efi --removable --boot-directory=/mnt/ --efi-directory=/mnt/EFI/ /dev/sdb
+    grub-install --target=x86_64-efi --removable          \
+                         --boot-directory=/mnt/           \
+                         --efi-directory=/mnt/EFI/ /dev/sdb
 
 安装BIOS引导文件，操作参考如下，需要使用grub-pc软件包提供的命令：
 
-    grub-install --target=i386-pc --removable --boot-directory=/mnt/ /dev/sdb
+    grub-install --target=i386-pc --removable             \
+                         --boot-directory=/mnt/ /dev/sdb
 
 最后将ISO文件拷贝到 /mnt/ 目录，在/mnt/grub/ 目录下创建 grub.cfg
 启动菜单文件
