@@ -21,11 +21,11 @@
 
 安装EFI引导文件，操作参考如下，需要使用grub-efi软件包提供的命令：
 
-    grub-install --removable --boot-directory=/mnt/ --efi-directory=/mnt/EFI/ /dev/sdb
+    grub-install --target=x86_64-efi --removable --boot-directory=/mnt/ --efi-directory=/mnt/EFI/ /dev/sdb
 
 安装BIOS引导文件，操作参考如下，需要使用grub-pc软件包提供的命令：
 
-    grub-install --removable --boot-directory=/mnt/ /dev/sdb
+    grub-install --target=i386-pc --removable --boot-directory=/mnt/ /dev/sdb
 
 最后将ISO文件拷贝到 /mnt/ 目录，在/mnt/grub/ 目录下创建 grub.cfg
 启动菜单文件
@@ -51,23 +51,6 @@
         linux (loop)/isolinux/vmlinuz inst.stage2=hd:LABEL=CentOS\x207\x20x86_64:/$isofile inst.ks=hd:LABEL=CentOS\x207\x20x86_64:/ks-bios-install.cfg noeject 
         initrd (loop)/isolinux/initrd.img
     }
-
-# 使用dd工具制作启动U盘
-=====================
-
--   针对BIOS主板的U盘启动制作方式：
-
-<!-- -->
-
-     isohybrid CentOS-7-x86_64-DVD-1708.iso
-     dd if=CentOS-7-x86_64-DVD-1708.iso of=/dev/sdX
-
--   针对UEFI主板的U盘启动制作方式
-
-<!-- -->
-
-    isohybrid --uefi CentOS-7-x86_64-DVD-1708.iso
-    dd if=CentOS-7-x86_64-DVD-1708.iso of=/dev/sdX
 
 # 使用syslinux工具制作启动U盘
 ===========================
