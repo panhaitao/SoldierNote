@@ -106,6 +106,7 @@ CA根证书的生成步骤：
 -   OpenSSL Command-Line HOWTO: <https://www.madboa.com/geek/openssl/>
 -   基于 OpenSSL 自建 CA 和颁发 SSL 证书: <http://www.jianshu.com/p/79c284e826fa>
 -   OpenSSL 标准命令详细解释 : <http://blog.csdn.net/scuyxi/article/details/54884976>
+-   ssl.cnf 配置文件参考：<http://www.jinbuguo.com/linux/openssl_install.html>
 
 未整理部分
 ---
