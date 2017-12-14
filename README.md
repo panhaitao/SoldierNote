@@ -35,7 +35,7 @@ Solution
 * 容器云
   * [容器云解决方案概述](https://github.com/panhaitao/markdown-blog/blob/master/Archives/Solution/caas-summary.md)
   * [使用etcd,flannel,docker搭建一个跨物理机的容器集群](https://github.com/panhaitao/markdown-blog/blob/master/Archives/Solution/caas-k8s-net.md)
-  * [kubernetes的部署与与基础配置](https://github.com/panhaitao/markdown-blog/blob/master/Archives/Solution/caas-k8s-install.md)
+  * [kubernetes的部署与基础配置](https://github.com/panhaitao/markdown-blog/blob/master/Archives/Solution/caas-k8s-install.md)
   * [kubernetes的安全认证](https://github.com/panhaitao/markdown-blog/blob/master/Archives/Solution/caas-k8s-auth.md)
 
 Viewpoint
