@@ -2,15 +2,6 @@ blog & note
 ---
 一个半路出家的程序猿的日志: 系统，运维，基础架构，个人随笔
 
-CentOS6
----
-
-CentOS7  
----
-
-Debian9
----
-
 Distribution
 ---
 * [debian9版本定制指南](https://github.com/panhaitao/markdown-blog/blob/master/Archives/Distribution/debian9-iso-custom.md)
@@ -24,12 +15,6 @@ Application
 * 安全
   * [openssl命令使用指南](https://github.com/panhaitao/markdown-blog/blob/master/Archives/Application/openssl-howto.md)
 
-OPS  
----
-DEV
----
-Essay  
----
 Solution 
 * [基于Rsyslog和LogAnalyzer的日志管理方案](https://github.com/panhaitao/markdown-blog/blob/master/Archives/Solution/loganalyzer.md)
 * 容器云
@@ -39,6 +24,20 @@ Solution
   * [kubernetes的安全认证](https://github.com/panhaitao/markdown-blog/blob/master/Archives/Solution/caas-k8s-auth.md)
 
 Viewpoint
+---
+CentOS6
+---
+
+CentOS7  
+---
+
+Debian9
+---
+OPS  
+---
+DEV
+---
+Essay  
 ---
 Scripts  
 ---
