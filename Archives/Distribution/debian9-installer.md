@@ -1,4 +1,4 @@
-debian-installer 原理分析
+# debian-installer 原理分析
 -------------------------
 
 ### 安装器的组成
@@ -7,7 +7,7 @@ debian-installer 原理分析
 -   initrd 用于辅助内核初始化安装器环境的initrd,
     由一系列udeb包组成.需要特别介绍下udeb包，udeb和deb格式相同扩展名不同，重要区别就是udeb仅仅用于构建debian-installer;
 
-### 安装器工作流程
+## 安装器工作流程
 
 当可引导安装介质(安装光盘，安装U盘)启动后，可以选择进入文本向导模式或图形向导模式，然后完成如下操作
 
@@ -21,22 +21,6 @@ debian-installer 原理分析
 -   安装可选的软件包, 完成上述操作后,最后配置
     grub, 将之前保存的全部设置应用，完成安装过程.
 
-### 上游参考文档
+## 上游参考文档
 
 (http://d-i.alioth.debian.org/doc/internals/index.html)
-
-### 重要记录：
-
--   ext2/3/4分区格式化参数： 修改 e2fsprogs 源码包 misc/mke2fs.conf.in
--   修改安装器默认背景logo：
-    git@bj.git.sndu.cn:Debian9-Server-Packages/rootskel-gtk.git
--   调整安装器自动挂载磁盘：
-    git@bj.git.sndu.cn:Debian9-Server-Packages/mountmedia.git
--   添加U盘安装支持功能:
-    git@bj.git.sndu.cn:Debian9-Server-Packages/cdrom-detect.git
--   修改默认分区格式:
-    git@bj.git.sndu.cn:Debian9-Server-Packages/partman-base.git
--   修改分区提示信息:
-    git@bj.git.sndu.cn:Debian9-Server-Packages/partman-ext3.git
--   选择内核软件包：
-    git@@bj.git.sndu.cn:Debian9-Server-Packages/base-installer.git
