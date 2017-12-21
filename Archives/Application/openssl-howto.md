@@ -1,4 +1,4 @@
-## OpenSSL组件
+# OpenSSL组件
 -----------
 
 OpenSSL 是一个开源项目，其组成主要包括一下三个组件：
@@ -20,7 +20,7 @@ openssl中有如下约定熟成的后缀名称：
     * .crl：   证书吊销列表，Certificate Revocation List的缩写
     * .pem：用于导出，导入证书时候的证书的格式，有证书开头，结尾的格式
 
-## 公钥私钥的核心功能
+## 加密和签名
 ----------
 
 -   加密: 公钥用于对数据进行加密，私钥用于对数据进行解密
@@ -34,36 +34,32 @@ openssl中有如下约定熟成的后缀名称：
 -   生成私钥: openssl genrsa -out private.key 2048
 -   到出公钥: openssl rsa -in private.key -pubout -out public.key
 
-```
-genrsa       产生RSA密钥命令。
--out         输出路径,这里指private/server.key.pem。
-2048         指RSA密钥长度位数，默认长度为512位。
-```
+<!-- -->
+
+    genrsa       产生RSA密钥命令。
+    -aes256      使用AES算法（256位密钥）对产生的私钥加密。可选算法包括DES，DESede，IDEA和AES。
+    -out         输出路径,这里指private/server.key.pem。
+    2048         指RSA密钥长度位数，默认长度为512位。
+
 ### 创建CA
 
 CA是专门签发证书的权威机构，处于证书的最顶端。自签是用自己的私钥给证书签名，CA签发则是用CA的私钥给自己的证书签名来保证证书的可靠性
-
 CA根证书的生成步骤：
 生成CA私钥（.key）--&gt;生成CA证书请求（.csr）--&gt;自签名得到根证书（.crt）（CA给自已颁发的证书）。
 
-* 生成私钥:   openssl genrsa -out ca.key 2048    
-* 生成证书请求: openssl req -new -key ca.key -out ca.csr   
-* 自签名:  openssl x509 -req -days 365 -in ca.csr -signkey ca.key -out ca.crt
+`   openssl genrsa -out ca.key 2048     `\
+`   openssl req -new -key ca.key -out ca.csr    `\
+`   openssl x509 -req -days 365 -in ca.csr -signkey ca.key -out ca.crt  `\
+`   `\
+`  以上操作合并操作如下：`\
+`   openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ca.key -out ca.crt`
 
-以上操作合并操作如下：
+    req
+    -x509
+    -nodes 本option被set的话,生成的私有密钥文件将不会被加密
+    -days 365 
 
-    openssl req -x509 -nodes -days 365    \
-    -newkey rsa:2048 -keyout ca.key -out ca.crt
-    
-
-其中重要参数含义如下：
-
-     req
-     -x509
-     -nodes 本option被set的话,生成的私有密钥文件将不会被加密
-     -days 365 
-
--   查看自签名CA证书：openssl x509 -text -in ca.cert
+-   查看自签名CA证书：openssl x509 -text -in ca.crt
 
 ### 颁发证书
 
@@ -77,8 +73,8 @@ CA根证书的生成步骤：
 -   生成密钥： openssl genrsa -out client.key 2048
 -   生成请求: openssl req -new -subj -key client.key -out client.csr
 -   签发证书: openssl x509 -req -days 3650 -sha1 -extensions v3\_req -CA
-    ca.cert -CAkey ca.key -CAserial ca.srl -CAcreateserial -in
-    client.csr -out client.cert
+    ca.crt -CAkey ca.key -CAserial ca.srl -CAcreateserial -in client.csr
+    -out client.crt
 
 <!-- -->
 
@@ -97,23 +93,25 @@ CA根证书的生成步骤：
     -CAkey         表示CA证书密钥,这里为ca.key
     -CAserial      表示CA证书序列号文件,这里为ca.srl
     -CAcreateserial表示创建CA证书序列号
-    -in            表示输入文件,这里为private/server.csr
-    -out           表示输出文件,这里为certs/server.cer
+    -in            表示输入文件,这里为private/client.csr
+    -out           表示输出文件,这里为certs/client.crt
 
--   验证CA颁发的证书提取的公钥和私钥导出的公钥是否一致 `openssl x509 -in server.cert -pubkey`
--   验证server证书`openssl verify -CAfile ca.cert server.cert`
--   生成pem格式证书有时需要用到pem格式的证书，可以用以下方式合并证书文件（crt）和私钥文件（key）来生成 `cat client.crt client.key > client.pem`
+-   验证CA颁发的证书提取的公钥和私钥导出的公钥是否一致 openssl x509 -in
+    client.cert -pubkey
+-   验证server证书 openssl verify -CAfile ca.crt client.crt
+-   生成pem格式证书有时需要用到pem格式的证书，可以用以下方式合并证书文件（crt）和私钥文件（key）来生成
+    cat client.crt client.key&gt; client.pem
 
-参考
+## 参考
 ----
 
 -   OpenSSL Command-Line HOWTO: <https://www.madboa.com/geek/openssl/>
--   基于 OpenSSL 自建 CA 和颁发 SSL 证书: <http://www.jianshu.com/p/79c284e826fa>
--   OpenSSL 标准命令详细解释 : <http://blog.csdn.net/scuyxi/article/details/54884976>
--   ssl.cnf 配置文件参考：<http://www.jinbuguo.com/linux/openssl_install.html>
--   openssl详解: <http://blog.csdn.net/w1781806162/article/details/46358747>
-
-未整理部分
+-   自建 CA 和颁发 SSL证书 : <http://www.jianshu.com/p/79c284e826fa>
+-   OpenSSL 标准命令详细解释 :
+    <http://blog.csdn.net/scuyxi/article/details/54884976>
+-   openssl详解:
+    <http://blog.csdn.net/w1781806162/article/details/46358747>
+## 未整理部分
 ---
 若服务端要求客户端认证，需要将pfx证书转换成pem格式
 
@@ -135,3 +133,4 @@ curl -k --cert client.pem --key key.pem https://www.xxxx.com
 curl -k --cert all.pem  https://www.xxxx.com
 
 使用-k，是不对服务器的证书进行检查，这样就不必关心服务器证书的导出问题了。
+OpenSSL组件
