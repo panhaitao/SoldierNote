@@ -1,33 +1,36 @@
-制作 debian-installer
----------------------
+# Debian9版本定制指南
 
-1\. 安装编译依赖包 apt-get build-dep debian-installer -y
+## 前提条件
 
-2\. 获取安装器源码 apt-get source debian-installer
+* 工作系统： debian9
+* 开启 deb-src 源码仓库
+* 工作目录 /home/user/ 
 
-3\. 编译安装器，进入 /home/deepin/debian-installer-20170615+deb9u2/build
-目录，创建配置文件 sources.list.udeb 添加如下内容
+## 制作 debian-installer
+ 
+1. 安装开发工具集合 `apt-get install dpkg-dev`
+2. 安装编译依赖包    `apt-get build-dep debian-installer -y`
+3. 获取安装器源码    `apt-get source debian-installer`, 命令完成后会将源码解压到 debian-installer-20170615+deb9u2目录 
+4. 编译安装器，进入 debian-installer-20170615+deb9u2/build 目录，创建配置文件 sources.list.udeb 添加如下内容
 
-`   deb [trusted=yes] copy:/home/deepin/debian-installer-20170615+deb9u2/build localudebs/`\
-`   deb  `[`http://mirrors.tuna.tsinghua.edu.cn/debian/`](http://mirrors.tuna.tsinghua.edu.cn/debian/)` stretch main/debian-installer`
+```
+deb [trusted=yes] copy:/home/user/debian-installer-20170615+deb9u2/build localudebs/
+deb http://mirrors.tuna.tsinghua.edu.cn/debian/ stretch main/debian-installer
+```  
+5. 在 /home/user/debian-installer-20170615+deb9u2/build目录执行如下命令
+`make build_cdrom_gtk`
+6. /home/user/debian-installer-20170615+deb9u2/build/dest
 
-4\. 在 /home/deepin/debian-installer-20170615+deb9u2/build
-目录执行如下命令
+    MANIFEST                                    编译结果清单列表 
+    MANIFEST.udebs                          构建initrd用到的udeb包列表清单 
+    cdrom/gtk/vmlinuz                          用于光盘安装的 kernel
+    cdrom/gtk/initrd.gz                         用于光盘安装的 initrd 等文件 
+    cdrom/gtk/debian-cd_info.tar.gz    和启动引导相关的文件
 
-`   make build_cdrom_gtk`
-
-5\. /home/deepin/debian-installer-20170615+deb9u2/build/dest
-
-    MANIFEST                            编译结果清单列表 
-    MANIFEST.udebs                      构建initrd用到的udeb包列表清单 
-    cdrom/gtk/vmlinuz                   用于光盘安装的 kernel
-    cdrom/gtk/initrd.gz                 用于光盘安装的 initrd 等文件 
-    cdrom/gtk/debian-cd_info.tar.gz     和启动引导相关的文件
-
-创建一个用于生成ISO的模板目录
+创建一个用于生成ISO的模板目录从
 -----------------------------
 
-    cd /home/deepin/debian-installer-20170615+deb9u2/
+    cd /home/user/debian-installer-20170615+deb9u2/
     mkdir -pv isotree/
     mkdir -pv isotree/{boot,efi,isolinux,installer,.disk}
     mkdir -pv isotree/efi/boot/
@@ -35,16 +38,16 @@
 
 将安装器相关的启动文件解压到模板目录中
 --------------------------------------
-
-    cd /home/deepin/debian-installer-20170615+deb9u2/
-    mkdir tmp && tar -xvpf build/dest/cdrom/gtk/debian-cd_info.tar.gz -C tmp
-    cp -av    build/dest/cdrom/gtk/{vmlinuz,initrd.gz}    isotree/installer            
-      
-    mcopy     -i tmp/grub/efi.img ::efi/boot/bootx64.efi isotree/efi/boot/bootx64.efi
-    mv        tmp/grub/                                  isotree/boot/
-    cp -av    tmp/*                                      isotree/isolinux/
-    cp        /usr/lib/ISOLINUX/isolinux.bin             isotree/isolinux/
-    cp        /usr/lib/syslinux/modules/bios/{ldlinux.c32,libcom32.c32,libutil.c32,vesamenu.c32} isotree/isolinux/
+```
+cd /home/user/debian-installer-20170615+deb9u2/
+mkdir tmp && tar -xvpf build/dest/cdrom/gtk/debian-cd_info.tar.gz -C tmp
+cp -av      build/dest/cdrom/gtk/{vmlinuz,initrd.gz}    isotree/installer            
+mcopy   -i tmp/grub/efi.img ::efi/boot/bootx64.efi isotree/efi/boot/bootx64.efi
+mv         tmp/grub/                                   isotree/boot/
+cp -av    tmp/*                                        isotree/isolinux/
+cp          /usr/lib/ISOLINUX/isolinux.bin             isotree/isolinux/
+cp        /usr/lib/syslinux/modules/bios/{ldlinux.c32,libcom32.c32,libutil.c32,vesamenu.c32} isotree/isolinux/
+```
 
 修改 isotree/isolinux/txt.cfg
 
@@ -103,6 +106,3 @@
         -boot-load-size 4 -boot-info-table -eltorito-alt-boot                                                 \
         -e boot/grub/efi.img -no-emul-boot -isohybrid-gpt-basdat -isohybrid-apm-hfsplus isotree/              \
         -o debian-custom-minimal-amd64.iso
-
-    rm -rvf /tmp/rootfs/var/cache/apt/archives/*.deb
-    mksquashfs /tmp/rootfs/ kui-15-build/live/filesystem.suqashfs

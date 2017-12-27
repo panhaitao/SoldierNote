@@ -230,3 +230,19 @@ kubectl
 
 - kubeconfig yaml格式参考：
 <https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/>
+
+记录
+----
+
+### 问题一
+
+    tail -f /var/log/message
+    Nov 14 07:12:51 image kubelet: E1114 07:12:51.627782    3007 summary.go:92] Failed to get system container stats for "/system.slice/kubelet.service": failed to get cgroup 
+    stats for "/system.slice/kubelet.service": failed to get container info for "/system.slice/kubelet.service": unknown container "/system.slice/kubelet.service"
+    Nov 14 07:12:51 image kubelet: E1114 07:12:51.627824    3007 summary.go:92] Failed to get system container stats for "/system.slice/docker.service": failed to get cgroup s
+    tats for "/system.slice/docker.service": failed to get container info for "/system.slice/docker.service": unknown container "/system.slice/docker.service"
+
+    * 处理办法：
+
+    Append configuration in Kubelet
+    --runtime-cgroups=/systemd/system.slice --kubelet-cgroups=/systemd/system.slice
