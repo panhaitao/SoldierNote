@@ -21,11 +21,8 @@ cat > index.html <<EOF
 <center>Email:xz@onnwalk.net</center>
 <hr />
 <h2>版权声明</h2>
-
-<li>任何人都可以自由的<u>转载/引用/再创作</u>此文档，但必须保留作者署名并注明出处。</li>
-
-</ul>
-
+<li>在满足非商业用途的前提条件下，任何人都可以自由的<u>转载/引用/再创作</u>此文档，但必须保留作者署名并注明出处。</li>
+<hr />
 </h2>
 EOF
 
@@ -56,6 +53,6 @@ done
 
 cat >> index.html <<EOF         
 </body>
-<footer> 深蓝@Sixknot.org</footer>
+<center> <footer >深蓝@onwalk.net</footer> </center>
 </html>
 EOF

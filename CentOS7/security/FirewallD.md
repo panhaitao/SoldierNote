@@ -48,3 +48,8 @@ FirewallD 提供了命令行管理工具firewall-cmd和 命令行配置工具fir
 | systemctl disable firewalld.service     |  从系统默认服务移除                                |                
 | firewall-cmd --reload                   |  重新加载防火墙，并不中断用户连接，即不丢失状态信息|
 | firewall-cmd --complete-reload          |  重新加载防火墙并中断用户连接，即丢弃状态信息，通常在防火墙出现严重问题时，这个命令才会被使用。比如，防火墙规则是正确的，但却出现状态信息问题和无法建立连接|
+
+
+### FirewallD的操作实例
+
+* 开启80端口 `firewall-cmd --zone=public --add-port=80/tcp --permanent && systemctl restart  firewalld` 
