@@ -13,7 +13,7 @@ cat > index.html <<EOF
 <!doctype html>
 <head>
   <meta charset="utf-8">
-  <meta name="description" content="一部记录工作与生活的笔记" >
+  <meta name="description" content="blog.onwalk.net 一个半路出家程序猿的日志." >
   <meta name="keywords" content="LINUX系统，服务器应用，运维与基础架构,个人随笔" >
 </head>
 <body>
