@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<h1 id="目录">目录</h1>
+<ul>
+<li><a href="README.md">概述</a></li>
+<li><a href="system/install.md">安装部署</a></li>
+<li><a href="system/readme.md">服务器系统</a>
+<ul>
+<li><a href="system/locale_and_timezone.md">设置本地化与时区</a></li>
+<li><a href="system/date_and_time.md">设置日期和时间</a></li>
+<li><a href="system/users_and_group.md">管理用户与组</a></li>
+<li><a href="system/networking.md">管理网络配置</a></li>
+<li><a href="system/nettools.md">网络实用工具</a>
+<ul>
+<li><a href="system/nettools/ping.md">ping</a></li>
+<li><a href="system/nettools/traceroute.md">traceroute</a></li>
+<li><a href="system/nettools/netstat.md">netstat</a></li>
+<li><a href="system/nettools/dhclient.md">dhclient</a></li>
+<li><a href="system/nettools/ifconfig.md">ifconfig</a></li>
+<li><a href="system/nettools/route.md">route</a></li>
+<li><a href="system/nettools/ss.md">ss</a></li>
+<li><a href="system/nettools/ip.md">ip</a></li>
+<li><a href="system/nettools/host.md">host</a></li>
+<li><a href="system/nettools/nslookup.md">nslookup</a></li>
+<li><a href="system/nettools/nc.md">nc</a></li>
+</ul></li>
+<li><a href="system/software_managing.md">软件仓库管理</a></li>
+<li><a href="system/service-and-daemon.md">服务与守护进程</a></li>
+</ul></li>
+<li><a href="software/software.md">服务器软件</a>
+<ul>
+<li><a href="software/download-tools.md">下载工具</a></li>
+<li><a href="software/sshd.md">远程连接</a></li>
+<li><a href="software/mail.md">邮件服务</a></li>
+<li><a href="software/bind.md">域名服务</a></li>
+<li><a href="software/dhcpd.md">DHCP服务</a></li>
+<li><a href="software/httpd.md">http服务</a></li>
+<li><a href="software/tomcat.md">tomcat中间件</a></li>
+<li><a href="software/jboss.md">jboss中间件</a></li>
+<li><a href="software/php5.md">PHP服务器</a></li>
+<li><a href="software/mysql.md">mysql数据库</a></li>
+<li><a href="software/postgresql.md">postgresql数据库</a></li>
+<li><a href="software/redis.md">redis数据库</a></li>
+<li><a href="software/mongodb.md">mongodb数据库</a></li>
+</ul></li>
+<li><a href="security/security.md">服务器安全</a>
+<ul>
+<li><a href="security/iptable.md">iptable的基础使用</a></li>
+<li><a href="security/selinux.md">selinux的基础使用</a></li>
+<li><a href="security/pam.md">PAM参考配置</a></li>
+<li><a href="security/john.md">弱口令检查工具john</a></li>
+<li><a href="security/nmap.md">端口扫描工具nmap</a></li>
+<li><a href="security/audit.md">安全审计工具audit</a></li>
+<li><a href="security/afick.md">文件完整性检查afick</a></li>
+</ul></li>
+<li><a href="vz/container_and_virtualzation.md">容器与虚拟化</a></li>
+<li>kvm
+<ul>
+<li>libvirt</li>
+<li><a href="vz/vagrant-libvirtd.md">vagrant</a></li>
+</ul></li>
+<li>docker
+<ul>
+<li>network</li>
+<li>flannel</li>
+<li>weave</li>
+<li>pipework</li>
+<li>tinc</li>
+<li>socketplane</li>
+</ul></li>
+<li><a href="vz/docker_orchestration.md">编排调度</a>
+<ul>
+<li>fleet</li>
+<li>marathon</li>
+<li>swarm</li>
+<li>mesos</li>
+<li>kubernetes</li>
+<li>compose</li>
+</ul></li>
+<li>service_discovery
+<ul>
+<li>etcd</li>
+<li>consul</li>
+<li>zookeeper</li>
+</ul></li>
+<li>SDN
+<ul>
+<li>openvswitch</li>
+<li></li>
+</ul></li>
+<li><a href="">集群与云服务</a></li>
+<li>openstack</li>
+<li>hadoop<br />
+</li>
+<li><a href="ops/ops.md">服务器运维</a></li>
+<li>代码审查
+<ul>
+<li><a href="ops/review_board.md">Review Board</a></li>
+</ul></li>
+<li>配置管理
+<ul>
+<li>Ansible</li>
+</ul></li>
+<li><a href="monitor.md">监控报警</a>
+<ul>
+<li>nagios</li>
+<li>nagios-plugins</li>
+<li>nagios-nrpe</li>
+<li>nagios-ncpa</li>
+</ul></li>
+<li><a href="">icinga2</a>
+<ul>
+<li><a href="">icinga2-web2</a></li>
+<li><a href="ops/icing2-dashing.md">icinga2-dashing</a></li>
+</ul></li>
+<li>性能监控
+<ul>
+<li>collectd</li>
+<li>collect-web</li>
+<li>InfluxDB</li>
+<li>Grafana</li>
+<li>cacti<br />
+</li>
+<li>RRDTools</li>
+</ul></li>
+<li>系统维护工具集
+<ul>
+<li><a href="ops/htop.md">htop</a></li>
+<li><a href="ops/iostat.md">iostat</a></li>
+<li><a href="ops/iftop.md">iftop</a></li>
+<li><a href="ops/procps.md">procps</a></li>
+<li><a href="ops/nload.md">nload</a></li>
+<li><a href="ops/sar.md">sar</a></li>
+<li><a href="ops/mpstat.md">mpstat</a></li>
+<li><a href="ops/lsof.md">lsof</a></li>
+<li><a href="ops/e2fsprogs.md">e2fsprogs</a></li>
+<li><a href="ops/strace.md">strace</a></li>
+<li><a href="ops/ltrace.md">ltrace</a></li>
+<li><a href="ops/dmidecode.md">dmidecode</a></li>
+</ul></li>
+<li><a href="src/solution.md">解决方案</a></li>
+<li>运维方案
+<ul>
+<li><a href="ops/Grafana_collectd_InfluxDB.md">性能监控:Grafana+collectd+InfluxDB</a></li>
+</ul></li>
+<li>日志分析
+<ul>
+<li><a href="src/solution/lognanlyzer.md">Rsyslog+Mysql+loganalyzer</a></li>
+</ul></li>
+</ul>
+</body>
+</html>

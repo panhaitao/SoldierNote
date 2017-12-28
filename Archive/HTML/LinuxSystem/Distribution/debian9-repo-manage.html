@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<h3 id="如何同步上游仓库">如何同步上游仓库</h3>
+<p>创建参考配置，如下所示：</p>
+<ul>
+<li>执行命令 <code>gpg --gen-key</code>创建签名密钥对，导入当前管理仓库所在的机器，具体执行步骤略：</li>
+<li>在repo目录 创建<code>reprepro</code>需要的配置:</li>
+<li><p>conf/distributions</p>
+<pre><code>Origin: orion
+Label: Orion Linux Server Main Repo
+Codename: orion
+Suite: stable
+Architectures: i386 amd64 source
+Components: main non-free contrib
+UDebComponents: main
+Contents: udebs percomponent allcomponents
+Description: Orion Linux Server 
+SignWith: Orion Server kui Automatic Signing Key &lt;packages@orion.pub&gt; 
+Log: orion.log
+Update: upstream-main</code></pre></li>
+<li><p>conf/updates</p>
+<pre><code>Name: upstream-main
+Method: http://mirrors.ustc.edu.cn/debian/ 
+Suite: stretch
+Components: main contrib non-free
+Architectures: i386 amd64 source
+GetInRelease: yes
+FilterSrcList: install filterlist/debian-stretch-src
+VerifyRelease: blindtrust</code></pre></li>
+<li><p>conf/incoming</p>
+<pre><code>Name: default
+IncomingDir: incoming/
+TempDir: temp/
+MorgueDir: morgue/
+LogDir: incoming-logs/
+Allow: orion stretch&gt;orion
+Permit: unused_files older_version
+Cleanup: unused_files on_deny on_error</code></pre></li>
+<li><p>最后执行命令</p>
+<pre><code>reprepro -V update</code></pre>
+<p>这列出最基本的实例，更多配置和更多高级特性请参考<code>man reprepro</code>.</p></li>
+</ul>
+<h3 id="源码与打包">源码与打包</h3>
+<ul>
+<li>修改来自上游仓库的软件包</li>
+</ul>
+<pre><code>apt-get source zip
+apt-get build-dep zip -y
+cd zip-3.0
+...
+dpkg-buildpackage -a</code></pre>
+<ul>
+<li>获取上游源码包制作新的deb包</li>
+</ul>
+<pre><code>wget http://ftp.gnu.org/pub/gnu/ed/ed-1.9.tar.gz
+tar -xvpf ed-1.9.tar.gz
+cd ed-1.9
+dh_make -s -y -e panhaitao@orion.pub -f ../ed-1.9.tar.gz
+apt install autotools-dev -y
+dpkg-buildpackage -a</code></pre>
+<ul>
+<li><p>如何源码目录 debian/source/format 是3.0 (native)格式，那么这个工作就比较简单，连同代码和debian目录文件，全部提交到远端git仓库，每次克隆下来就是一套完整的deb源码包，直接构建就好.</p></li>
+<li><p>如何源码目录 debian/source/format 是3.0 (quilt))格式，可以考虑使用git仅仅托管debian目录</p>
+<pre><code>apt-get source pkg_name                           # 从仓库获取源码
+cd pkg_name/ &amp;&amp; rm -rvf pkg_name/debian           # 删除陈旧的debian目录
+cd pkg_name/ &amp;&amp; git clone git_repo_url debian     # 从仓库获取最新最新的debian 
+编译构建 ...</code></pre></li>
+</ul>
+<p>最后打包好的软件包可以使用<code>dput</code>工具上传到仓库管理主机的<code>/data/UploadQueue</code>目录，下文会谈到这个目录的用途,具体使用参考<code>man dput</code>。</p>
+<h2 id="管理仓库">管理仓库</h2>
+<p><code>reprepro</code> 可以用来方便的管理的deb包导入仓库，推荐的方式是使用reprepro工具操作.changes文件，完整的导入二进制和源码示例如下： <code>reprepro inlude &lt;codename&gt; glibc_2.23_amd64.changes</code></p>
+<p>下面是一个结合inotifywait实现自动管理仓库的脚本，结合dput把构建好的软件包提交到仓库对应主机 /data/UploadQueue目录就能实现自动管理仓库</p>
+<pre><code>#!/bin/bash
+
+inotifywait -me close_write --format &#39;%w%f&#39; /data//UploadQueue 2&gt; /dev/null | while read line
+do
+    if [ &quot;${line##*.}&quot; = &quot;changes&quot; ];then
+        DIST=`cat $line | grep Distribution | awk &#39;{print $2}&#39;` 
+        cd repo_tools_dir &amp;&amp; reprepro.sh include $DIST $line
+    fi
+done</code></pre>
+<p>仓库推送流程: 开发版本仓库 -&gt; 内网正式仓库 -&gt; 外网正式仓库，TIPS：建议每个提交阶段仓库都能创建快照，在遇到问题的时候也好做回滚操作，比如利用LVM，btrfs。</p>
+</body>
+</html>

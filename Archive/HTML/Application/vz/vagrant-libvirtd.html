@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<h2 id="vagrant-libvirt-使用指南">vagrant-libvirt 使用指南</h2>
+<ul>
+<li>homepage: https://releases.hashicorp.com/vagrant/</li>
+<li>system: debian9</li>
+</ul>
+<h2 id="安装基本软件">安装基本软件</h2>
+<pre><code>apt-get install vagrant qemu-kvm libvirt-daemon-system  vagrant-libvirt libvirt-dev</code></pre>
+<h3 id="获取-vm模版文件">获取 VM模版文件</h3>
+<pre><code>git clone http://anonscm.debian.org/cgit/cloud/debian-vm-templates.git</code></pre>
+<p>需要修改默认用户密码，preseed文件，和初始化配置脚本文件，具体改动文件列表如下： * helpers/vagrant-setup * packer-virtualbox-vagrant/http/vanilla-debian-8-jessie-preseed.cfg * packer-virtualbox-vagrant/jessie.json 具体修改可以参考 <a href="https://bj.git.sndu.cn/panhaitao/deepin-vm-templates/commit/e88bbd435f9d263e74519a4b59fb6773bc832f1e">最新提交补丁</a></p>
+<h3 id="获取打包工具">获取打包工具</h3>
+<p>从官方下载<a href="https://releases.hashicorp.com/packer/0.10.1/packer_0.10.1_linux_amd64.zip">packer</a>,解压到系统 <code>/usr/bin/</code> 目录</p>
+<h3 id="构建系统镜像">构建系统镜像</h3>
+<pre><code>cd debian-vm-templates/packer-virtualbox-vagrant/ 
+packer build jessie.json</code></pre>
+<p>成功构建后，会在当前目录生成 deepin-v15.box 镜像文件</p>
+<h3 id="使用系统镜像">使用系统镜像</h3>
+<pre><code>vagrant box add ci-vm-node *.box
+vagrant init ci-vm-node
+vagrant up --provider=libvirt</code></pre>
+<h3 id="vagrantfile-配置实例">Vagrantfile 配置实例</h3>
+<pre><code>Vagrant.configure(&quot;2&quot;) do |config|
+  config.vm.box = &quot;ci-vm-node&quot;
+    config.vm.provider :libvirt do |libvirt|
+      libvirt.driver = &quot;kvm&quot;
+    end
+    config.vm.define :node1 do |node1_config|
+        node1_config.vm.network :public_network, :dev =&gt; &quot;br0&quot;
+    end
+    config.vm.define :node2 do |node2_config|
+        node2_config.vm.network :public_network, :dev =&gt; &quot;br0&quot;
+    end
+end</code></pre>
+<h2 id="参考">参考</h2>
+<ul>
+<li><a href="http://linuxsimba.com/vagrant-libvirt-install" class="uri">http://linuxsimba.com/vagrant-libvirt-install</a></li>
+<li><a href="http://ftp.cvut.cz/debian/pool/main/r/ruby-fog-libvirt/" class="uri">http://ftp.cvut.cz/debian/pool/main/r/ruby-fog-libvirt/</a></li>
+<li><a href="http://www.oschina.net/translate/get-vagrant-up-and-running-in-no-time" class="uri">http://www.oschina.net/translate/get-vagrant-up-and-running-in-no-time</a></li>
+<li><a href="https://www.packer.io/" class="uri">https://www.packer.io/</a></li>
+<li><a href="http://www.rubydoc.info/gems/vagrant-libvirt/0.0.28#Create_Vagrantfile" class="uri">http://www.rubydoc.info/gems/vagrant-libvirt/0.0.28#Create_Vagrantfile</a></li>
+<li><a href="http://www.jianshu.com/p/2d2648451f28" class="uri">http://www.jianshu.com/p/2d2648451f28</a></li>
+<li><a href="http://rmingwang.com/vagrant-commands-and-config.html" class="uri">http://rmingwang.com/vagrant-commands-and-config.html</a></li>
+<li><a href="http://blog.csdn.net/54powerman/article/details/50676320" class="uri">http://blog.csdn.net/54powerman/article/details/50676320</a></li>
+</ul>
+</body>
+</html>

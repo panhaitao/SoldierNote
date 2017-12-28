@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>深度服务器操作系统之路</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header>
+<h1 class="title">深度服务器操作系统之路</h1>
+</header>
+<h2 id="服务器版本回顾">服务器版本回顾</h2>
+<ul>
+<li>2014年，</li>
+<li>2015年，以debian8为基础，选用mate-deskop为默认桌面，完成第一个版本(20151028)</li>
+<li>2016年，在桌面团队发布基于debian sid的版本后，开始整合DDE桌面环境，进行LSB认证，在经历了大半年的努力后，这个服务器版本并不成功，快速迭代的版本发布周期，并不是适合企业用户，桌面团队开发的DDE桌面也不适用于服务器生产环境，最后终于决定服务器版本放弃整合dde桌面， 之后张磊放弃对服务器团队的管理工作，研发和测试和原工程团队合并为技术团队，由木梁直接领导。</li>
+<li>2017年，公司服务器产品产品重新规划，停滞基于 debian8 版本的开发工作，以CentOS 8为基础创建x86企业版本，以debian9为基础创建x86社区版本。</li>
+</ul>
+<h2 id="主流服务器操作系统厂商">主流服务器操作系统厂商</h2>
+<h3 id="产品线对比">产品线对比</h3>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 6%" />
+<col style="width: 14%" />
+<col style="width: 6%" />
+<col style="width: 8%" />
+<col style="width: 64%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">RHEL</th>
+<th style="text-align: left;">SUSE</th>
+<th style="text-align: left;">Ubuntu</th>
+<th style="text-align: left;">Deepin</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">服务器</td>
+<td style="text-align: left;">RHEL 6.x/ 7.x</td>
+<td style="text-align: left;">SUSE 12</td>
+<td style="text-align: left;">Ubuntu Server</td>
+<td style="text-align: left;">x86企业版15.1(debian8)<br> x86企业版15.2(centos6)<br> x86社区版15.0(debian9) <br> mips64el龙芯版15.1(debian9) <br> sw64申威版 15.0(debian8~debian9)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">桌面版本</td>
+<td style="text-align: left;">有</td>
+<td style="text-align: left;">有</td>
+<td style="text-align: left;">有</td>
+<td style="text-align: left;">deepin desktop (debian sid)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">工作站</td>
+<td style="text-align: left;">有</td>
+<td style="text-align: left;">有</td>
+<td style="text-align: left;">无</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">core系统</td>
+<td style="text-align: left;">Fedora(Atomic)</td>
+<td style="text-align: left;">MicroOS</td>
+<td style="text-align: left;">Ubuntu Core</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">配置管控系统</td>
+<td style="text-align: left;">Satellite</td>
+<td style="text-align: left;">SUSE Manager</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+<p>RHEL, SUSE, Ubuntu 三家操作系统厂商除了拥有从桌面或者工作站到服务器核心产品线外，每家都有自己独特的产品和解决方案在CoreOS出现后，三家分别作出了相应动作</p>
+<ul>
+<li>RHEL在自己资助的fedora社区推出了面向运行， 托管Docker容器的Atomic</li>
+<li>SUSE则在自己的CaaS解决方案中整合了同样是面向Docker容器的MicroOS</li>
+<li>Ubuntu略有不同，推出了面向物联网的Ubuntu Core系统和对应snap包格式</li>
+</ul>
+<p>另外RHEL 创建了Satellite , SUSE创建了 SUSE Manager，提供面向管理员的OPS系统版本，通过一个简单的管理端和一套方便管理方法, 来管理物理机，虚拟机，云服务器，完成软件软件，更新，配置分发，服务启停，跟踪监控分析等运维功能。</p>
+<p>Deepin 服务器从最初的上游选型和方向策略都存在问题，走了很多弯路，过快的版本发布周期，整合DDE桌面，创建过多但是没有落地的服务器分支版本:大数据版，云端系统版本，以及各种定制版本等，在目前无法搜集足够的客户需求时，面向政府机关等项目这些离不开IOE，服务系统选型只能最大限度的匹配应用，兼通红帽系，对于服务器版本后续规划中，提出三点建议:</p>
+<ul>
+<li>及时砍掉无力维护的服务器社区版本，除了对工商总局已有客户的支持外，彻底停滞原debian8版本的后续开发工作；</li>
+<li>基于Centos7的系统后续规划， 对于系统本身建议制作最小更改，尽可能保持和上游和IOE等企业级应用的兼容程度；</li>
+</ul>
+<h3 id="解决方案或支持服务对比">解决方案或支持服务对比</h3>
+<table>
+<colgroup>
+<col style="width: 9%" />
+<col style="width: 30%" />
+<col style="width: 38%" />
+<col style="width: 12%" />
+<col style="width: 8%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">RHEL</th>
+<th style="text-align: left;">SUSE</th>
+<th style="text-align: left;">Ubuntu</th>
+<th style="text-align: left;">Deepin</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">IaaS</td>
+<td style="text-align: left;">CloudForms <br> OpenStack</td>
+<td style="text-align: left;">openstack</td>
+<td style="text-align: left;">openstack</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">PaaS</td>
+<td style="text-align: left;">OpenShift</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">CaaS</td>
+<td style="text-align: left;">Kubernetes</td>
+<td style="text-align: left;">Kubernetes<br> MicroOS <br> Salt</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">公共云</td>
+<td style="text-align: left;">Openstack</td>
+<td style="text-align: left;">openstack</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">集群与高可用</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Pacemaker HA</td>
+<td style="text-align: left;">Livepatch</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">SAP 解决方案</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">SAP HANA</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">存储</td>
+<td style="text-align: left;">Gluster <br> Ceph</td>
+<td style="text-align: left;">Ceph</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">中间件</td>
+<td style="text-align: left;">JBoss</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">认证管理</td>
+<td style="text-align: left;">LDAP</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">移动应用</td>
+<td style="text-align: left;">移动应用平台</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">DevOps</td>
+<td style="text-align: left;">Satellite <br> CloudForms <br> ansible <br> Insights</td>
+<td style="text-align: left;">SUSE Manager <br> SUSE Studio</td>
+<td style="text-align: left;">Ubuntu Advantage</td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+<p>基础服务与解决方案</p>
+<ul>
+<li>server : ssh, ntp, ftp(tftp,vsftp), dhcp, bind, unbound,</li>
+<li>server : nginx, apache, lighthttp, exim4, posix, sendmail, LDAP</li>
+<li>HA : LVS, nginx, keepalive, coorsync, pacemaker, drdb, haproxy</li>
+<li>db : MariaDB, MySQL, PostgreSQL, Redis, MongoDB, InfluxDB</li>
+<li>store ：Ceph, GlusterFS, NFS, Samba, LVM, RAID</li>
+<li>中间件 : Tomcat, JBoss, WebSphere、WebLogic, Kafka、RabbitMQ、RocketMQ</li>
+<li>SDN : Openvswitch, NFV, VPN,<br />
+</li>
+<li>虚拟化 : qemu/kvm, xen, vagrant, libvirt, virtualbox, vmware<br />
+</li>
+<li>容器技术：lxc, docker</li>
+<li>IaaS : Openstack, CloudFormS</li>
+<li>PaaS : Deis、Flynn、Tsuru、Dawn, Octohost,loud Foundry,OpenShift</li>
+<li>CaaS : Kubernetes, compose , swarm,</li>
+<li>配置 : puppt,saltstack,ansible,</li>
+</ul>
+<p>这些软件面向的互联网，或者大型企业，设计的初衷是充分利用大规模常规服务器组建高性能，高可靠性，易扩展易维护的解决方案，<br />
+和互联网或大型企业相比，我们的政府客户相对而言是服务器数量少，单机性能好，配置高，可以考虑针对比这些对应场景, 以及解决用户痛点为基础，提供服务和解决方案, 在深度服务器产品的发展历程中我们经历了，企业版选择以debian为上游，后由于实际项目需求不得已转回以红帽系为上游，将原来维护的debian版本转换为社区版本， 并期望未来有一天debian社区版本成熟再转化为企业级产品，政府客户和企业客户不可能去IOE化，没有IOE企业级应用厂商的支持，debian系发行版成长为企业级产品 也就无从谈起，芯片和操作系统是IT产业的基石，被世界上几大公司作掌控，服务器系统本身又是一个非常成熟的产品，在公司目前对服务器投入的全部研发资源及其有限前提下， 我们不可能也做不到以拓展新技术为亮点在市场有所突破，回到现实我提出以下几点建议：</p>
+<ul>
+<li>不针对红帽系上游做无意义的开发工作，把工作重心转移到项目支持和解决方案定制中;</li>
+<li>花时间去熟悉主流 IaaS, PaaS, CaaS 等解决方案，以达到都能独立搭建及其排查问题;<br />
+</li>
+<li>打造一套实用的CaaS解决方案：harbor + docker + openvswitch + compose + swarm + ansible + semaphore;</li>
+<li>开辟新的技术预览工作：提供Docker封装服务的镜像，提供可以跨发行版的snap包格式支持;</li>
+</ul>
+<p>在传统的应用，数据库，服务等基础架构中”应用与数据分离“已经成熟，在容器技术的推进下，”系统与应用分离“这个目标已经越来越逼近， 未来如果坚持以将服务固化到容器中，应用封装的到跨发行版的包格式中，如果能在技术和观念及其落后的政府和传统企业客户中推行， 那么切换基础系统也将变得越来越容易，</p>
+</body>
+</html>

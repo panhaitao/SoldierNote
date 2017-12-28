@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<p>3.6. MySQL数据库 MySQL是一个开源的关系型数据库管理系统，最早由瑞典MySQL AB 公司开发，目前属于 Oracle 旗下产品。 3.6.1. MySQL的安装和基础配置 安装MySQL<code>yum install -y mysql-server</code> 设置MySQL管理员root用户密码<code>/usr/bin/mysqladmin -u root password '密码'</code> 3.6.2. MySQL数据库管理的操作实例 执行命令<code>mysql -u root -p</code>输入刚刚创建的密码，登录MySQL， 创建一个库名为testdatabase的库。 mysql&gt; create database test_db； 列出全部数据库 mysql&gt; show databases； +--------------------+ | Database | +--------------------+ | information_schema | | mysql | | test | | test_db | +--------------------+ 4 rows in set (0.00 sec) 在test_db库中创建users表。 mysql&gt; use test_db； mysql&gt; create table users (<code>id</code> int(11)， <code>name</code> char(255))； 列出test_db库中的全部表 mysql&gt; show tables； +-------------------+ | Tables_in_test_db | +-------------------+ | users | +-------------------+ 1 row in set (0.00 sec) 向表中插入记录 mysql&gt; insert into users values(001，'zhang')； mysql&gt; insert into users values(002，'wang')； mysql&gt; insert into users values(003，'zhao')； mysql&gt; insert into users values(004，'li')； 查询 users 表中的数据记录如下 mysql&gt; select * from users； +------+-------+ | id | name | +------+-------+ | 1 | zhang | | 2 | wang | | 3 | zhao | | 4 | li | +------+-------+ 4 rows in set (0.00 sec) 执行exit命令，即可退出MySQL。 3.6.3. MySQL数据库的备份和还原 备份全部数据库： mysqldump -uroot -p -A &gt; backup.sql 从备份文件还原： mysql -u root -p &lt; backup.sql 其他更多参考 man mysql 。</p>
+</body>
+</html>

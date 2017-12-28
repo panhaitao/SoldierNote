@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>基于Rsyslog和LogAnalyzer的日志管理方案</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header>
+<h1 class="title">基于Rsyslog和LogAnalyzer的日志管理方案</h1>
+</header>
+<h1 id="基于rsyslog和loganalyzer的日志管理方案">基于Rsyslog和LogAnalyzer的日志管理方案</h1>
+<h2 id="概述">概述</h2>
+<p>在数据为王的时代，日志管理是一个绕不开的话题，相应的开源软件有不少，比如热门的三件套：Logstash、ElasticSearch、Kibana，虽然功能强大，但是配置复杂，是为大数据运维场景而生。相比较而言，rsyslog更容易快速上手,可以将收集日志存在mysql中，同时又有Web前端Loganalyzer开源软件的支持，方便搜索，分析、审计,用户可以基于日志数据快速定位解决问题，可以满足服务器量级从数十到百规模的运维场景。</p>
+<h2 id="工作模式">工作模式</h2>
+<p>rsyslog+mysql＋loganalyzer组合型日志服务器，要求客户端生成的日志，由rsyslog服务器收集，写入mysql数据库，最后由loganalyzer工具在前端界面展示出来,日志数据流简单总结如下:</p>
+<pre><code>log =&gt; logserver =&gt; mysql =&gt; lognanlyzer</code></pre>
+<h2 id="环境搭建">环境搭建</h2>
+<p>LogAnalyzer 获取客户端日志会有两种保存模式，一种是直接读取客户端/var/log/目录下的日志并保存到服务端该目录下，一种是读取后保存到日志服务器数据库中，推荐使用后者。LogAnalyzer 采用php开发，所以日志服务器需要php的运行环境，本文采用LNMP(Linux Nginx Mariadb PHP),部署在Debian9系统上</p>
+<ul>
+<li>客户端软件:</li>
+<li>rsyslog</li>
+<li>服务端软件:</li>
+<li>nginx</li>
+<li>mariadb-server-10.1</li>
+<li>php7.0</li>
+<li>php7.0-gd</li>
+<li>php7.0-fpm</li>
+<li>php7.0-mysql</li>
+<li>rsyslog</li>
+<li>rsyslog-mysql</li>
+</ul>
+<h3 id="客户端配置">客户端配置</h3>
+<p>客户端，也就是实际需要收集日志的业务主机，这里配置很简单，只需要在所有业务主机Rsyslog配置文件<code>/etc/rsyslog.conf</code>，加入一行,重启服务即可，参考配置如下：</p>
+<pre><code>*.*         @logserver_ip   </code></pre>
+<p>其中: <code>*.*</code> 表示收集所有默认系统日志 ; <code>logserver_ip</code>　替换为实际logserver服务器的IP</p>
+<h3 id="服务端配置">服务端配置</h3>
+<p>本实例中 logserver,mariadb,loganalyzer 都部署在同一个系统中,安装相关包:</p>
+<pre><code>apt install nginx mariadb-server-10.1 php7.0 php7.0-gd php7.0-fpm php7.0-mysql rsyslog-mysql -y</code></pre>
+<h4 id="rsyslog-服务端配置">Rsyslog 服务端配置</h4>
+<ol type="1">
+<li><p>配置rsyslog使用imudp模块,新增配置文件<code>/etc/rsyslog.d/server.conf</code>，添加如下参考配置：</p>
+<pre><code>$ModLoad imudp                                 #加载模块
+$UDPServerRun 514                              #监听UDP端口，接受来自其他服务器的记录日志请求</code></pre></li>
+<li><p>配置rsyslog使用ommysql模块,新增配置文件 <code>/etc/rsyslog.d/mysql.conf</code>,添加如下参考配置：</p>
+<pre><code>$ModLoad ommysql                               #加载模块
+*.* :ommysql:127.0.0.1,syslog,lognan,password  #和数据库相关的配置</code></pre></li>
+</ol>
+<p>配置中　`<em>.</em>:ommysql｀表示所有默认系统日志都写入数据库。之后分别是,数据库服的IP地址，数据库名称，登录数据库的用户名，登录数据库的密码,后续数据库的配置用到这里的配置。</p>
+<ol start="3" type="1">
+<li>执行命令<code>systemctl restart rsyslog.service</code>,重启rsyslog服务，可以通过<code>tail -f /var/log/syslog</code>观察是否能看到来其他主机的日志，来验证imudp模块配置是否生效，在配置完数据库后来可以进行ommysql模块配置验证，在后文配置数据库中会提到。这里是基于Rsyslog 的imudp模块和ommysql模块完成logserver配置,其他还有<code>imtcp,imrelp</code>等模块，读者可以根据具体需求变更配置，详细可参考官方文档<a href="http://www.rsyslog.com/doc/" class="uri">http://www.rsyslog.com/doc/</a>。</li>
+</ol>
+<h4 id="数据库配置">数据库配置</h4>
+<p>登录 MariaDB 服务器，创建初始的库表的连接用户,这里的数据名，用户，密码需要和<code>/etc/rsyslog.d/mysql.conf</code>配置中定义的一致，</p>
+<pre><code>root@logserver:~# mysql -u root -p
+Enter password: 
+...
+MariaDB [(none)]&gt; 
+
+MariaDB [(none)]&gt;create database if not exists syslog;
+MariaDB [(none)]&gt;grant select,insert,update on syslog.* to lognan@&#39;127.0.0.%&#39; identified by &#39;password&#39;;
+MariaDB [(none)]&gt;use syslog;
+MariaDB [(none)]&gt;\. /usr/share/dbconfig-common/data/rsyslog-mysql/install/mysql
+</code></pre>
+<p>会建立起两张表：SystemEvents、SystemEventsProperties，日志也记录在第一张表里。现在可以完整rsyslog服务ommysql模块的验证，登录 MariaDB 服务器,看表里已有的日志: <code>MariaDB [(none)]&gt; SELECT * from SystemEvents\G</code>，如果有数据，说明以上配置生效。</p>
+<h4 id="部署loganalyzer">部署LogAnalyzer</h4>
+<ol type="1">
+<li>配置 php7.0-fpm 编辑配置文件｀/etc/php/7.0/fpm/pool.d/www.conf`,参考配置如下：</li>
+</ol>
+<pre><code>[www]
+user = www-data
+group = www-data
+listen = 127.0.0.1:9000
+
+listen.owner = www-data
+listen.group = www-data
+
+pm = dynamic
+pm.max_children = 5
+pm.start_servers = 2
+pm.min_spare_servers = 1
+pm.max_spare_servers = 3</code></pre>
+<ol start="2" type="1">
+<li>配置 nginx 编辑配置文件<code>/etc/nginx/sites-available/default</code>, 参考配置如下：</li>
+</ol>
+<pre><code>server {
+        listen 80 default_server;
+        listen [::]:80 default_server;
+
+        root /var/www/html;
+        index index.php index.html index.htm index.nginx-debian.html;
+        server_name _;
+
+        location / {
+                try_files $uri $uri/ =404;
+        }
+
+        location ~ \.php$ {
+                fastcgi_pass 127.0.0.1:9000;
+                fastcgi_index index.php;
+                fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+                include fastcgi_params;
+        }
+}</code></pre>
+<ol start="3" type="1">
+<li>启动服务</li>
+</ol>
+<pre><code>root@logserver:~# systemctl restart php7.0-fpm.service
+root@logserver:~# systemctl restart nginx.service</code></pre>
+<p>检查服务项启动,确认<code>80,3306,9000</code>端口已启用。</p>
+<pre><code>root@logserver:~# ss -tnl
+State      Recv-Q Send-Q                         Local Address:Port                                        Peer Address:Port
+LISTEN     0      128                                127.0.0.1:9000                                                   *:*
+LISTEN     0      80                                 127.0.0.1:3306                                                   *:*
+LISTEN     0      128                                        *:80                                                     *:*
+LISTEN     0      128                                        *:22                                                     *:*
+LISTEN     0      128                                       :::80                                                    :::*
+LISTEN     0      128                                       :::22                                                    :::* </code></pre>
+<p>４. 安装loganalyzer，获取源码包，解压到服务器根目录</p>
+<pre><code>wget http://download.adiscon.com/loganalyzer/loganalyzer-4.1.5.tar.gz
+tar -xf loganalyzer-3.6.5.tar.gz
+cp -a loganalyzer-3.6.5/src  /var/www/html/log/
+touch /var/www/html/log/config.php
+chmod 666 /var/www/html/log/config.php</code></pre>
+<p>打开浏览器访问,&quot;http://server-ip/log/install.php&quot;，在安装向导中完成LogAnalyzer的配置:</p>
+<ol type="1">
+<li><p>步骤一，开始安装 <img src="/images/loganalyzer-installer-step1.png" alt="step1" /></p></li>
+<li><p>步骤二,检查配置文件是否可写 <img src="/images/loganalyzer-installer-step2.png" alt="step2" /></p></li>
+<li><p>步骤三,完整基本配置，默认即可 <img src="/images/loganalyzer-installer-step3.png" alt="step3" /></p></li>
+<li><p>步骤四,配置数据库，如图所示 <img src="/images/loganalyzer-installer-step7.png" alt="step4" /></p></li>
+<li><p>步骤五,完成Loganalyzer的安装 <img src="/images/loganalyzer-installer-step8.png" alt="step5" /></p></li>
+<li><p>安装完成后，打开浏览器访问，&quot;http://server-ip/log/&quot; ,Loganalyzer 的运行状态示例如下: <img src="/images/loganalyzer-running-status.png" alt="running" /></p></li>
+</ol>
+<p>后续调整LogAnalyzer配置可修改<code>/var/www/html/log/config.php</code>文件。</p>
+</body>
+</html>

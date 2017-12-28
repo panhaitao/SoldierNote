@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<h1 id="tomcat">Tomcat</h1>
+<p>Tomcat是一个免费的开放源代码的Web应用服务器，目前属于Apache软件基金会的Jakarta项目中的一个核心项目。</p>
+<h2 id="实例安装部署最新tomcat-9">实例，安装部署最新tomcat-9</h2>
+<pre><code>yum install java-1.8.0-openjdk.x86_64 -y
+wget http://www.apache.org/dist/tomcat/tomcat-9/v9.0.0.M22/bin/apache-tomcat-9.0.0.M22.tar.gz
+tar -xvpf apache-tomcat-9.0.0.M22.tar.gz -C /opt/
+echo &quot;export CATALINA_HOME=&quot;/opt/apache-tomcat-9.0.0.M22&quot; &gt;&gt; ~/.bashrc
+echo &quot;export JRE_HOME=/usr/lib/jvm/jre-1.8.0-openjdk.x86_64/&quot; &gt;&gt; ~/.bashrc
+source ~/.bashrc
+/opt/apache-tomcat-9.0.0.M22/bin/startup.sh</code></pre>
+<h2 id="验证服务运行状态">验证服务运行状态</h2>
+<ul>
+<li>打开浏览器访问：<code>http://ip:8080</code> 能出现apache tomcat配置页面，说明配置成功</li>
+<li>相关配置在<code>/opt/apache-tomcat-9.0.0.M22/conf目录下</code></li>
+</ul>
+</body>
+</html>
