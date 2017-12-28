@@ -39,7 +39,6 @@ do
         LinuxSystem) title="系统"     ;;
         Solution)    title="解决方案" ;;
         Viewpoint)   title="视角"     ;;
-        *)           break;;
     esac
     echo "<h2> $title </h2> <hr />" >> index.html
 
