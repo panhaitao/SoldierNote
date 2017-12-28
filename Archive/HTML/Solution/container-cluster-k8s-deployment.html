@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<h2 id="k8s">k8s</h2>
+<ul>
+<li>master 端的公共配置 /etc/kubernetes/config</li>
+</ul>
+<!-- -->
+<pre><code>/etc/kubernetes/config 
+KUBE_MASTER=&quot;--master=https://10.1.10.232:6443&quot;
+KUBE_CONFIG=&quot;--kubeconfig=/etc/kubernetes/kubeconfig&quot;
+KUBE_COMMON_ARGS=&quot;--logtostderr=true --v=1&quot; 
+
+#KUBE_COMMON_ARGS=&quot;--logtostderr=true --v=1 --allow-privileged=false&quot;</code></pre>
+<p>/etc/kubernetes/config 配置记录的所有组件的公共配置</p>
+<ul>
+<li>kube-apiserver.service</li>
+<li>kube-controller-manager.service</li>
+<li>kube-scheduler.service</li>
+<li>kubelet.service</li>
+<li>kube-proxy.service</li>
+</ul>
+<h2 id="k8s-api-server">k8s-api-server</h2>
+<ul>
+<li>/lib/systemd/system/kube-apiserver.service</li>
+</ul>
+<!-- -->
+<pre><code>[Unit]
+Description=Kubernetes API Server
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+After=network.target
+After=etcd.service
+
+[Service]
+PermissionsStartOnly=true
+ExecStartPre=-/usr/bin/mkdir -pv /var/run/kubernetes
+#ExecStartPre=/usr/bin/chown -R kube:kube /var/run/kubernetes/
+EnvironmentFile=-/etc/kubernetes/config
+EnvironmentFile=-/etc/kubernetes/apiserver
+#User=kube
+ExecStart=/usr/bin/kube-apiserver   \
+            $KUBE_ETCD_SERVERS      \
+            $KUBE_ADMISSION_CONTROL \
+        $KUBE_COMMON_ARGS       \
+        $KUBE_API_ARGS
+Restart=on-failure
+Type=notify
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target</code></pre>
+<ul>
+<li>/etc/kubernetes/apiserver</li>
+</ul>
+<!-- -->
+<pre><code>KUBE_ETCD_SERVERS=&quot;--storage-backend=etcd3 --etcd-servers=http://10.1.10.232:2379&quot;
+
+#KUBE_ADMISSION_CONTROL=&quot;--admission-control=NamespaceLifecycle,NamespaceExists,LimitRanger,SecurityContextDeny,ServiceAccount,ResourceQuota&quot;
+KUBE_ADMISSION_CONTROL=&quot;--admission-control=NamespaceLifecycle,NamespaceExists,LimitRanger,SecurityContextDeny,ResourceQuota&quot;
+
+KUBE_API_ARGS=&quot;--service-node-port-range=1-65535 --service-cluster-ip-range=10.254.0.0/16 --bind-address=0.0.0.0 --insecure-port=0 --secure-port=6443 --client-ca-file=/etc/kubernetes/ca/ca.crt --tls-cert-file=/etc/kubernetes/ca/server.crt --tls-private-key-file=/etc/kubernetes/ca/server.key&quot;</code></pre>
+<ul>
+<li>这里监听SSL/TLS的端口是6443；若指定小于1024的端口，有可能会导致启动apiServer启动失败</li>
+<li>在master机器上，默认开8080端口提供未加密的HTTP服务,可以通过--insecure-port=0 参数来关闭</li>
+</ul>
+<h2 id="k8s-client">k8s-client</h2>
+<h3 id="kube-controller-manager">kube-controller-manager</h3>
+<ul>
+<li>/lib/systemd/system/kube-controller-manager.service</li>
+</ul>
+<!-- -->
+<pre><code>[Unit]
+Description=Kubernetes Controller Manager
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+
+[Service]
+EnvironmentFile=-/etc/kubernetes/config
+EnvironmentFile=-/etc/kubernetes/controller-manager
+#User=kube
+ExecStart=/usr/bin/kube-controller-manager \
+        $KUBE_MASTER                   \
+        $KUBE_COMMON_ARGS              \
+        $KUBE_CONTROLLER_MANAGER_ARGS
+Restart=on-failure
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target</code></pre>
+<ul>
+<li>/etc/kubernetes/controller-manager</li>
+</ul>
+<!-- -->
+<pre><code>KUBE_CONTROLLER_MANAGER_ARGS=&quot;--cluster-signing-cert-file=/etc/kubernetes/ca/server.crt --cluster-signing-key-file=/etc/kubernetes/ca/server.key --root-ca-file=/etc/kubernetes/ca/ca.crt --kubeconfig=/etc/kubernetes/kubeconfig&quot;</code></pre>
+<h3 id="kube-scheduler">kube-scheduler</h3>
+<ul>
+<li>/lib/systemd/system/kube-scheduler.service</li>
+</ul>
+<!-- -->
+<pre><code>[Unit]
+Description=Kubernetes Scheduler Plugin
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+
+[Service]
+EnvironmentFile=-/etc/kubernetes/config
+EnvironmentFile=-/etc/kubernetes/scheduler
+#User=kube
+ExecStart=/usr/bin/kube-scheduler   \
+        $KUBE_MASTER            \
+        $KUBE_COMMON_ARGS       \
+        $KUBE_SCHEDULER_ARGS
+Restart=on-failure
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target</code></pre>
+<ul>
+<li>/etc/kubernetes/scheduler</li>
+</ul>
+<!-- -->
+<pre><code>KUBE_SCHEDULER_ARGS=&quot;--kubeconfig=/etc/kubernetes/kubeconfig&quot;</code></pre>
+<h2 id="k8s-nodes">k8s-nodes</h2>
+<ul>
+<li>docker OPTIONS for kubelet</li>
+</ul>
+<!-- -->
+<pre><code>OPTIONS=&#39;--selinux-enabled --log-driver=journald --signature-verification=false --exec-opt native.cgroupdriver=systemd -H unix:///var/run/docker.sock --insecure-registry=registry.deepin.com&#39;</code></pre>
+<h3 id="kubelet.service">kubelet.service</h3>
+<ul>
+<li>/lib/systemd/system/kubelet.service</li>
+</ul>
+<!-- -->
+<pre><code>[Unit]
+Description=Kubernetes Kubelet Server
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+After=docker.service
+Requires=docker.service
+
+[Service]
+WorkingDirectory=/var/lib/kubelet
+EnvironmentFile=-/etc/kubernetes/config
+EnvironmentFile=-/etc/kubernetes/kubelet
+ExecStart=/usr/bin/kubelet \
+        $KUBELET_ADDRESS \
+        $KUBELET_HOSTNAME \
+        $KUBELET_POD_INFRA_CONTAINER \
+        $KUBE_COMMON_ARGS            \
+        $KUBELET_ARGS
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.targe</code></pre>
+<ul>
+<li>/etc/kubernetes/kubelet</li>
+</ul>
+<!-- -->
+<pre><code>KUBELET_ADDRESS=&quot;--address=0.0.0.0&quot;
+KUBELET_HOSTNAME=&quot;--hostname-override=k8s-node1&quot;
+KUBELET_POD_INFRA_CONTAINER=&quot;--pod-infra-container-image=registry.deepin.com/library/pod-infrastructure&quot;
+KUBELET_ARGS=&quot;--kubeconfig=/etc/kubernetes/kubeconfig --cgroup-driver=systemd --fail-swap-on=false --runtime-cgroups=/systemd/system.slice --kubelet-cgroups=/systemd/system.slice&quot;</code></pre>
+<h3 id="kube-proxy">kube-proxy</h3>
+<ul>
+<li>/lib/systemd/system/kube-proxy.service</li>
+</ul>
+<!-- -->
+<pre><code>[Unit]
+Description=Kubernetes Kube-Proxy Server
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+After=network.target
+
+[Service]
+EnvironmentFile=-/etc/kubernetes/config
+EnvironmentFile=-/etc/kubernetes/proxy
+ExecStart=/usr/bin/kube-proxy \
+        $KUBE_LOGTOSTDERR \
+        $KUBE_LOG_LEVEL \
+        $KUBE_MASTER \
+        $KUBE_COMMON_ARGS       \
+        $KUBE_PROXY_ARGS
+Restart=on-failure
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target</code></pre>
+<ul>
+<li>/etc/kubernetes/proxy</li>
+</ul>
+<!-- -->
+<pre><code>KUBE_PROXY_ARG=&quot;--kubeconfig=/etc/kubernetes/kubeconfig&quot;</code></pre>
+<h2 id="kubectl">kubectl</h2>
+<p>查看pod</p>
+<pre><code>kubectl --kubeconfig=/etc/kubernetes/kubeconfig get nodes
+kubectl --kubeconfig=/etc/kubernetes/kubeconfig get deployments --all-namespaces
+kubectl --kubeconfig=/etc/kubernetes/kubeconfig get ReplicationController  --all-namespaces
+kubectl --kubeconfig=/etc/kubernetes/kubeconfig get DaemonSets  --all-namespaces
+kubectl --kubeconfig=/etc/kubernetes/kubeconfig get ReplicaSets --all-namespaces
+kubectl --kubeconfig=/etc/kubernetes/kubeconfig get pods --all-namespaces</code></pre>
+<p>查看endpoint</p>
+<pre><code>kubectl get services  --all-namespaces
+kubectl get endpoints  --all-namespaces</code></pre>
+<h2 id="参考">参考</h2>
+<ul>
+<li>kubeconfig yaml格式参考： <a href="https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/" class="uri">https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/</a></li>
+</ul>
+<h2 id="记录">记录</h2>
+<h3 id="问题一">问题一</h3>
+<pre><code>tail -f /var/log/message
+Nov 14 07:12:51 image kubelet: E1114 07:12:51.627782    3007 summary.go:92] Failed to get system container stats for &quot;/system.slice/kubelet.service&quot;: failed to get cgroup 
+stats for &quot;/system.slice/kubelet.service&quot;: failed to get container info for &quot;/system.slice/kubelet.service&quot;: unknown container &quot;/system.slice/kubelet.service&quot;
+Nov 14 07:12:51 image kubelet: E1114 07:12:51.627824    3007 summary.go:92] Failed to get system container stats for &quot;/system.slice/docker.service&quot;: failed to get cgroup s
+tats for &quot;/system.slice/docker.service&quot;: failed to get container info for &quot;/system.slice/docker.service&quot;: unknown container &quot;/system.slice/docker.service&quot;
+
+* 处理办法：
+
+Append configuration in Kubelet
+--runtime-cgroups=/systemd/system.slice --kubelet-cgroups=/systemd/system.slice</code></pre>
+</body>
+</html>

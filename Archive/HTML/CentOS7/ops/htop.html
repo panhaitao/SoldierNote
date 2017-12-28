@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<p>htop概述 htop 是Linux系统中的一个互动的进程查看器，一个文本模式的应用程序(在控制台或者X终端中)，需要ncurses。</p>
+<p>与Linux传统的top相比，htop更加人性化。它可让用户交互式操作，支持颜色主题，可横向或纵向滚动浏览进程列表，并支持鼠标操作。</p>
+<p>与top相比，htop有以下优点：</p>
+<p>Ø 可以横向或纵向滚动浏览进程列表，以便看到所有的进程和完整的命令行。 Ø 在启动上，比top 更快。 Ø 杀进程时不需要输入进程号。 Ø htop 支持鼠标操作。 Ø top 已经很老了</p>
+<p>htop安装 深度服务器操作系统默认已经集成了htop工具。</p>
+<p>htop用法 htop语法 htop [-dChusv]</p>
+<p>htop常用的命令行选项及其含义如表5.6所示。</p>
+<p>表5.6 htop常用的命令行选项及其含义 短参数 长参数 含义 -d --delay 设置延迟更新时间，单位秒 -C --no-color 使用一个单色的配色方案 -h -help 显示htop命令的帮助信息 -p --pid 仅显示所给的pid进程信息 -s --sort-key 依此列来排序 -u --user 只显示一个给定的用户的进程 -v --version 显示版本信息</p>
+<p>htop命令的其他更多选项参数及其含义，用户可以直接运行man htop即可查看。</p>
+<p>F1~F10 的功能和对应的字母快捷键见表5.7</p>
+<p>表5.7 F1~F10 的功能和对应的字母快捷键 功能键 快捷键 功能键说明 F1 h, ? 查看htop使用说明 F2 S htop 设定 F3 / 搜索进程 F4<br />
+增量进程过滤器 F5 t 显示树形结构 F6 &lt;, &gt; 选择排序方式 F7 [ 可减少nice值，这样就可以提高对应进 程的优先级 F8] 可增加nice值，这样就可以降低对应进 程的优先级 F9 k 可对进程传递信号 F10 q 结束htop</p>
+<p>交互式命令（INTERACTIVE COMMANDS） 上下键或PgUP, PgDn 选定想要的进程，左右键或Home, End 移动字段，当然也可 以直接用鼠标选定进程； Space 标记/取消标记一个进程。命令可以作用于多个进程，例如 &quot;kill&quot;，将应 用于所有已标记的进程 U 取消标记所有进程 s 选择某一进程，按s:用strace追踪进程的系统调用 l 显示进程打开的文件: 如果安装了lsof，按此键可以显示进程所打开的文件 I 倒转排序顺序，如果排序是正序的，则反转成倒序的，反之亦然 +, - When in tree view mode, expand or collapse subtree. When a subtree is collapsed a &quot;+&quot; sign shows to the left of the process name. a (在有多处理器的机器上) 设置 CPU affinity: 标记一个进程允许使用哪些 CPU u 显示特定用户进程 M 按Memory 使用排序 P 按CPU 使用排序 T 按Time+ 使用排序 F 跟踪进程: 如果排序顺序引起选定的进程在列表上到处移动，让选定条跟随该进 程。这对监视一个进程非常有用：通过这种方式，你可以让一个进程在屏幕上一直可见。 使用方向键会停止该功能。 K 显示/隐藏内核线程 H 显示/隐藏用户线程 Ctrl-L 刷新</p>
+<p>htop应用 1. root登录深度服务器操作系统，执行命令htop，打开Htop进程查看器，显示进程的实时状态。 2. 按下F1键，转到Htop的使用说明页面。 3. 按下F2键，转到Htop设定页面。 4. 按下F3键，然后在窗口底部的文本框中输入搜索关键字例如mate，如果找到，含有mate关键字的进程将会在进程列表中被高亮选中。 5. 按下F4键，然后在窗口底部的文本框中输入关键字例如mate，含有mate关键字的进程将被过滤出来。 6. 按下F5键切换树形视图模式，切换到树形视图模式，进程列表里的进程以树形视图的形式显示。 7. 按下F6键选择排序方式，在窗口左侧会出现一列排序方式用来选择用什么方式排序，选中“PERCENT_CPU”，按下Enter键，进程列表中的进程以PERCENT_CPU的方式进行排序。 8. 在进程列表中选中一进程（该进程NI值是0），然后按两下注：我们用sadc 收集系统动态数据，让它收集1秒之内的10次动态信息； 然后通过sar 工具来查看系统的状态。也可以用 sadf 来查看所收集的数据。 9. F7键，该进程的NI值减2，变为-2。 10. 再按三下F8键，该进程的NI值加3，变为1。 11. 选中一个进程，按下F9键，然后按下Enter键“Send”，该进程被杀掉，进程列表中不再有该进程。 12. 按下F10键，退出Htop，Htop窗口关闭。</p>
+</body>
+</html>

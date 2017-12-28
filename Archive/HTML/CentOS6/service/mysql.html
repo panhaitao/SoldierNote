@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<h1 id="mysql概述">MySQL概述</h1>
+<p>MySQL是一个开源的关系型数据库管理系统，最早由瑞典MySQL AB 公司开发，目前属于 Oracle 旗下产品</p>
+<h2 id="mysql的安装和基础配置">MySQL的安装和基础配置</h2>
+<ul>
+<li>安装MySQL<code>yum install -y mysql-server</code></li>
+<li>设置MySQL管理员root用户密码<code>/usr/bin/mysqladmin -u root password '密码'</code></li>
+</ul>
+<h2 id="mysql数据库管理的操作实例">MySQL数据库管理的操作实例</h2>
+<ul>
+<li><p>执行命令<code>mysql -u root -p</code>输入刚刚创建的密码，登录MySQL，</p></li>
+<li><p>创建一个库名为testdatabase的库。</p>
+<pre><code>mysql&gt; create database test_db;</code></pre></li>
+<li><p>列出全部数据库 ``` mysql&gt; show databases; +--------------------+ | Database | +--------------------+ | information_schema | | mysql | | test | | test_db | +--------------------+ 4 rows in set (0.00 sec)</p></li>
+</ul>
+<pre><code>
+* 在test_db库中创建users表。</code></pre>
+<p>mysql&gt; use test_db; mysql&gt; create table users (<code>id</code> int(11), <code>name</code> char(255));</p>
+<pre><code>
+* 列出test_db库中的全部表</code></pre>
+<p>mysql&gt; show tables； +-------------------+ | Tables_in_test_db | +-------------------+ | users | +-------------------+ 1 row in set (0.00 sec)</p>
+<pre><code>* 向表中插入记录。</code></pre>
+<p>mysql&gt; insert into users values(001,'zhang'); mysql&gt; insert into users values(002,'wang'); mysql&gt; insert into users values(003,'zhao'); mysql&gt; insert into users values(004,'li');</p>
+<pre><code>* 查询`users`表中的数据记录如下。</code></pre>
+<p>mysql&gt; select * from users; +------+-------+ | id | name | +------+-------+ | 1 | zhang | | 2 | wang | | 3 | zhao | | 4 | li | +------+-------+ 4 rows in set (0.00 sec) ``` * 执行exit命令，即可退出MySQL。</p>
+<h2 id="mysql数据库的备份和还原">MySQL数据库的备份和还原</h2>
+<ul>
+<li>备份全部数据库：<code>mysqldump -uroot -p -A &gt; backup.sql</code></li>
+<li>从备份文件还原：<code>mysql -u root -p &lt; backup.sql</code></li>
+</ul>
+<p>其他更多参考<code>man mysql</code></p>
+</body>
+</html>

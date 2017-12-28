@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>设置本地化与时区</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header>
+<h1 class="title">设置本地化与时区</h1>
+</header>
+<h2 id="设置本地化与时区">设置本地化与时区</h2>
+<h3 id="本地化设置locale">本地化设置(locale)</h3>
+<p>本地化设置（locale），也称作“本地化策略集”、“本地环境”，是表达程序用户地区方面的软件设定。不同系统、平台、与软件有不同的区域设置处理方式和不同的设置范围，但是一般区域设置最少也会包括语言和地区。操作系统的区域设置通常比较复杂。区域设置的内容包括：数据格式、货币金额格式、小数点符号、千分位符号、度量衡单位、通货符号、日期写法、日历类型、文字排序、姓名格式、地址等等。</p>
+<p>在深度服务器操作系统V15版本中，可以通过执行<code>locale</code>命令来查看相关环境变量：</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">[<span class="kw">root@deepin-server</span> ~]# locale
+<span class="ot">LANG=</span>zh_CN.UTF-8
+<span class="ot">LC_CTYPE=</span><span class="st">&quot;zh_CN.UTF-8&quot;</span>
+<span class="ot">LC_NUMERIC=</span><span class="st">&quot;zh_CN.UTF-8&quot;</span>
+<span class="ot">LC_TIME=</span><span class="st">&quot;zh_CN.UTF-8&quot;</span>
+<span class="ot">LC_COLLATE=</span><span class="st">&quot;zh_CN.UTF-8&quot;</span>
+<span class="ot">LC_MONETARY=</span><span class="st">&quot;zh_CN.UTF-8&quot;</span>
+<span class="ot">LC_MESSAGES=</span><span class="st">&quot;zh_CN.UTF-8&quot;</span>
+<span class="ot">LC_PAPER=</span><span class="st">&quot;zh_CN.UTF-8&quot;</span>
+<span class="ot">LC_NAME=</span><span class="st">&quot;zh_CN.UTF-8&quot;</span>
+<span class="ot">LC_ADDRESS=</span><span class="st">&quot;zh_CN.UTF-8&quot;</span>
+<span class="ot">LC_TELEPHONE=</span><span class="st">&quot;zh_CN.UTF-8&quot;</span>
+<span class="ot">LC_MEASUREMENT=</span><span class="st">&quot;zh_CN.UTF-8&quot;</span>
+<span class="ot">LC_IDENTIFICATION=</span><span class="st">&quot;zh_CN.UTF-8&quot;</span>
+<span class="ot">LC_ALL=</span></code></pre></div>
+<p>以上各项配置项含义如下：</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">配置项</th>
+<th style="text-align: left;">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">LANG</td>
+<td style="text-align: left;">提供系统区域设置的默认值,<code>LC_*</code>的默认值，是最低级别的设置，如果<code>LC_*</code>没有设置，则使用该值</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">LC_CTYPE</td>
+<td style="text-align: left;">用于字符分类和字符串处理，控制所有字符的处理方式，包括字符编码，字符是单字节还是多字节，如何打印等</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">LC_NUMERIC</td>
+<td style="text-align: left;">指定使用某区域的非货币的数字格式</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">LC_TIME</td>
+<td style="text-align: left;">指定使用某区域的日期和时间格式</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">LC_COLLATE</td>
+<td style="text-align: left;">定义更改比较本地字母表中的字符串的函数的行为该环境的排序和比较则</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">LC_MONETARY</td>
+<td style="text-align: left;">指定使用某区域的货币格式</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">LC_MESSAGES</td>
+<td style="text-align: left;">确定用于写入标准错误输出的诊断消息的区域设置</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">LC_PAPER</td>
+<td style="text-align: left;">指定使用某区域的纸张大小</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">LC_NAME</td>
+<td style="text-align: left;">指定使用某区域的姓名书写方式</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">LC_ADDRESS</td>
+<td style="text-align: left;">指定使用某区域的地址格式和位置信息</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">LC_TELEPHONE</td>
+<td style="text-align: left;">指定使用某区域的电话号码格式</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">LC_MEASUREMENT</td>
+<td style="text-align: left;">指定使用某区域的度量衡规则</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">LC_IDENTIFICATION</td>
+<td style="text-align: left;">对 locale 自身信息的概述</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">LC_ALL</td>
+<td style="text-align: left;">这不是一个环境变量，是一个可被C语言库函数setlocale设置的宏，其值可覆盖所有其他的locale设定。因此缺省时此值为空</td>
+</tr>
+</tbody>
+</table>
+<h3 id="列出可用的语言环境">列出可用的语言环境</h3>
+<p>要列出系统可用的所有区域设置，执行命令<code>locale -a</code>，将会输出如下示例内容</p>
+<pre><code>...
+yi_US
+yi_US.cp1255
+yi_US.utf8
+yo_NG
+yo_NG.utf8
+zh_CN
+zh_CN.gb18030
+zh_CN.gb2312
+zh_CN.gbk
+zh_CN.utf8
+zh_HK
+zh_HK.big5hkscs
+zh_HK.utf8
+...</code></pre>
+<p><strong>(由于输出篇幅过长，只截取部分)</strong></p>
+<h3 id="修改语言环境配置">修改语言环境配置</h3>
+<ul>
+<li>系统默认语言环境用户可以根据需要自行</li>
+</ul>
+<p>在<code>/etc/sysconfig/i18n</code>文件中，该文件是在init守护程序启动时读取，并调用locale命令来完成初始化设置。可以配置系统默认语言环境,此配置由每个服务或用户继承，除非个别程序或个别用户的自定义覆盖系统的默认配置, 如果安装过程选择的中文语言环境，<code>/etc/sysconfig/i18n</code>文件的内容将如下所示：</p>
+<pre><code>LANG=&quot;zh_CN.UTF-8&quot;</code></pre>
+<ul>
+<li>用户自定义配置</li>
+</ul>
+<p>用户可以根据需要自定义环境变量覆盖系统的默认配置, 例如执行命令将语言环境修改为英文，<code>export LANG=en_US.UTF-8</code> ，临时修改的配置，只针对当前会话生效，如果需要持久存储配置，可以修改<code>~/.bashrc</code>用户家目录的相关配置文件</p>
+<h3 id="其他参考部分">其他参考部分</h3>
+<ul>
+<li>相关系统命令：</li>
+<li>locale 列出当前采用的各项本地策略，这些由<code>LC_*</code>环境变量定义</li>
+<li>locale charmap 列出系统当前使用的字符集</li>
+<li>locale -a 列出系统中已经安装的所有locale</li>
+<li>locale -m 列出系统中已经安装的所有charmap</li>
+<li>localedef locale的生成工具 exzample: <code>localedef -f UTF-8 -i zh_CN zh_CN.UTF-8</code></li>
+<li>相关系统文件：</li>
+<li>在目录/usr/share/i18n/charmaps下，缺省的charmap存放路径</li>
+<li>在目录/usr/share/i18n/locales下， 缺省的locale source file存放路径</li>
+<li>在文件/usr/lib/locale/locale-archive中，包含了很多本地已经生成的locale的具体内容，使用命令localedef管理这一文件</li>
+</ul>
+<p><br> <br> <br> <br> <br> <br></p>
+<h3 id="时区设置">时区设置</h3>
+<p>时区（Time Zone)是地球上的区域使用同一个时间定义.</p>
+<h3 id="确认当前时区">确认当前时区</h3>
+<p>可以通过执行命令<code>date +%z</code>输出来确认当前系统时区配置，如下例子显示当前系统时区配置为东8区：</p>
+<pre><code>[root@deepin-server ~]# date  +%z
++0800</code></pre>
+<h4 id="修改默认时区">修改默认时区</h4>
+<p>可以通过执行命令<code>tzselect</code> 修改默认时区配置，如下是一个修为时区设置为<code>Asia/China/Beijing Time</code>的例子：</p>
+<pre><code>[root@deepin-server ~]# tzselect
+Please identify a location so that time zone rules can be set correctly.
+Please select a continent or ocean.
+ 1) Africa
+ 2) Americas
+ 3) Antarctica
+ 4) Arctic Ocean
+ 5) Asia
+ 6) Atlantic Ocean
+ 7) Australia
+ 8) Europe
+ 9) Indian Ocean
+10) Pacific Ocean
+11) none - I want to specify the time zone using the Posix TZ format.
+#? 5
+Please select a country.
+ 1) Afghanistan           18) Israel                35) Palestine
+ 2) Armenia               19) Japan                 36) Philippines
+ 3) Azerbaijan            20) Jordan                37) Qatar
+ 4) Bahrain               21) Kazakhstan            38) Russia
+ 5) Bangladesh            22) Korea (North)         39) Saudi Arabia
+ 6) Bhutan                23) Korea (South)         40) Singapore
+ 7) Brunei                24) Kuwait                41) Sri Lanka
+ 8) Cambodia              25) Kyrgyzstan            42) Syria
+ 9) China                 26) Laos                  43) Taiwan
+10) Cyprus                27) Lebanon               44) Tajikistan
+11) East Timor            28) Macau                 45) Thailand
+12) Georgia               29) Malaysia              46) Turkmenistan
+13) Hong Kong             30) Mongolia              47) United Arab Emirates
+14) India                 31) Myanmar (Burma)       48) Uzbekistan
+15) Indonesia             32) Nepal                 49) Vietnam
+16) Iran                  33) Oman                  50) Yemen
+17) Iraq                  34) Pakistan
+#? 9
+Please select one of the following time zone regions.
+1) Beijing Time
+2) Xinjiang Time
+#? 1
+
+The following information has been given:
+
+        China
+        Beijing Time
+
+Therefore TZ=&#39;Asia/Shanghai&#39; will be used.
+Local time is now:      Thu Jun 22 21:40:16 CST 2017.
+Universal Time is now:  Thu Jun 22 13:40:16 UTC 2017.
+Is the above information OK?
+1) Yes
+2) No
+#? 1
+
+You can make this change permanent for yourself by appending the line
+        TZ=&#39;Asia/Shanghai&#39;; export TZ
+to the file &#39;.profile&#39; in your home directory; then log out and log in again.
+
+Here is that TZ value again, this time on standard output so that you
+can use the /usr/bin/tzselect command in shell scripts:
+Asia/Shanghai
+</code></pre>
+<h4 id="其他参考部分-1">其他参考部分</h4>
+<ul>
+<li>相关系统文件/etc/sysconfig/clock</li>
+<li>时区的信息存在/usr/share/zoneinfo/下面，</li>
+<li>本机的时区信息存在/etc/localtime</li>
+</ul>
+</body>
+</html>

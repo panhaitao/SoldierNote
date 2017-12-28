@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>DEB包与APT仓库</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header>
+<h1 class="title">DEB包与APT仓库</h1>
+</header>
+<p>DEB包与APT仓库基础（基础入门） 准备开发环境</p>
+<p>apt-get install build-essential dpkg-dev debhelper</p>
+<pre><code>build-essential 基础开发环境工具集
+dpkg-dev deb包开发基础套件
+debhelper 包含dh开头的命令集合,主要用于简化rules文件的编写，把一些通用，重复的操作用perl命令来代替。</code></pre>
+<p>修改来自上游仓库的软件包简要示例</p>
+<p>确保 /etc/apt/sources.list 中开启 deb-src 源码仓库配置，例如：</p>
+<p>deb-src [trusted=yes] http://10.1.10.21/server-dev/dsce-15-amd64 kui contrib main non-free</p>
+<p>获取dsc格式的源码，重新编译打包</p>
+<p>apt-get source zip cd zip-3.0 apt-get build-dep zip -y … dpkg-buildpackage -a</p>
+<p>debian目录的重要文件</p>
+<pre><code>debian/rules deb格式软件包的编译规则文件
+debian/control 定义二进制deb包的名称，编译依赖，安装依赖等信息
+debian/changelog 记录软件包修订版记录，以及定义版本号码
+debian/compat 定义对 debhelper 最低版本要求
+debian/source/format 定义 deb 源代码包格式
+debian/copyright 定义版权信息</code></pre>
+<p>debian/rules 解析</p>
+<p>rules文件本质上是一个Makefile文件，这个Makefile文件定义了创建deb格式软件包的规则。打包工具按照rules文件指定的规则，完成编译，将软件安装到临时安装目录 debiani/tmpdir，清理编译目录等操作，并依据安装到临时目录的文件来生成deb格式的软件包。 deb包的执行脚本</p>
+<p>许多软件安装前或安装后都需要进行一些设置工作，deb格式的软件安装过程执行的操作是由如下脚本来控制的</p>
+<p>debian/preinst 安装前执行脚本 debian/postinst 安装后执行脚本 debian/prerm 卸载前执行脚本 debian/postrm 卸载后执行脚本</p>
+<p>创建APT仓库</p>
+<p>工具 reprepro 一个快速搭建deb软件仓库的工具。</p>
+<pre><code>安装软件包
+
+执行命令 apt-get install reprepro -y
+
+创建配置文件
+比如仓库目录在/var/www/repo 为例</code></pre>
+<p>mkdir conf/ cat &gt; conf/distributions &lt;&lt; &quot;EOF&quot; Origin: deepin Label: kui Codename: kui Architectures: i386 amd64 source Components: main UDebComponents: main Contents: .gz Version: 2017.5.12 Description: local repo 2017.5.12 EOF</p>
+<pre><code>向仓库导入软件包</code></pre>
+<p>reprepro includedeb kui pkgdir/<em>.deb reprepro includeudeb kui pkgdir/</em>.udeb reprepro includedsc kui pkgdir/*.dsc</p>
+<pre><code>添加apt 仓库配置文件</code></pre>
+<p>cat &gt;&gt; /etc/apt/sources.list &lt;&lt; &quot;EOF&quot; deb file:///var/www/repo kui main deb-src file:///var/www/repo kui main EOF # DEB包与APT仓库基础 ## 准备开发环境</p>
+<pre><code>`apt-get install build-essential dpkg-dev dh-make debhelper dpkg-sign` 
+
+* gcc        GNU C语言编译器
+* g++        GNU C++语言编译器
+* make       GNU自动化构建工具 
+* autotools  autoconf automake 工具集  
+* dpkg-dev   这个软件包包括了在解开、制作、上传Debian源文件包时需要用到的工具
+* diff/patch 源码补丁制作与补丁管理工具
+* fakeroot   模拟变成root用户，这在创建软件包的过程的一些部分是必要的
+* dh-make    提供了我们需要用到的 dh_make 命令,用于根据上游tarball生成我们deb包模板
+* debhelper  包含dh开头的命令集合,主要用于简化rules文件的编写，把一些通用，重复的操作用perl命令来代替。  
+* gnupg      加密签名相关
+* dpkg-sign  deb包签名工具 
+
+## 基础部分
+
+### 修改来自上游仓库的软件包简要示例
+
+```
+apt-get source zip
+cd zip-3.0
+apt-get build-dep zip -y
+…
+dpkg-buildpackage -a
+```
+
+### debian目录的重要文件
+
+* debian/control             定义二进制deb包的名称，编译依赖，安装依赖等信息
+* debian/changelog        记录软件包修订版记录，以及定义版本号码
+* debian/compat             定义对 debhelper 最低版本要求 
+* debian/source/format   定义 deb 源代码包格式    
+* debian/copyright          定义版权信息
+* debian/rules                 
+
+### debian/rules  解析
+
+rules文件本质上是一个Makefile文件，这个Makefile文件定义了创建deb格式软件包的规则。打包工具按照rules文件指定的规则，完成编译，将软件安装到临时安装目录 debiani/tmpdir，清理编译目录等操作，并依据安装到临时目录的文件来生成deb格式的软件包。
+
+rules文件一般会包含，”binary-arch”, ”binary-indep”, ”binary”，”build”, ”clean”, ”install”, 等targets。
+
+### dh命令简要解析
+
+dh是debhelper包中的命令序列，dh开头的命令主要用于简化rules文件的编写，把一些通用的重复的操作用perl命令来代替。
+
+下面是一些dh命令和实际对应执行的操作的简要介绍
+
+```
+dh_auto_clean           make distclean
+dh_auto_configure       ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var ...
+dh_auto_build           make
+dh_auto_test            make test
+dh_auto_install         make install DESTDIR=/path/to/package_version-revision/debian/package 
+
+以上的targets 如果需要 fakeroot 操作，则需要加上dh_testroot
+```
+
+### deb包的执行脚本
+
+许多软件安装前或安装后都需要进行一些设置工作，deb格式的软件安装过程执行的操作是由如下脚本来控制的
+
+    debian/preinst    安装前执行脚本
+    debian/postinst   安装后执行脚本
+    debian/prerm      卸载前执行脚本
+    debian/postrm     卸载后执行脚本
+
+## 深入理解打包
+
+### 从源码安装开始 
+
+基于 autotools 制作的源码包编译安装,通常为如下步骤
+
+```
+./configure --prefix=/usr --sysconfdir=/etc --mandir=/usr/share/man --localstatedir=/var 
+make 
+make install
+make clean
+```
+
+### 从软件源码包开始制作deb包
+
+```
+ wget http://ftp.gnu.org/gnu/tar/tar-1.26.tar.bz2
+ tar -xvpf tar-1.26.tar.bz2
+ cd tar-1.26
+ dh_make -e regulus_cn@163.com -f ../tar-1.26.tar.bz2
+ … 
+ debian/rules
+ debian/changlog
+ dpkg-buildpackage -a
+ ...
+```
+
+更多细节参考  
+
+＊ [ https://www.debian.org/doc/manuals/maint-guide/index.en.html ]
+＊ [ https://www.debian.org/doc/debian-policy/ ］
+
+
+### 创建一个简单的 debian/rules
+```
+#!/usr/bin/make -f
+
+binary:build install 
+    dh_gencontrol
+    dh_md5sums 
+    dh_builddeb 
+binary-indep: binary
+binary-arch: binary
+build:
+    ./configure --prefix=/usr --sysconfdir=/etc --mandir=/usr/share/man --localstatedir=/var
+    make -j16
+install:
+        make install DSEDIR=./debian/tmpdir/    
+clean:
+    make clean
+    rm -rf debian/tmpdir/
+
+```
+
+### 全部操作 使用 debhelper 命令集来简化 debian/rules 的编写  
+
+```
+#!/usr/bin/make -f
+
+binary:build install 
+    dh_gencontrol
+    dh_md5sums 
+    dh_builddeb 
+binary-indep: binary
+binary-arch: binary
+build:
+    dh_auto_configure
+    dh_auto_build
+install:
+        dh_auto_install
+clean:
+        dh_auto_clean
+```
+
+### 使用默认的rules
+
+在新版本中，dh_make 会使用默认的dh $@ 指令 来进一步简化 rules 文件的编写
+
+```
+%:
+    dh $@    
+```
+
+使用 dh $@时，dh_make会执行一系列的默认的dh_命令，具体请参考 [ http://www.debian.org/doc/manuals/maint-guide/dreq.zh-cn.html#defaultrules ] 
+
+这一系列的默认的dh命令，不能满足所有软件包的编译安装，我们可以通过 override_来重新定义 dh命令，示例如下:
+
+```
+%:
+        dh $@ --with python2
+
+override_dh_install:
+        python setup.py install --root=$(CURDIR)/debian/timelib --prefix=/usr --install-layout=deb
+
+override_dh_auto_clean:
+        dh_auto_clean
+        rm -rf $(CURDIR)/debian/timelib
+
+```
+
+
+##  仓库同步
+
+### 使用 reprepro工具同步  
+
+###  使用 apt-mirror工具来同步
+
+#### 基本配置：
+
+/etc/apt/mirror.list
+
+    ############# config ##################
+    #
+    # set base_path    /var/spool/apt-mirror
+    #
+    # set mirror_path  $base_path/mirror
+    # set skel_path    $base_path/skel
+    # set var_path     $base_path/var
+    # set cleanscript $var_path/clean.sh
+    # set defaultarch  &lt;running host architecture&gt;
+    # set postmirror_script $var_path/postmirror.sh
+    # set run_postmirror 0
+    set base_path    /data/upstream/
+    set mirror_path  $base_path/mirror
+    set skel_path    $base_path/skel
+    set var_path     $base_path/var
+    set nthreads     20
+    set run_postmirror 0
+
+    ############# end config ##############
+
+    deb http://security.ubuntu.com/ubuntu precise-security main restricted universe multiverse
+    deb-src http://security.ubuntu.com/ubuntu precise-security main restricted universe multiverse
+
+
+#### 结合crond 每天自动同步
+
+```
+/etc/cron.d/apt-mirror
+0 1 * * * root /usr/bin/apt-mirror &amp;&gt; /data/log/cron.log &amp;
+```
+
+
+## deb 签名
+
+### 生成签名所需的密钥
+```
+gpg --gen-key
+gpg --list-keys
+gpg --export -a 6A9E1B52 &gt; key.pub
+apt-key add key.pub
+```
+
+用户需要将这个公钥key.pub下载添加到系统的keyring中，就可以使用对应签过名的软件包
+
+### 给deb软件包签名
+
+给软件包签名指令如下,需要输入之前生成公钥时的密码，：
+```
+ dpkg-sig -k keyid --sign builder /your_packages_&lt;version&gt;_&lt;architecture&gt;.deb -f passwdfile
+ Keyid          为之前生成的公钥ID， 
+ --sign builder 后面为deb全路径和deb包
+```
+
+参考文档 [ http://blog.csdn.net/michaelwubo/article/details/keyid ]
+
+
+#### 其他进阶工具
+
+* debootstrap    构建临时环境
+* devscripts      辅助脚本集合
+* pbuilder         用于创建和维护chroot环境的程序。在此chroot环境中构建Debian可以检查构建软件包的依赖关系的正确性
+* ccache            用于缓存编译临时文件，加快编译
+
+#### 介绍下pbuilder 的基本用法
+
+    pbuilder create
+    pbuilder build  *.dsc
+
+* https://wiki.ubuntu.com/PbuilderHowto
+
+
+
+## 参考文档：
+
+
+http://live-systems.org/build/
+http://www.buildd.net/
+https://wiki.debian.org/buildd
+
+
+
+* https://wiki.debian.org/Debootstrap/
+* https://wiki.debian.org/Simple-CDD/Howto
+* https://wiki.debian.org/DebianCustomCD
+* http://debian-handbook.info/browse/stable/sect.automated-installation.html#sect.simple-cdd
+* &lt;https://wiki.debian.org/tasksel&gt; 安装定制相关
+* &lt;http://www.infrastructureanywhere.com/documentation/additional/mirrors.html#reprepro&gt; reprepro udeb deb dsc
+* &lt;https://www.debian.org/releases/wheezy/example-preseed.txt&gt; preseed 参考文档
+
+
+
+也十分简单，命令格式为：
+
+sudo debootstrap --arch [平台] [发行版本代号] [目录]
+比如下面的命令
+sudo debootstrap --arch i386 trusty /mnt</code></pre>
+<p>debian 打包原理分析</p>
+<p>还是从deb源码包说起，使用dh_make初始化之后的源码目录下会生成debian目录，里面包换所有打包相关的文件，一个典型的deb-src格式源码包,下面会有如下文件:</p>
+<p>changelog 记录软件包修订版记录,以及定义生成的二进制包的版本号 compat 定义对 debhelper 最低版本要求 rules 一个别名的Makefile文件,用于控制整个打包流程 postinst 安装执行脚本 source/format 定义 deb 源代码包格式<br />
+control 定义二进制deb包的名称，编译依赖，安装依赖等控制信息 copyright 定义版权信息 docs 定义默认文档 README 说明文档 README.Debian 说明文档 README.source 版本变更记录 *.ex 这些是用于参考的模板文件</p>
+<p>在源码目录下执行dpkg-buildpackage命令开始打包，会完成如下流程:</p>
+<pre><code>首先会调用dpkg-source 生成deb-src格式的源码包
+然后执行 debian/rules完成打包操作。debian/rules是整个打包流程的核心控制文件，这个文件本质上是一个别名的Makefile文件，其中定义了创建deb格式软件包的规则。打包工具按照rules文件指定的规则，完成编译，将软件安装到临时安装目录(debian/tmp 或者 debian/PKG_NAME)，生成对应二进制包的控制文件，并调用dpkg-deb依据安装到临时目录的文件和控制文件来生成deb格式的安装包。</code></pre>
+<p>更多具体细节可以参考debian新人维护手册</p>
+<p>[TOC] # DEB包与APT仓库基础</p>
+<h2 id="准备开发环境">准备开发环境</h2>
+<p><code>apt-get install build-essential dpkg-dev dh-make debhelper dpkg-sign</code></p>
+<ul>
+<li>gcc GNU C语言编译器</li>
+<li>g++ GNU C++语言编译器</li>
+<li>make GNU自动化构建工具</li>
+<li>autotools autoconf automake 工具集<br />
+</li>
+<li>dpkg-dev 这个软件包包括了在解开、制作、上传Debian源文件包时需要用到的工具</li>
+<li>diff/patch 源码补丁制作与补丁管理工具</li>
+<li>fakeroot 模拟变成root用户，这在创建软件包的过程的一些部分是必要的</li>
+<li>dh-make 提供了我们需要用到的 dh_make 命令,用于根据上游tarball生成我们deb包模板</li>
+<li>debhelper 包含dh开头的命令集合,主要用于简化rules文件的编写，把一些通用，重复的操作用perl命令来代替。<br />
+</li>
+<li>gnupg 加密签名相关</li>
+<li>dpkg-sign deb包签名工具</li>
+</ul>
+<h2 id="基础部分">基础部分</h2>
+<h3 id="修改来自上游仓库的软件包简要示例">修改来自上游仓库的软件包简要示例</h3>
+<pre><code>apt-get source zip
+cd zip-3.0
+apt-get build-dep zip -y
+…
+dpkg-buildpackage -a</code></pre>
+<h3 id="debian目录的重要文件">debian目录的重要文件</h3>
+<ul>
+<li>debian/control 定义二进制deb包的名称，编译依赖，安装依赖等信息</li>
+<li>debian/changelog 记录软件包修订版记录，以及定义版本号码</li>
+<li>debian/compat 定义对 debhelper 最低版本要求</li>
+<li>debian/source/format 定义 deb 源代码包格式<br />
+</li>
+<li>debian/copyright 定义版权信息</li>
+<li>debian/rules</li>
+</ul>
+<h3 id="debianrules-解析">debian/rules 解析</h3>
+<p>rules文件本质上是一个Makefile文件，这个Makefile文件定义了创建deb格式软件包的规则。打包工具按照rules文件指定的规则，完成编译，将软件安装到临时安装目录 debiani/tmpdir，清理编译目录等操作，并依据安装到临时目录的文件来生成deb格式的软件包。</p>
+<p>rules文件一般会包含，”binary-arch”, ”binary-indep”, ”binary”，”build”, ”clean”, ”install”, 等targets。</p>
+<h3 id="dh命令简要解析">dh命令简要解析</h3>
+<p>dh是debhelper包中的命令序列，dh开头的命令主要用于简化rules文件的编写，把一些通用的重复的操作用perl命令来代替。</p>
+<p>下面是一些dh命令和实际对应执行的操作的简要介绍</p>
+<pre><code>dh_auto_clean           make distclean
+dh_auto_configure       ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var ...
+dh_auto_build           make
+dh_auto_test            make test
+dh_auto_install         make install DESTDIR=/path/to/package_version-revision/debian/package 
+
+以上的targets 如果需要 fakeroot 操作，则需要加上dh_testroot</code></pre>
+<h3 id="deb包的执行脚本">deb包的执行脚本</h3>
+<p>许多软件安装前或安装后都需要进行一些设置工作，deb格式的软件安装过程执行的操作是由如下脚本来控制的</p>
+<pre><code>debian/preinst    安装前执行脚本
+debian/postinst   安装后执行脚本
+debian/prerm      卸载前执行脚本
+debian/postrm     卸载后执行脚本</code></pre>
+<h2 id="深入理解打包">深入理解打包</h2>
+<h3 id="从源码安装开始">从源码安装开始</h3>
+<p>基于 autotools 制作的源码包编译安装,通常为如下步骤</p>
+<pre><code>./configure --prefix=/usr --sysconfdir=/etc --mandir=/usr/share/man --localstatedir=/var 
+make 
+make install
+make clean</code></pre>
+<h3 id="从软件源码包开始制作deb包">从软件源码包开始制作deb包</h3>
+<pre><code> wget http://ftp.gnu.org/gnu/tar/tar-1.26.tar.bz2
+ tar -xvpf tar-1.26.tar.bz2
+ cd tar-1.26
+ dh_make -e regulus_cn@163.com -f ../tar-1.26.tar.bz2
+ … 
+ debian/rules
+ debian/changlog
+ dpkg-buildpackage -a
+ ...</code></pre>
+<p>更多细节参考</p>
+<p>＊ [ https://www.debian.org/doc/manuals/maint-guide/index.en.html ] ＊ [ https://www.debian.org/doc/debian-policy/ ］</p>
+<h3 id="创建一个简单的-debianrules">创建一个简单的 debian/rules</h3>
+<pre><code>#!/usr/bin/make -f
+
+binary:build install 
+    dh_gencontrol
+    dh_md5sums 
+    dh_builddeb 
+binary-indep: binary
+binary-arch: binary
+build:
+    ./configure --prefix=/usr --sysconfdir=/etc --mandir=/usr/share/man --localstatedir=/var
+    make -j16
+install:
+        make install DSEDIR=./debian/tmpdir/    
+clean:
+    make clean
+    rm -rf debian/tmpdir/
+</code></pre>
+<h3 id="全部操作-使用-debhelper-命令集来简化-debianrules-的编写">全部操作 使用 debhelper 命令集来简化 debian/rules 的编写</h3>
+<pre><code>#!/usr/bin/make -f
+
+binary:build install 
+    dh_gencontrol
+    dh_md5sums 
+    dh_builddeb 
+binary-indep: binary
+binary-arch: binary
+build:
+    dh_auto_configure
+    dh_auto_build
+install:
+        dh_auto_install
+clean:
+        dh_auto_clean</code></pre>
+<h3 id="使用默认的rules">使用默认的rules</h3>
+<p>在新版本中，dh_make 会使用默认的dh $@ 指令 来进一步简化 rules 文件的编写</p>
+<pre><code>%:
+    dh $@    </code></pre>
+<p>使用 dh $<span class="citation" data-cites="时">@时</span>，dh_make会执行一系列的默认的dh_命令，具体请参考 [ http://www.debian.org/doc/manuals/maint-guide/dreq.zh-cn.html#defaultrules ]</p>
+<p>这一系列的默认的dh命令，不能满足所有软件包的编译安装，我们可以通过 override_来重新定义 dh命令，示例如下:</p>
+<pre><code>%:
+        dh $@ --with python2
+
+override_dh_install:
+        python setup.py install --root=$(CURDIR)/debian/timelib --prefix=/usr --install-layout=deb
+
+override_dh_auto_clean:
+        dh_auto_clean
+        rm -rf $(CURDIR)/debian/timelib
+</code></pre>
+<h2 id="仓库同步">仓库同步</h2>
+<h3 id="使用-reprepro工具同步">使用 reprepro工具同步</h3>
+<h3 id="使用-apt-mirror工具来同步">使用 apt-mirror工具来同步</h3>
+<h4 id="基本配置">基本配置：</h4>
+<p>/etc/apt/mirror.list</p>
+<pre><code>############# config ##################
+#
+# set base_path    /var/spool/apt-mirror
+#
+# set mirror_path  $base_path/mirror
+# set skel_path    $base_path/skel
+# set var_path     $base_path/var
+# set cleanscript $var_path/clean.sh
+# set defaultarch  &lt;running host architecture&gt;
+# set postmirror_script $var_path/postmirror.sh
+# set run_postmirror 0
+set base_path    /data/upstream/
+set mirror_path  $base_path/mirror
+set skel_path    $base_path/skel
+set var_path     $base_path/var
+set nthreads     20
+set run_postmirror 0
+
+############# end config ##############
+
+deb http://security.ubuntu.com/ubuntu precise-security main restricted universe multiverse
+deb-src http://security.ubuntu.com/ubuntu precise-security main restricted universe multiverse</code></pre>
+<h4 id="结合crond-每天自动同步">结合crond 每天自动同步</h4>
+<pre><code>/etc/cron.d/apt-mirror
+0 1 * * * root /usr/bin/apt-mirror &amp;&gt; /data/log/cron.log &amp;</code></pre>
+<h2 id="deb-签名">deb 签名</h2>
+<h3 id="生成签名所需的密钥">生成签名所需的密钥</h3>
+<pre><code>gpg --gen-key
+gpg --list-keys
+gpg --export -a 6A9E1B52 &gt; key.pub
+apt-key add key.pub</code></pre>
+<p>用户需要将这个公钥key.pub下载添加到系统的keyring中，就可以使用对应签过名的软件包</p>
+<h3 id="给deb软件包签名">给deb软件包签名</h3>
+<p>给软件包签名指令如下,需要输入之前生成公钥时的密码，：</p>
+<pre><code> dpkg-sig -k keyid --sign builder /your_packages_&lt;version&gt;_&lt;architecture&gt;.deb -f passwdfile
+ Keyid          为之前生成的公钥ID， 
+ --sign builder 后面为deb全路径和deb包</code></pre>
+<p>参考文档 [ http://blog.csdn.net/michaelwubo/article/details/keyid ]</p>
+<h4 id="其他进阶工具">其他进阶工具</h4>
+<ul>
+<li>debootstrap 构建临时环境</li>
+<li>devscripts 辅助脚本集合</li>
+<li>pbuilder 用于创建和维护chroot环境的程序。在此chroot环境中构建Debian可以检查构建软件包的依赖关系的正确性</li>
+<li>ccache 用于缓存编译临时文件，加快编译</li>
+</ul>
+<h4 id="介绍下pbuilder-的基本用法">介绍下pbuilder 的基本用法</h4>
+<pre><code>pbuilder create
+pbuilder build  *.dsc</code></pre>
+<ul>
+<li>https://wiki.ubuntu.com/PbuilderHowto</li>
+</ul>
+<h2 id="参考文档">参考文档：</h2>
+<p>http://live-systems.org/build/ http://www.buildd.net/ https://wiki.debian.org/buildd</p>
+<h2 id="仓库管理">仓库管理</h2>
+<p>工具 reprepro 一个快速搭建deb软件仓库的工具。</p>
+<h3 id="安装-apt-get-install-reprepro--y">安装 apt-get install reprepro -y</h3>
+<h3 id="使用">使用</h3>
+<p>创建配置文件，比如仓库目录在/var/www/repo 为例</p>
+<pre>
+cd /var/www/repo/
+cat > conf/distributions << "EOF"
+Origin: deepin
+Label:  jessie
+Codename: jessie
+Architectures: i386 amd64 source
+Components: main
+UDebComponents: main
+Contents: .gz
+Version: 2015.4.17
+Description: local repo 2015.4.17
+SignWith: 48FE4F60
+
+Origin: deepin
+Label:  jessie-updates
+Codename: jessie-updates
+Architectures: i386 amd64 source
+Components: main
+UDebComponents: main
+Contents: .gz
+Version: 2015.4.17
+Description: local repo update 2015.4.17
+SignWith: 48FE4F60
+
+Origin: deepin
+Label:  jessie-security
+Codename: jessie-security
+Architectures: i386 amd64 source
+Components: main
+UDebComponents: main
+Contents: .gz
+Version: 2015.4.17
+Description: local repo update 2015.4.17
+SignWith: 48FE4F60
+EOF
+</pre>
+<h3 id="更新仓库">更新仓库</h3>
+<pre>
+reprepro includedeb wheezy pkgdir/*.deb
+reprepro includeudeb wheezy pkgdir/*.udeb
+reprepro includedsc wheezy pkgdir/*.dsc
+</pre>
+<pre>
+SignWith: key_id  仓库签名
+UDebComponents: main   Udeb包相关
+</pre>
+<pre><code>/var/www/repo/
+conf/  
+db/..  
+dists/..  
+pool/..</code></pre>
+<h2 id="创建iso">创建ISO</h2>
+<pre><code>build-simple-cdd --conf ./custom.conf</code></pre>
+<ul>
+<li>https://wiki.debian.org/Debootstrap/</li>
+<li>https://wiki.debian.org/Simple-CDD/Howto</li>
+<li>https://wiki.debian.org/DebianCustomCD</li>
+<li>http://debian-handbook.info/browse/stable/sect.automated-installation.html#sect.simple-cdd</li>
+<li><a href="https://wiki.debian.org/tasksel" class="uri">https://wiki.debian.org/tasksel</a> 安装定制相关</li>
+<li><a href="http://www.infrastructureanywhere.com/documentation/additional/mirrors.html#reprepro" class="uri">http://www.infrastructureanywhere.com/documentation/additional/mirrors.html#reprepro</a> reprepro udeb deb dsc</li>
+<li><a href="https://www.debian.org/releases/wheezy/example-preseed.txt" class="uri">https://www.debian.org/releases/wheezy/example-preseed.txt</a> preseed 参考文档</li>
+</ul>
+<p>也十分简单，命令格式为：</p>
+<p>sudo debootstrap --arch [平台] [发行版本代号] [目录] 比如下面的命令 sudo debootstrap --arch i386 trusty /mnt</p>
+<h3 id="详解-debianrules">详解 debian/rules</h3>
+<p>一个通用的源码包可能使用如下方式编译安装:</p>
+<pre><code>./configure --prefix=/usr --sysconfdir=/etc --mandir=/usr/share/man --localstatedir=/var 
+make 
+make install</code></pre>
+<p>将编译安装转化为一个简单的rules文件来完成打包, rules文件一般会包含，”binary-arch”, ”binary-indep”, ”binary”，”build”, ”clean”, ”install”, 等targets，参考如下例子:</p>
+<pre><code>#!/usr/bin/make -f
+
+binary:build install 
+    dh_gencontrol
+    dh_md5sums 
+    dh_builddeb 
+binary-indep: binary
+binary-arch: binary
+build:
+    ./configure --prefix=/usr --sysconfdir=/etc --mandir=/usr/share/man --localstatedir=/var
+    make 
+install:
+        make install DSEDIR=./debian/pkg_name/  
+clean:
+    make clean
+    rm -rf debian/pkg_name/</code></pre>
+<p>很多操作是通用重复的，因此debian社区开发了一个 包含常用操作dh命令的 debhelper 软件包来简化 debian/rules 的编写</p>
+<pre><code>#!/usr/bin/make -f
+
+binary:build install 
+    dh_gencontrol
+    dh_md5sums 
+    dh_builddeb 
+binary-indep: binary
+binary-arch: binary
+build:
+    dh_auto_configure
+    dh_auto_build
+install:
+        dh_auto_install
+clean:
+        dh_auto_clean
+&lt;/pre&gt;
+
+
+即使使用各种dh命令来简化`debian/rules`的编写，对于维护众多软件包的发行版来说，编写`debian/rules`依然是重复机械的体力劳动，最新版本的 dh_make 会使用默认的`dh $@` 来进一步简化rules文件的编写
+</code></pre>
+<p>%: dh $@</p>
+<pre><code>
+使用 dh $@时，dh_make会执行一系列的默认的dh_命令，具体请参考[debian官方手册] (http://www.debian.org/doc/manuals/maint-guide/dreq.zh-cn.html#defaultrules)
+当默认执行的dh命令，不能满足所有软件包的编译安装，我们可以通过 override_来重新定义 dh命令，示例如下:
+</code></pre>
+<p>%: dh $@ override_dh_auto_install: mv release/bin/liblfs.so release/bin/liblfs.so.1.02.160708 dh_auto_install</p>
+<pre><code>
+#### dh命令简要解析
+
+dh是debhelper包中的命令序列，dh开头的命令主要用于简化rules文件的编写，把一些通用的重复的操作用perl命令来代替。下面是部分dh命令和实际对应执行的操作的简要介绍
+</code></pre>
+<p>dh_auto_clean make distclean dh_auto_configure ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var ... dh_auto_build make dh_auto_test make test dh_auto_install make install DESTDIR=/path/to/package_version-revision/debian/package ``` 以上的targets 如果需要 fakeroot 操作，则需要加上dh_testroot</p>
+<h4 id="deb包的执行脚本-1">deb包的执行脚本</h4>
+<p>许多软件安装前或安装后都需要进行一些设置工作，deb格式的软件安装过程执行的操作是由如下脚本来控制的</p>
+<pre><code>debian/preinst    安装前执行脚本
+debian/postinst   安装后执行脚本
+debian/prerm      卸载前执行脚本
+debian/postrm     卸载后执行脚本</code></pre>
+<h4 id="deb源代码包新格式">deb源代码包新格式</h4>
+<ul>
+<li>Format：1.0 一个 .dsc 文件，一个 .orig.tar.gz 文件，一个 .diff.gz 文件 　　</li>
+<li>Format：2.0 这个格式不建议广泛使用，是个过渡格式</li>
+<li>Format：3.0 (native) 包含了 debian 化的所有更改全部在一个压缩包中　　</li>
+<li>Format：3.0 (quilt) 一个 .dsc 文件, 一个 .debian.tar.{gz,bz2,lzma} 包含了 debian 化的所有更改, 零个或者多个 .orig-.tar.{gz,bz2,lzma}， 　　</li>
+<li>Format：3.0 (git) 实验性质的，源代码包和版本控制系统 (git) 的结合</li>
+<li>Format：3.0 (bzr) 实验性质的，源代码包和版本控制系统 (bzr) 的结合</li>
+</ul>
+<h2 id="deb-签名-1">deb 签名</h2>
+<h3 id="生成签名所需的密钥-1">生成签名所需的密钥</h3>
+<pre><code># gpg --gen-key
+# gpg --list-keys
+# gpg --export -a 6A9E1B52 &gt; key.pub
+# apt-key add key.pub</code></pre>
+<p>用户需要将这个公钥key.pub下载添加到系统的keyring中，就可以使用对应签过名的软件包</p>
+<h3 id="给deb软件包签名-1">给deb软件包签名</h3>
+<p>给软件包签名指令如下,需要输入之前生成公钥时的密码，：</p>
+<pre><code>dpkg-sig -k keyid --sign builder /your_packages_&lt;version&gt;_&lt;architecture&gt;.deb
+
+Keyid          为之前生成的公钥ID， 
+--sign builder 后面为deb全路径和deb包</code></pre>
+<p>参考文档 [ http://blog.csdn.net/michaelwubo/article/details/keyid ]</p>
+<h4 id="其他进阶工具-1">其他进阶工具</h4>
+<ul>
+<li>debootstrap 构建临时环境</li>
+<li>devscripts 辅助脚本集合</li>
+<li>pbuilder 用于创建和维护chroot环境的程序。在此chroot环境中构建Debian可以检查构建软件包的依赖关系的正确性</li>
+<li>ccache 用于缓存编译临时文件，加快编译</li>
+</ul>
+<h4 id="介绍下pbuilder-的基本用法-1">介绍下pbuilder 的基本用法</h4>
+<pre><code>pbuilder create
+pbuilder build  *.dsc</code></pre>
+<ul>
+<li>https://wiki.ubuntu.com/PbuilderHowto</li>
+</ul>
+<h2 id="参考文档-1">参考文档：</h2>
+<p>http://live-systems.org/build/ http://www.buildd.net/ https://wiki.debian.org/buildd</p>
+<h2 id="仓库管理-1">仓库管理</h2>
+<p>工具 reprepro 一个快速搭建deb软件仓库的工具。</p>
+<h3 id="安装-apt-get-install-reprepro--y-1">安装 apt-get install reprepro -y</h3>
+<h3 id="使用-1">使用</h3>
+<p>创建配置文件，比如仓库目录在/var/www/repo 为例</p>
+<pre>
+cd /var/www/repo/
+cat > conf/distributions << "EOF"
+Origin: regulus
+Label:  wheezy
+Codename: wheezy
+Architectures: i386 amd64 source 
+Components: main
+Version: 2015.4.17
+Description: regulus.intra.repo 2015.4.17
+EOF
+</pre>
+<h3 id="更新仓库-1">更新仓库</h3>
+<pre>
+reprepro includedeb wheezy pkgdir/*.deb
+reprepro includedsc wheezy pkgdir/*.dsc
+</pre>
+<pre><code>/var/www/repo/
+conf/  
+db/..  
+dists/..  
+pool/..</code></pre>
+<h2 id="deb_build_options">DEB_BUILD_OPTIONS</h2>
+<p><code>DEB_BUILD_OPTIONS=nocheck</code></p>
+<p>This is a quick post to show how you can rebuild a debian package and skip some steps, like “make test” for example in the upstream package, by passing some build options. More and more debian packages are now supporting the nodocs, nocheck/notest build options. You might want this if you are repeatedly building the package and want to skip some parts and make it faster, or maybe some step is failing while running the tests and that is something acceptable and known. In this case you can build the package as usual and export DEB_BUILD_OPTIONS=nocheck.</p>
+<p>For example rebuilding the mysql package takes quite a long time, and to skip the package run tests we will do something like:</p>
+<p>dpkg-source -x mysql-dfsg-5.0_5.0.67-1.dsc cd mysql-dfsg-5.0-5.0.67/ <strong>DEB_BUILD_OPTIONS=nocheck debuild -us -uc</strong> Note: not all packages implement this option and you might want to look in the rules file and see if this is defined or not.</p>
+</body>
+</html>

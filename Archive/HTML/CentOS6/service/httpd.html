@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<h1 id="apache服务器">Apache服务器</h1>
+<p>Apache HTTP Server（简称Apache）是Apache软件基金会的一个开放源代码的网页服务器软件，可以在大多数电脑操作系统中运行，由于其跨平台和安全性。被广泛使用，是最流行的Web服务器软件之一。它快速、可靠并且可通过简单的API扩充，将Perl／Python等解释器编译到服务器中。</p>
+<h2 id="实例apache服务器的简单配置">实例Apache服务器的简单配置</h2>
+<p>本实例中没有提到添加防火墙配置，关闭防火墙作为前提条件,执行命令<code>service iptables stop</code>。</p>
+<ul>
+<li>安装软件: <code>yum install httpd -y</code></li>
+<li><p>编辑配置文件<code>/etc/httpd/conf/httpd.conf</code>,根据需要修改参考配置：</p>
+<pre><code>DocumentRoot /var/www/html/</code></pre></li>
+<li>重启服务: <code>service httpd restart</code></li>
+<li><p>测试验证: 执行命令`<code>curl 127.0.0.1</code>能正确返回页面，说明http服务器基本配置已经安装成功。</p></li>
+</ul>
+</body>
+</html>

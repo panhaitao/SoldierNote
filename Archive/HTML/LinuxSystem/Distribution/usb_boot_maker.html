@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<h1 id="使用grub2制作启动u盘"># 使用grub2制作启动U盘</h1>
+<p>原理概述：将U盘格式为GPT类型的分区，添加bios引导支持的启动分区和EFI引导分区，然后将grub2引导程序安装到U盘上，引导借助grub的loopback模块来读取U盘分区内ISO文件的内容，完成安装器的引导，从而达到灵活制作启动U盘的目标，并且后续更新ISO只需要替换ISO文件即可，目前在centos7测试通过，具体步骤如下</p>
+<ul>
+<li><h2 id="在u盘上创建gpt类型的分区">在U盘上创建GPT类型的分区</h2></li>
+</ul>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">分区</th>
+<th style="text-align: center;">文件系统类型</th>
+<th style="text-align: right;">大小</th>
+<th style="text-align: left;">启动标志</th>
+<th style="text-align: left;">分区标签</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">分区一</td>
+<td style="text-align: center;">fat32</td>
+<td style="text-align: right;">4M</td>
+<td style="text-align: left;">bios-grub</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">分区二</td>
+<td style="text-align: center;">fat32</td>
+<td style="text-align: right;">64M</td>
+<td style="text-align: left;">boot esp</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">分区三</td>
+<td style="text-align: center;">ext4</td>
+<td style="text-align: right;">&gt; 5G</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">CentOS20720x86_64</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><h2 id="将grub-引导程序安装到u盘上"> 将grub 引导程序安装到U盘上</h2>
+mount /dev/sdb3 /mnt/ mkdir /mnt/EFI/ mount /dev/sdb2 /mnt/EFI</li>
+</ul>
+<p>安装EFI引导文件，操作参考如下，需要使用grub-efi软件包提供的命令：</p>
+<pre><code>grub-install --target=x86_64-efi --removable          \
+                     --boot-directory=/mnt/           \
+                     --efi-directory=/mnt/EFI/ /dev/sdb</code></pre>
+<p>安装BIOS引导文件，操作参考如下，需要使用grub-pc软件包提供的命令：</p>
+<pre><code>grub-install --target=i386-pc --removable             \
+                     --boot-directory=/mnt/ /dev/sdb</code></pre>
+<p>最后将ISO文件拷贝到 /mnt/ 目录，在/mnt/grub/ 目录下创建 grub.cfg 启动菜单文件</p>
+<ul>
+<li><h2 id="grub.cfg-参考实例">grub.cfg 参考实例</h2>
+<p>menuentry &quot;Centos7 (Auto Install for EFI)&quot; { insmod ext2 insmod loopback set isofile=/CentOS-7-x86_64-DVD-1708.iso loopback loop <span class="math inline">$isofile  linuxefi (loop)/images/pxeboot/vmlinuz inst.stage2=hd:LABEL=CentOS\x207\x20x86_64:/$</span>isofile inst.ks=hd:LABEL=CentOS20720x86_64:/ks-uefi-install.cfg noeject initrdefi (loop)/images/pxeboot/initrd.img }</p>
+<p>menuentry &quot;Centos7 (Auto Install for BIOS)&quot; { insmod ext2 insmod loopback insmod iso9660 set isofile=/CentOS-7-x86_64-DVD-1708.iso loopback loop <span class="math inline">$isofile  linux (loop)/isolinux/vmlinuz inst.stage2=hd:LABEL=CentOS\x207\x20x86_64:/$</span>isofile inst.ks=hd:LABEL=CentOS20720x86_64:/ks-bios-install.cfg noeject initrd (loop)/isolinux/initrd.img }</p></li>
+</ul>
+<h1 id="使用syslinux工具制作启动u盘"># 使用syslinux工具制作启动U盘</h1>
+<p>首先确保系统已经安装 syslinux 和 dosfstools 两个软件包</p>
+<pre><code>mkfs.vfat /dev/sdb1 
+syslinux -i /dev/sdb1
+fatlabel /dev/sdb1 CentOS\x207\x20x86_64
+parted /dev/sdb set 1 boot on
+dd if=/usr/lib/SYSLINUX/mbr.bin of=/dev/sdb conv=notrunc bs=440 count=1 </code></pre>
+<p>其中notrunc的含义是，如果目标文件比来源文件大，不截断之后内容</p>
+<ul>
+<li>将ISO中全部文件，包括两个隐藏文件（.discinfo 和 .treeinfo ) 拷贝到U盘分区</li>
+<li>然后将U盘中的isolinux目录重命名为syslinux,将syslinux目录内的isolinux.cfg 重命文件名为 syslinux.cfg</li>
+</ul>
+</body>
+</html>
