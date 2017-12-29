@@ -1,5 +1,4 @@
-k8s
----
+# 容器云基础三:kubernetes的部署与与基础配置
 
 -   master 端的公共配置 /etc/kubernetes/config
 

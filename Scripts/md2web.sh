@@ -5,7 +5,7 @@ do
     html_dir=$(dirname $f)
     html_name=$(basename $f | awk -F. '{print $1}')
     mkdir -pv HTML/${html_dir}
-    pandoc  -f markdown -t html5 -o HTML/${html_dir}/${html_name}.html -s $f
+    pandoc -toc -f markdown -t html5 -o HTML/${html_dir}/${html_name}.html -s $f
 done
 
 cd HTML 
@@ -45,8 +45,10 @@ do
     for f in `find $d | grep .html`
     do
         
-        article_title=$(basename $f | awk -F. '{print $1}')
-        echo "<a href=\"$f\"> $article_title </a> <br>" >> index.html
+        #num=`cat HTML/Application/openssl-howto.html | grep -n \<body\> | awk -F: '{print $1}'`
+        #line_num=[ $num + 1 ]
+        title=`sed -n '14p' $f | awk -F'>' '{print $2}' | awk -F'<' '{print $1}'`
+        echo "<a href=\"$f\"> $title </a> <br>" >> index.html
     done
 done
 

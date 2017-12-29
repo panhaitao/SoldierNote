@@ -1,12 +1,6 @@
+# DEB包与APT仓库基础（基础入门）
 
----
-title: DEB包与APT仓库
-tags: 包管理
-categories: 基础技能
----
-
-DEB包与APT仓库基础（基础入门）
-准备开发环境
+## 准备开发环境
 
 apt-get install build-essential dpkg-dev debhelper
 
