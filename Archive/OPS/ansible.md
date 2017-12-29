@@ -1,10 +1,4 @@
----
-title: "ansible"
-categories: 运维技术
-tags: 配置管理
----
-
-## Ansible 概述
+# Ansible 基础使用指南
 　　　
 ansible是新出现的自动化运维工具，基于Python开发，集合了众多运维工具（puppet、cfengine、chef、func、fabric）的优点，实现了批量系统配置、批量程序部署、批量运行命令等功能。目前版本实现的功能如下：
 

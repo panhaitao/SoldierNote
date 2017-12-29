@@ -18,7 +18,7 @@ cat > index.html <<EOF
 </head>
 <body>
 <h1 align="center">深蓝作品集</h1>
-<center>Email:xz@onnwalk.net</center>
+<center>Author:潘海涛 Email:xz@onwalk.net</center>
 <hr />
 <h2>版权声明</h2>
 <li>在满足非商业用途的前提条件下，任何人都可以自由的<u>转载/引用/再创作</u>此文档，但必须保留作者署名并注明出处。</li>

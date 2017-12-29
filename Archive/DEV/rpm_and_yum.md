@@ -1,8 +1,4 @@
----
-title: RPM包与YUM仓库
-tags: 包管理
-categories: 基础技能
----
+# RPM包与YUM仓库基础（基础入门）
 
 ## 什么是RPM
 RPM包源自于Red Hat Linux 分发版，是Linux下常见的软件包格式之一，RPM包有两种包格式：

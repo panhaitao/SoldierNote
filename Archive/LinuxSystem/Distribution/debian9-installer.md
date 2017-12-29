@@ -1,5 +1,4 @@
-# debian-installer 原理分析
--------------------------
+# Debian9版本定制: debian-installer 原理分析
 
 ### 安装器的组成
 

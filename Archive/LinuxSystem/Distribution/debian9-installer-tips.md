@@ -1,4 +1,4 @@
-# deian-installer 组件定制
+#  Debian9版本定制: deian-installer 组件定制
 
 * 修改安装器默认背景logo：                     git@bj.git.sndu.cn:Debian9-Server-Packages/rootskel-gtk.git
 * 调整安装器自动挂载磁盘：                     git@bj.git.sndu.cn:Debian9-Server-Packages/mountmedia.git

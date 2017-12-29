@@ -1,4 +1,4 @@
-# 使用说明
+# Centos7版本定制指南 
 
 centos7-custom-iso-build 是一个能快速定制centos7 iso 的脚本
 
@@ -9,37 +9,10 @@ centos7-custom-iso-build 是一个能快速定制centos7 iso 的脚本
 
 # 构建ISO
 
+    git clone https://github.com/panhaitao/centos7-custom-iso-build.git
     bash build.sh <Produce_Name> <Version>
     例如:
     bash build.sh SHENLAN 17
-
-
-# 使用dd工具制作启动U盘
-
-* 针对BIOS主板的U盘启动制作方式：
- 
-```
- isohybrid centos7-custom-xxx.iso
- dd if=centos7-custom-xxx.iso of=/dev/sdX
-```
-
-* 针对BIOS主板的U盘启动制作方式
-
-```
-isohybrid --uefi centos7-custom-xxx.iso
-dd if=centos7-custom-xxx.iso of=/dev/sdX
-```
-
-# 使用syslinux工具制作启动U盘
-
-```
-mkfs.vfat /dev/sdb1
-syslinux -i /dev/sdb1
-dd if=/usr/share/syslinux/mbr.bin of=/dev/sdb bs=440 count=1
-fatlabel /dev/sdb1 "SHENLAN 17"
-```
-
-最后将ISO中全部文件，包括两个隐藏文件（.discinfo  和 .treeinfo ) 拷贝到U盘分区
 
 # 最小定制修改参考列表
 
