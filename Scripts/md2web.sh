@@ -2,10 +2,12 @@
 
 for f in `find . | grep .md`
 do
-    html_dir=$(dirname $f)
-    html_name=$(basename $f | awk -F. '{print $1}')
-    mkdir -pv HTML/${html_dir}
-    pandoc -toc -f markdown -t html5 -o HTML/${html_dir}/${html_name}.html -s $f
+    dir=$(dirname $f)
+    name=$(basename $f | awk -F. '{print $1}')
+    mkdir -pv HTML/${dir}
+    mkdir -pv WIKI/${dir}
+    pandoc -toc -f markdown -t html5 -o HTML/${dir}/${name}.html -s $f
+    pandoc -toc -f markdown -t mediawiki -o WIKI/${dir}/${name}.wiki -s $f
 done
 
 cd HTML 

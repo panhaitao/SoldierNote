@@ -6,3 +6,4 @@ html: clean
 
 clean:
 	rm -rvf HTML/
+	rm -rvf WIKI/
