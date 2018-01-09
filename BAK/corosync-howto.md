@@ -1,4 +1,16 @@
+# Corosync 概述 
 
+Corosync群集引擎是一个源自OpenAIS项目的开源项目，并在新的BSD许可证下获得许可。 Corosync工作的使命是开发，发布和支持社区定义的开源集群。
+
+Corosync群集引擎是一个群组通信系统，具有实现应用程序内高可用性的附加功能。
+
+该项目提供了四个C API功能：
+
+* 具有虚拟同步的封闭进程组通信模型保证了用于创建复制状态机。
+* 一个简单的可用性管理器，在失败时重新启动应用程序进程。
+* 内存数据库配置和统计信息，提供设置，检索和接收信息更改通知的功能。
+* 达到法定人数或丢失时通知应用程序的法定人数系统。
+* 该软件设计用于在UDP/IP 和 InfiniBand网络上运行。
 
 # cp /etc/corosync/corosync.conf.example /etc/corosync.conf  复制一份corosync的样本配置文件
 # vim /etc/corosync/corosync.conf   编辑配置文件修改如下内容
