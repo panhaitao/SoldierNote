@@ -113,7 +113,7 @@ Worker 由主控制进程生成“StartServers”个子进程，每个子进程�
 
 Worker模式下所能同时处理的请求总数是由子进程总数乘以ThreadsPerChild 值决定的，应该大于等于MaxRequestWorkers。如果负载很大，现有的子进程数不能满足时，控制进程会派生新的子进程。默认最大的子进程总数是16，加大时 也需要显式声明ServerLimit（最大值是20000）。需要注意的是，如果显式声明了ServerLimit，那么它乘以 ThreadsPerChild的值必须大于等于MaxRequestWorkers，而且MaxRequestWorkers必须是ThreadsPerChild的整数倍，否则 Apache将会自动调节到一个相应值。
 	
-## event 模式
+### event 模式
 
 ![event 模式示意图](images/mpm_event_module.jpg)  
 
@@ -126,7 +126,7 @@ event MPM在遇到某些不兼容的模块时，会失效，将会回退到worke
 还有，需要补充的是HTTPS的连接（SSL），它的运行模式仍然是类似worker的方式，线程会被一直占用，知道连接关闭。部分比较老的资料里，说event MPM不支持SSL，那个说法是几年前的说法，现在已经支持了。
 
 Apache的httpd.conf中的配置方式：
-	
+```	
 <IfModule mpm_event_module>
     StartServers             3
     MinSpareThreads         75
@@ -135,6 +135,7 @@ Apache的httpd.conf中的配置方式：
     MaxRequestWorkers      400
     MaxConnectionsPerChild   0
 </IfModule>
+```
 
     # StartServers:初始数量的服务器进程开始
     # MinSpareThreads:　　最小数量的工作线程,保存备用
@@ -143,14 +144,13 @@ Apache的httpd.conf中的配置方式：
     # MaxRequestWorkers:　　最大数量的工作线程
     # MaxConnectionsPerChild:　　最大连接数的一个服务器进程服务
 
-###  三种模式下，ab性能测试对比
+##  三种模式下，ab性能测试对比
 
 常规满负载的场景下，并未发现有大的差异。
 
 * 测试语句：
 ```
 ./ab -k -c 200 -n 200000 192.168.0.11/index.html
-	
 测试结果：
 prefork：9556QPS
 worker ：11038QPS
@@ -158,9 +158,9 @@ event ：10224QPS
 ```
 
 * 测试语句：
+
 ```
 ./ab -k -c 200 -n 200000 192.168.0.11/index.php（echo "hello world";）
-	
 测试结果：
 prefork：6094QPS
 worker ：7411QPS
@@ -171,6 +171,6 @@ event ：7089QPS
 
 现在的最新浏览器，在单个域名下的连接数变得越来越多（通常都是使用keep-alive），主流浏览器是2-6个（还有继续增长趋势，为了加快页面的并发下载速度）。高并发场景，会越来越成为Web系统的一种常态。Apache很成熟，同时也背负了比较重的历史代码和模块，因此，在Web系统比较方面，Nginx在不少场景下，表现比起Apache更为出色。
 
-# 参考
+## 参考
 
 * Apache的三种MPM模式比较：prefork，worker，event <http://blog.jobbole.com/91920/>
