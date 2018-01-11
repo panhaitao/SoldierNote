@@ -158,3 +158,7 @@ event ：7089QPS
 就使用PHP而言，fastCGI和php-fpm是更推荐的使用模式。
 
 现在的最新浏览器，在单个域名下的连接数变得越来越多（通常都是使用keep-alive），主流浏览器是2-6个（还有继续增长趋势，为了加快页面的并发下载速度）。高并发场景，会越来越成为Web系统的一种常态。Apache很成熟，同时也背负了比较重的历史代码和模块，因此，在Web系统比较方面，Nginx在不少场景下，表现比起Apache更为出色。
+
+# 参考
+
+* Apache的三种MPM模式比较：prefork，worker，event <http://blog.jobbole.com/91920/>
