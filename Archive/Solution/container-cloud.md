@@ -22,57 +22,125 @@
 
 ![容器生态技术栈](images/container-cloud.png)
 
+## 部署规划
+
+参考上文图示,以四台机器为例做规划，一台主机做master，其他三台主机做node节点，所有主机部署centos7, 按照角色为每台主机命名:
+
+| IP          |  主机名   |
+|-------------|-----------|
+| 10.1.10.101 |  master   |
+| 10.1.10.102 |  node1    |
+| 10.1.10.103 |  node2    |
+| 10.1.10.104 |  node3    |
+
+每台主机需要做的配置是：
+
+* 关闭防火墙，禁用SElinux
+* 开启 base,extras 软件源,修改配置文件`/etc/yum.repos.d/CentOS-Base.repo`，完成如下修改：
+
+```
+[base]
+name=CentOS-$releasever - Base - 163.com
+baseurl=http://mirrors.163.com/centos/7.4.1708/os/x86_64/
+gpgcheck=0
+enabled=1
+
+[extras]
+name=CentOS-$releasever - Extras - 163.com
+baseurl=http://mirrors.163.com/centos/7.4.1708/extras/x86_64/
+gpgcheck=0
+enabled=1
+```
+
+* 添加四台主机名的解析,可以修改/etc/hosts,添加如下配置:
+```
+10.1.10.101  master
+10.1.10.102  node1
+10.1.10.103  node2
+10.1.10.104  node3
+```
 ## docker集群部署与配置
 
+首先要实现跨物理机的容器访问——是不同物理内的容器能够互相访问,四台机器，在master主机上部署etcd，三台机器安装flannel和docker。
 
-大致步骤是： 
+|    主机     |    部署软件     |
+|-------------|-----------------|
+|   master    |      etcd       |
+|   node1     | flannel、docker |
+|   node2     | flannel、docker |
+|   node3     | flannel、docker |
 
-启动Etcd后台进程
+简单的说flannel做了三件事情：
 
-在Etcd里添加Flannel的配置
+1. 数据从源容器中发出后，经由所在主机的docker0虚拟网卡转发到flannel0虚拟网卡，这是个P2P的虚拟网卡，flanneld服务监听在网卡的另外一端。Flannel也是通过修改Node的路由表实现这个效果的。
+2. 源主机的flanneld服务将原本的数据内容UDP封装后根据自己的路由表投递给目的节点的flanneld服务，数据到达以后被解包，然后直接进入目的节点的flannel0虚拟网卡，然后被转发到目的主机的docker0虚拟网卡，最后就像本机容器通信一样由docker0路由到达目标容器。
+3. 使每个结点上的容器分配的地址不冲突。Flannel通过Etcd分配了每个节点可用的IP地址段后，再修改Docker的启动参数。“--bip=X.X.X.X/X”这个参数，它限制了所在节点容器获得的IP范围。
 
-启动Flanneld后台进程
+如上分所述，需要完成如下操作：
 
-配置Docker的启动参数
+- 启动Etcd后台进程
+- 在Etcd里添加Flannel的配置
+- 启动Flanneld后台进程
+- 配置Docker的启动参数
+- 重启Docker后台进程
 
-重启Docker后台进程
+三个组件的启动顺序是: etcd->flanned->docker.
 
-简单的说flannel做了三件事情： 
+###  master主机的配置
 
-1.数据从源容器中发出后，经由所在主机的docker0虚拟网卡转发到flannel0虚拟网卡，这是个P2P的虚拟网卡，flanneld服务监听在网卡的另外一端。 Flannel也是通过修改Node的路由表实现这个效果的。
+1. 修改配置文件: /etc/etcd/etcd.conf, 参考修改如下(其中ip为master主机IP)：
 
-2.源主机的flanneld服务将原本的数据内容UDP封装后根据自己的路由表投递给目的节点的flanneld服务，数据到达以后被解包，然后直接进入目的节点的flannel0虚拟网卡，然后被转发到目的主机的docker0虚拟网卡，最后就像本机容器通信一样由docker0路由到达目标容器。 
+```
+ETCD_LISTEN_CLIENT_URLS="http://10.1.11.101:2379"
+ETCD_ADVERTISE_CLIENT_URLS="http://10.1.11.101:2379"
+```
 
-3.使每个结点上的容器分配的地址不冲突。Flannel通过Etcd分配了每个节点可用的IP地址段后，再修改Docker的启动参数。“--bip=X.X.X.X/X”这个参数，它限制了所在节点容器获得的IP范围。
+* ETCD_LISTEN_CLIENT_URLS 对外提供服务的地址,客户端会连接到这里和 etcd 交互
+* ETCD_ADVERTISE_CLIENT_URLS 告知客户端url, 也就是服务的url
 
-etcd 和flannel
+2. 重新启动etcd服务，确认运行状态:
+```
+systemctl restart etcd
+```
 
-etcdctl -C http://10.1.11.168:2379 set /flannel/network/config '{"Network": "192.168.0.0/16"}'
+3. 确认修改无误后，添加和flannel相关的初始设置:
 
-docker 和 flannel
+```
+etcdctl -C http://10.1.11.101:2379 set /flannel/network/config '{"Network": "192.168.0.0/16"}'
+```
 
-- flanneld.service 
+### node 主机的配置
 
-ExecStartPost=/usr/libexec/flanneld/mk-docker-opts.sh -k DOCKER_NETWORK_OPTIONS -d /run/flannel/docker.env
+1. 修改flannel配置 /etc/sysconfig/flanneld， 参考如下修改：
+```
+FLANNEL_ETCD_ENDPOINTS="http://master:2379"
+FLANNEL_OPTIONS='-etcd-prefix="/flannel/network"'
+```
 
-- docker.service 
-
-[Service]
-
+2. 修改 /lib/systemd/system/docker.service 在 [Service] 段内添加一行配置，也是让docker读取flanneld提供给docker的网路参数，参考修改如下:
+```
 EnvironmentFile=-/run/flannel/docker.env
+```
+
+3. 按照顺序重启服务
+```
+systemctl daemon-reload
+systemctl restart flanneld
+systemctl restart docker
+```
+
+4. 其他node节点主机做同样操作,最后在所有节点各自运行一个docker容器实例，查看各个容器间网络是否互通，如果一切顺利，跨物理机的容器集群网络配置完成。
 
 
+## k8s部署和配置
 
+### K8s 的整体架构
 
+### kubernetes的安全认证
 
-k8s部署和配置
+### k8s-master的配置
 
-K8s 的整体架构
+### k8s-node的配置
 
-k8s-master的配置
+### k8s操作和管理
 
-k8s-node的配置
-
-kubernetes的安全认证
-
-k8s操作和管理
