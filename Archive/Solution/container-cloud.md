@@ -36,7 +36,7 @@
 每台主机需要做的配置是：
 
 * 关闭防火墙，禁用SElinux
-* 开启 base,extras 软件源,修改配置文件`/etc/yum.repos.d/CentOS-Base.repo`，完成如下修改：
+* 配置软件源, 编辑文件 `/etc/yum.repos.d/CentOS-Base.repo`，完成如下修改：
 
 ```
 [base]
@@ -48,6 +48,12 @@ enabled=1
 [extras]
 name=CentOS-$releasever - Extras - 163.com
 baseurl=http://mirrors.163.com/centos/7.4.1708/extras/x86_64/
+gpgcheck=0
+enabled=1
+
+[k8s-1.8]
+name=K8S 1.8
+baseurl=http://mirrors.164.com/centos/7.4.1708/extras/x86_64/
 gpgcheck=0
 enabled=1
 ```
@@ -63,7 +69,7 @@ enabled=1
 
 首先要实现跨物理机的容器访问——是不同物理内的容器能够互相访问,四台机器，在master主机上部署etcd，三台机器安装flannel和docker。
 
-|    主机     |    部署软件     |
+|    主机     |    安装软件     |
 |-------------|-----------------|
 |   master    |      etcd       |
 |   node1     | flannel、docker |
@@ -131,12 +137,114 @@ systemctl restart docker
 
 4. 其他node节点主机做同样操作,最后在所有节点各自运行一个docker容器实例，查看各个容器间网络是否互通，如果一切顺利，跨物理机的容器集群网络配置完成。
 
+## K8s的整体架构
+
+Kubenetes整体架构如下图所示，主要包括apiserver、scheduler、controller-manager、kubelet、proxy。
+
+![Kubenetes整体架构图](images/kuberbetes-arch.jpeg)
+
+- master端运行三个组件： 
+* apiserver：kubernetes系统的入口，封装了核心对象的增删改查操作，以RESTFul接口方式提供给外部客户和内部组件调用。它维护的REST对象将持久化到etcd（一个分布式强一致性的key/value存储）。 
+* scheduler：负责集群的资源调度，为新建的pod分配机器。 
+* controller-manager：负责执行各种控制器，目前有两类：
+  * endpoint-controller：定期关联service和pod(关联信息由endpoint对象维护)，保证service到pod的映射总是最新的。 
+  * replication-controller：定期关联replicationController和pod，保证replicationController定义的复制数量与实际运行pod的数量总是一致。
+
+- minion端运行两个组件：
+* kubelet：负责管控docker容器，如启动/停止、监控运行状态等。它会定期从etcd获取分配到本机的pod，并根据pod信息启动或停止相应的容器。同时，它也会接收apiserver的HTTP请求，汇报pod的运行状态.
+* proxy：负责为pod提供代理。它会定期从etcd获取所有的service，并根据service信息创建代理。当某个客户pod要访问其他pod时，访问请求会经过本机proxy做转发。 
 
 ## k8s部署和配置
 
-### K8s 的整体架构
+在准备好快物理主机的集群网络后, 在master主机上安装kubernetes-master，其余三台节点主机安装kubernetes-node
+
+|    主机     |    安装软件                                             |
+|-------------|---------------------------------------------------------|
+|   master    | kubernetes-master、kubernetes-common、kubernetes-client |
+|   node1     | kubernetes-node、kubernetes-common                      |
+|   node2     | kubernetes-node、kubernetes-common                      |
+|   node3     | kubernetes-node、kubernetes-common                      |
+
+集群架构
+
+* master: 运行服务 apiserver, controllerManager, scheduler
+* node1 : 运行服务 kubelet, proxy
+* node2 : 运行服务 kubelet, proxy
+* node3 : 运行服务 kubelet, proxy
 
 ### kubernetes的安全认证
+
+基于CA签名的双向证书的生成过程如下：
+
+1. 创建CA根证书
+
+2. 为kube-apiserver生成一个证书，并用CA证书进行签名，设置启动参数
+
+    根据k8s集群数量，分别为每个主机生成一个证书，并用CA证书进行签名，设置相应节点上的服务启动参数
+
+* node3 : 运行服务 kubelet, proxy
+
+生成证书
+创建集群的root CA
+
+生成CA、私钥、证书
+
+   openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ca.key -out ca.crt -subj "/CN=k8s-master"  
+
+   CA的CommonName 需要和运行kube-apiserver服务器的主机一直
+创建apiServer的私钥、服务端证书
+
+创建证书配置文件 /etc/kubernetes/openssl.cnf ，在alt_names里指定所有访问服务时会使用的目标域名和IP； 因为SSL/TLS协议要求服务器地址需与CA签署的服务器证书里的subjectAltName信息一致
+
+[req]
+req_extensions = v3_req
+distinguished_name = req_distinguished_name
+[req_distinguished_name]
+[ v3_req ]
+basicConstraints = CA:FALSE
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+subjectAltName = @alt_names
+[alt_names]
+DNS.1 = kubernetes
+DNS.2 = kubernetes.default
+DNS.3 = kubernetes.default.svc
+DNS.4 = kubernetes.default.svc.cluster.local
+DNS.5 = localhost
+DNS.6 = master
+IP.1 = 127.0.0.1
+IP.2 = 10.254.0.1
+IP.3 = 10.1.10.238
+
+最后两个IP分别是clusterIP取值范围里的第一个可用值、master机器的IP。 k8s会自动创建一个service和对应的endpoint，来为集群内的容器提供apiServer服务； service默认使用第一个可用的clusterIP作为虚拟IP，放置于default名称空间，名称为kubernetes，端口是443； openssl.cnf里的DNS1~4就是从容器里访问这个service时会使用到的域名。
+
+创建分配给apiServer的私钥与证书
+
+cd /etc/kubernetes/ca/
+openssl genrsa -out server.key 2048
+openssl req -new -key server.key -out server.csr -subj "/CN=k8s-master" -config ../openssl.cnf
+openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt -days 9000 -extensions v3_req -extfile ../openssl.cnf
+
+验证证书： openssl verify -CAfile ca.crt server.crt
+创建访问apiServer的各个组件使用的客户端证书
+
+for f in client node1 node2 node3  
+do
+    KEY_NAME=$f
+    if [[ $KEY_NAME == client ]];then
+      #HOST_NAME=k8s-master
+      HOST_NAME=$KEY_NAME 
+    else
+      HOST_NAME=$KEY_NAME
+    fi
+      
+    openssl genrsa -out $KEY_NAME.key 2048
+    openssl req -new -key $KEY_NAME.key -out $KEY_NAME.csr -subj "/CN=$HOST_NAME"
+    openssl x509 -req -days 9000 -in $KEY_NAME.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out $KEY_NAME.crt 
+done
+
+注意设置CN(CommonName) 要在k8s集群中（client node1 node2 node3）域名解析生效
+
+验证证书： openssl verify -CAfile ca.crt *.crt
 
 ### k8s-master的配置
 
