@@ -373,7 +373,7 @@ systemctl restart kube-scheduler
 ```
 KUBELET_ADDRESS="--address=0.0.0.0"
 KUBELET_HOSTNAME="--hostname-override=node1"
-KUBELET_POD_INFRA_CONTAINER="--pod-infra-container-image=registry.deepin.com/library/pod-infrastructure"
+KUBELET_POD_INFRA_CONTAINER="--pod-infra-container-image=docker.io/tianyebj/pod-infrastructure"
 KUBELET_ARGS="--kubeconfig=/etc/kubernetes/kubeconfig --cgroup-driver=systemd --fail-swap-on=false --runtime-cgroups=/systemd/system.slice --kubelet-cgroups=/systemd/system.slice"
 ```
 
@@ -389,5 +389,119 @@ systemctl restart kubelet
 systemctl restart kube-proxy
 ```
 
-### k8s操作和管理
+* 最后验证节点运行状态
+```
+kubectl --kubeconfig=/etc/kubernetes/kubeconfig get nodes
+```
 
+### k8s 的操作和管理
+
+1. 创建一个nginx实例配置 `nginx-rc-v1.yaml
+```
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: nginx-v1 
+  version: v1
+spec:
+  replicas: 3
+  selector:
+    app: nginx
+    version: v1
+  template:
+    metadata:
+      labels:
+        app: nginx
+        version: v1 
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:v1 
+          ports:
+            - containerPort: 80
+```
+
+2. 创建nginx对应的服务配置 `nginx-src.yaml` 
+
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx 
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 80 
+  selector:
+      app: nginx
+```
+
+3. 执行如下命令,完成一个nginx实例的部署
+```
+kubectl --kubeconfig=/etc/kubernetes/kubeconfig create -f nginx-rc-v1.yaml 
+kubectl --kubeconfig=/etc/kubernetes/kubeconfig create -f nginx-srv.yaml 
+```
+
+4. 其他操作参考
+
+* 扩容Replication Controller到副本数目4: `kubectl --kubeconfig=/etc/kubernetes/kubeconfig cale rc nginx --replicas=4` 
+* 创建V2版本的Replication Controller配置文件`nginx-rc-v2.yaml`
+```
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: nginx-v2 
+  version: v2
+spec:
+  replicas: 4
+  selector:
+    app: nginx
+    version: v2
+  template:
+    metadata:
+      labels:
+        app: nginx
+        version: v2 
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:v2 
+          ports:
+            - containerPort: 80
+```
+* 以灰度升级方式从将 nginx pod 从V1版本升级到V2版本: `kubectl --kubeconfig=/etc/kubernetes/kubeconfig rolling-update nginx-v2 -f nginx-rc-v2.yaml --update-period=10s`
+
+### 部分Kubernetes操作实例概念参考
+
+* Pods
+
+Pod是Kubernetes的基本操作单元，把相关的一个或多个容器构成一个Pod，通常Pod里的容器运行相同的应用。Pod包含的容器运行在同一个Minion(Host)上，看作一个统一管理单元，共享相同的volumes和network namespace/IP和Port空间。
+
+* Services
+
+Services也是Kubernetes的基本操作单元，是真实应用服务的抽象，每一个服务后面都有很多对应的容器来支持，通过Proxy的port和服务selector决定服务请求传递给后端提供服务的容器，对外表现为一个单一访问接口，外部不需要了解后端如何运行，这给扩展或维护后端带来很大的好处。
+
+* Replication Controllers
+
+Replication Controller确保任何时候Kubernetes集群中有指定数量的pod副本(replicas)在运行， 如果少于指定数量的pod副本(replicas)，Replication Controller会启动新的Container，反之会杀死多余的以保证数量不变。Replication Controller使用预先定义的pod模板创建pods，一旦创建成功，pod 模板和创建的pods没有任何关联，可以修改pod 模板而不会对已创建pods有任何影响，也可以直接更新通过Replication Controller创建的pods。对于利用pod 模板创建的pods，Replication Controller根据label selector来关联，通过修改pods的label可以删除对应的pods。Replication Controller主要有如下用法：
+
+1. Rescheduling     :如上所述，Replication Controller会确保Kubernetes集群中指定的pod副本(replicas)在运行， 即使在节点出错时。
+2. Scaling          :通过修改Replication Controller的副本(replicas)数量来水平扩展或者缩小运行的pods。
+3. Rolling updates  :Replication Controller的设计原则使得可以一个一个地替换pods来rolling updates服务。
+4. Multiple release :tracks: 如果需要在系统中运行multiple release的服务，Replication Controller使用labels来区分multiple release tracks。
+
+* Labels
+
+Labels是用于区分Pod、Service、Replication Controller的key/value键值对，Pod、Service、 Replication Controller可以有多个label，但是每个label的key只能对应一个value。Labels是Service和Replication Controller运行的基础，为了将访问Service的请求转发给后端提供服务的多个容器，正是通过标识容器的labels来选择正确的容器。同样，Replication Controller也使用labels来管理通过pod 模板创建的一组容器，这样Replication Controller可以更加容易，方便地管理多个容器，无论有多少容器。
+
+## 文档参考
+
+* Kubernetes系统架构简介: http://www.infoq.com/cn/articles/Kubernetes-system-architecture-introduction
+* Kubernetes CA证书配置 ： 
+  * https://kubernetes.io/docs/admin/authentication/#authentication-strategies
+  * https://kubernetes.io/docs/concepts/cluster-administration/certificates/#openssl
+* Kubernetes 集群配置参考 ： https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/
+* Kubernetes yaml格式参考 ： https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/
+* kubenetes pod 升级和回滚： http://dockone.io/article/735

@@ -1,8 +1,3 @@
----
-title: "基于Rsyslog和LogAnalyzer的日志管理方案"
-tags: 服务器技术
-categories: 解决方案
----
 # 基于Rsyslog和LogAnalyzer的日志管理方案
  
 ## 概述
