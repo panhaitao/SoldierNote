@@ -53,7 +53,7 @@ enabled=1
 
 [k8s-1.8]
 name=K8S 1.8
-baseurl=http://mirrors.164.com/centos/7.4.1708/extras/x86_64/
+baseurl=http://onwalk.net/repo/
 gpgcheck=0
 enabled=1
 ```
@@ -127,8 +127,13 @@ FLANNEL_OPTIONS='-etcd-prefix="/flannel/network"'
 ```
 EnvironmentFile=-/run/flannel/docker.env
 ```
+3. 添加Kubelet服务需要的启动参数,修改配置文件,在配置文件/etc/sysconfig/docker 配置项 OPTIONS 中添加
+```
+--exec-opt native.cgroupdriver=systemd -H unix:///var/run/docker.sock
+```
+* 可选参数：--insecure-registry=registry.localhost 制定自定义的docker registry
 
-3. 按照顺序重启服务
+4. 按照顺序重启服务
 ```
 systemctl daemon-reload
 systemctl restart flanneld
@@ -143,12 +148,15 @@ Kubenetes整体架构如下图所示，主要包括apiserver、scheduler、contr
 
 ![Kubenetes整体架构图](images/kuberbetes-arch.jpeg)
 
+* etcd 负责集群的协调和服务发现
+
 - master端运行三个组件： 
 * apiserver：kubernetes系统的入口，封装了核心对象的增删改查操作，以RESTFul接口方式提供给外部客户和内部组件调用。它维护的REST对象将持久化到etcd（一个分布式强一致性的key/value存储）。 
 * scheduler：负责集群的资源调度，为新建的pod分配机器。 
 * controller-manager：负责执行各种控制器，目前有两类：
-  * endpoint-controller：定期关联service和pod(关联信息由endpoint对象维护)，保证service到pod的映射总是最新的。 
-  * replication-controller：定期关联replicationController和pod，保证replicationController定义的复制数量与实际运行pod的数量总是一致。
+
+    * endpoint-controller：定期关联service和pod(关联信息由endpoint对象维护)，保证service到pod的映射总是最新的。 
+    * replication-controller：定期关联replicationController和pod，保证replicationController定义的复制数量与实际运行pod的数量总是一致。
 
 - minion端运行两个组件：
 * kubelet：负责管控docker容器，如启动/停止、监控运行状态等。它会定期从etcd获取分配到本机的pod，并根据pod信息启动或停止相应的容器。同时，它也会接收apiserver的HTTP请求，汇报pod的运行状态.
@@ -176,26 +184,20 @@ Kubenetes整体架构如下图所示，主要包括apiserver、scheduler、contr
 
 基于CA签名的双向证书的生成过程如下：
 
-1. 创建CA根证书
+- 创建CA根证书
+- 为kube-apiserver生成一个证书，并用CA证书进行签名，设置启动参数
+- 根据k8s集群数量,分别为每个主机生成一个证书，并用CA证书进行签名，设置相应节点上的服务启动参数
 
-2. 为kube-apiserver生成一个证书，并用CA证书进行签名，设置启动参数
+1. 生成CA、私钥、证书
+```
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ca.key -out ca.crt -subj "/CN=master"  
+```
+* CA的CommonName 需要和运行kube-apiserver服务器的主机名一致.
 
-    根据k8s集群数量，分别为每个主机生成一个证书，并用CA证书进行签名，设置相应节点上的服务启动参数
-
-* node3 : 运行服务 kubelet, proxy
-
-生成证书
-创建集群的root CA
-
-生成CA、私钥、证书
-
-   openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ca.key -out ca.crt -subj "/CN=k8s-master"  
-
-   CA的CommonName 需要和运行kube-apiserver服务器的主机一直
-创建apiServer的私钥、服务端证书
+2. 创建apiServer的私钥、服务端证书
 
 创建证书配置文件 /etc/kubernetes/openssl.cnf ，在alt_names里指定所有访问服务时会使用的目标域名和IP； 因为SSL/TLS协议要求服务器地址需与CA签署的服务器证书里的subjectAltName信息一致
-
+```
 [req]
 req_extensions = v3_req
 distinguished_name = req_distinguished_name
@@ -212,43 +214,180 @@ DNS.4 = kubernetes.default.svc.cluster.local
 DNS.5 = localhost
 DNS.6 = master
 IP.1 = 127.0.0.1
-IP.2 = 10.254.0.1
-IP.3 = 10.1.10.238
+IP.2 = 192.168.1.1
+IP.3 = 10.1.10.101
+```
+最后两个IP分别是clusterIP取值范围里的第一个可用值、master机器的IP。 k8s会自动创建一个service和对应的endpoint，来为集群内的容器提供apiServer服务； service默认使用第一个可用的clusterIP作为虚拟IP，放置于default名称空间，名称为kubernetes，端口是443； openssl.cnf里的DNS1~4就是从容器里访问这个service时会使用到的域名.
 
-最后两个IP分别是clusterIP取值范围里的第一个可用值、master机器的IP。 k8s会自动创建一个service和对应的endpoint，来为集群内的容器提供apiServer服务； service默认使用第一个可用的clusterIP作为虚拟IP，放置于default名称空间，名称为kubernetes，端口是443； openssl.cnf里的DNS1~4就是从容器里访问这个service时会使用到的域名。
-
-创建分配给apiServer的私钥与证书
-
+3. 创建分配给apiServer的私钥与证书
+```
+mkdir -pv /etc/kubernetes/ca/
 cd /etc/kubernetes/ca/
 openssl genrsa -out server.key 2048
-openssl req -new -key server.key -out server.csr -subj "/CN=k8s-master" -config ../openssl.cnf
+openssl req -new -key server.key -out server.csr -subj "/CN=master" -config ../openssl.cnf
 openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt -days 9000 -extensions v3_req -extfile ../openssl.cnf
+```
+* 因为 controllerManager、scheduler 和 apiservers运行在同一台主机上，因此CommonName 为master
+* 验证证书： `openssl verify -CAfile ca.crt server.crt`
 
-验证证书： openssl verify -CAfile ca.crt server.crt
-创建访问apiServer的各个组件使用的客户端证书
-
-for f in client node1 node2 node3  
+4. 创建访问apiServer的各个组件使用的客户端证书
+```
+for NAME in client node1 node2 node3  
 do
-    KEY_NAME=$f
-    if [[ $KEY_NAME == client ]];then
-      #HOST_NAME=k8s-master
-      HOST_NAME=$KEY_NAME 
-    else
-      HOST_NAME=$KEY_NAME
-    fi
-      
-    openssl genrsa -out $KEY_NAME.key 2048
-    openssl req -new -key $KEY_NAME.key -out $KEY_NAME.csr -subj "/CN=$HOST_NAME"
-    openssl x509 -req -days 9000 -in $KEY_NAME.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out $KEY_NAME.crt 
+    openssl genrsa -out $NAME.key 2048
+    openssl req -new -key $NAME.key -out $NAME.csr -subj "/CN=$NAME"
+    openssl x509 -req -days 9000 -in $NAME.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out $NAME.crt 
 done
+```
 
-注意设置CN(CommonName) 要在k8s集群中（client node1 node2 node3）域名解析生效
+* 注意设置CN(CommonName) 要在k8s集群中（client node1 node2 node3）域名解析生效
+* 验证证书：`openssl verify -CAfile ca.crt *.crt`
 
-验证证书： openssl verify -CAfile ca.crt *.crt
+5. 集群分发证书
+
+* 创建 /etc/kubernetes/kubeconfig 模板,各个客户端组件服务的启动参数需要用到 : "--kubeconfig=/etc/kubernetes/kubeconfig"
+```
+kubectl config set-cluster k8s-cluster --server=https://10.1.10.101:6443 --certificate-authority=/etc/kubernetes/ca/ca.crt 
+kubectl config set-credentials default-admin --certificate-authority=/etc/kubernetes/ca/ca.crt --client-key=/etc/kubernetes/ca/client.key --client-certificate=/etc/kubernetes/ca/client.crt
+kubectl config set-context default-system --cluster=k8s-cluster --user=default-admin
+kubectl config use-context default-system
+kubectl config view > /etc/kubernetes/kubeconfig
+```
+
+生成的配置文件内容如下：
+```
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority: /etc/kubernetes/ca/ca.crt
+    server: https://10.1.10.101:6443
+  name: k8s-cluster
+contexts:
+- context:
+    cluster: k8s-cluster
+    user: default-admin
+  name: default-system
+current-context: default-system
+kind: Config
+preferences: {}
+users:
+- name: default-admin
+  user:
+    client-certificate: /etc/kubernetes/ca/client.crt
+    client-key: /etc/kubernetes/ca/client.key
+```
+* 最后需要分发给各个主机的证书、KEY文件和对应的配置文件
+```
+/etc/kubernetes/kubeconfig : 所有主机的共用配置文件
+ca.crt                     : CA根证书
+client.key client.crt      : 提供给运行在k8s-master主机上的controllerManager、scheduler服务和kubectl工具使用   
+node1.key node1.crt        : 提供给运行在node1主机上的kubelet, proxy服务使用
+node2.key node2.crt        : 提供给运行在node2主机上的kubelet, proxy服务使用
+node3.key node3.crt        : 提供给运行在node3主机上的kubelet, proxy服务使用
+```
+
+* 因为controllerManager、scheduler 运行在master主机上，直接使用client.key client.crt
+```
+/etc/kubernetes/kubeconfig -> master 主机: /etc/kubernetes/kubeconfig
+ca.crt    ->               master 主机: /etc/kubernetes/ca/ca.crt
+node1.crt ->               master 主机: /etc/kubernetes/ca/client.crt
+node1.key ->               master 主机: /etc/kubernetes/ca/client.key
+```
+
+* node主机需要把对应证书拷贝到对应目录和重命名文件，以node1主机为例,操作如下，余下类同:
+```
+/etc/kubernetes/kubeconfig -> node1 主机: /etc/kubernetes/kubeconfig
+ca.crt    ->               node1 主机: /etc/kubernetes/ca/ca.crt
+node1.crt ->               node1 主机: /etc/kubernetes/ca/client.crt
+node1.key ->               node1 主机: /etc/kubernetes/ca/client.key
+```
+
+* 每台主机存放的证书位置如下，和kubeconfig配置中需要保持一致
+```
+/etc/kubernetes/kubeconfig
+/etc/kubernetes/ca/ca.crt
+/etc/kubernetes/ca/client.crt
+/etc/kubernetes/ca/client.key
+```
+
+* 因为自建的CA的根证书默认是不被k8s组件信任的，所有主机需要将CA根证书添加到信任列表
+
+1. 安装 ca-certificates package: yum install ca-certificates
+2. 启用dynamic CA configuration feature: update-ca-trust force-enable
+3. 新增加一个可信的根证书 cp /etc/kubernetes/ca/ca.crt /etc/pki/ca-trust/source/anchors/
+4. 更新列表: update-ca-trust extract
+
+### k8s的公共配置 
+
+/etc/kubernetes/config 配置记录的所有组件的公共配置，以下服务启动的时候都用到：
+
+* kube-apiserver
+* kube-controller-manager
+* kube-scheduler
+* kubelet
+* kube-proxy
+
+/etc/kubernetes/config 内容如下：
+
+```
+KUBE_MASTER="--master=https://10.1.10.101:6443"
+KUBE_CONFIG="--kubeconfig=/etc/kubernetes/kubeconfig"
+KUBE_COMMON_ARGS="--logtostderr=true --v=1" 
+```
 
 ### k8s-master的配置
 
+* 修改 kube-api-server 服务配置文件 /etc/kubernetes/apiserver ：
+
+```
+KUBE_ETCD_SERVERS="--storage-backend=etcd3 --etcd-servers=http://10.1.10.101:2379"
+KUBE_ADMISSION_CONTROL="--admission-control=NamespaceLifecycle,NamespaceExists,LimitRanger,SecurityContextDeny,ResourceQuota"
+KUBE_API_ARGS="--service-node-port-range=80-65535 --service-cluster-ip-range=192.168.1.0/16 --bind-address=0.0.0.0 --insecure-port=0 --secure-port=6443 --client-ca-file=/etc/kubernetes/ca/ca.crt --tls-cert-file=/etc/kubernetes/ca/server.crt --tls-private-key-file=/etc/kubernetes/ca/server.key"
+```
+
+* 这里监听SSL/TLS的端口是6443；若指定小于1024的端口，有可能会导致启动apiServer启动失败
+* 在master机器上，默认开8080端口提供未加密的HTTP服务,可以通过--insecure-port=0 参数来关闭
+
+* 修改 kube-controller-manager  服务配置文件 /etc/kubernetes/controller-manager
+```
+KUBE_CONTROLLER_MANAGER_ARGS="--cluster-signing-cert-file=/etc/kubernetes/ca/server.crt --cluster-signing-key-file=/etc/kubernetes/ca/server.key --root-ca-file=/etc/kubernetes/ca/ca.crt --kubeconfig=/etc/kubernetes/kubeconfig"
+```
+
+* 修改 kube-scheduler 服务配置文件 /etc/kubernetes/scheduler
+```
+KUBE_SCHEDULER_ARGS="--kubeconfig=/etc/kubernetes/kubeconfig"
+```
+
+* 完成配置后重启master服务：
+```
+systemctl restart kube-apiserver
+systemctl restart kube-controller-manager
+systemctl restart kube-scheduler
+```
+
 ### k8s-node的配置
+
+以node1主机为例，其余主机类同
+
+* 修改 kubelet 服务配置文件 /etc/kubernetes/kubelet
+```
+KUBELET_ADDRESS="--address=0.0.0.0"
+KUBELET_HOSTNAME="--hostname-override=node1"
+KUBELET_POD_INFRA_CONTAINER="--pod-infra-container-image=registry.deepin.com/library/pod-infrastructure"
+KUBELET_ARGS="--kubeconfig=/etc/kubernetes/kubeconfig --cgroup-driver=systemd --fail-swap-on=false --runtime-cgroups=/systemd/system.slice --kubelet-cgroups=/systemd/system.slice"
+```
+
+* 修改 kube-proxy 服务配置文件 /etc/kubernetes/proxy
+
+```
+KUBE_PROXY_ARG="--kubeconfig=/etc/kubernetes/kubeconfig"
+```
+
+* 完成配置后重启node服务：
+```
+systemctl restart kubelet
+systemctl restart kube-proxy
+```
 
 ### k8s操作和管理
 
