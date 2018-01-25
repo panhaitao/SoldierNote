@@ -1,8 +1,3 @@
----
-title: "用户与权限管理"
-categories: CentOS7
-tags: 系统管理
----
 # 用户与权限管理
 
 ## 概述 
@@ -91,4 +86,3 @@ groupadd Webserver
 * 修改用户组信息`groupmod -n server Webserver` 将组名由Webserver变更为server
 * 删除用户`userdel -r deepin`, 执行后,会清空和用户相关的配置或目录 
 * 删除用户组`groupdel server`,执行后会清空和用户组相关的配置 
-

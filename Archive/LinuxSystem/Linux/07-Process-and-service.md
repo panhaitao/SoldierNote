@@ -1,8 +1,3 @@
----
-title: "服务与守护进程"
-categories: CentOS7
-tags: 系统管理
----
 # 服务与守护进程
 
 本章介绍服务和运行级别的概念，并介绍如何启动，停止和重新启动服务，并且涵盖了如何调整个服务的缺省运行级别。
@@ -95,12 +90,3 @@ ypbind         	0:关闭	1:关闭	2:关闭	3:关闭	4:关闭	5:关闭	6:关闭
 * `service start httpd`               #启动http服务
 * `service stop httpd`                #停止http服务
 * `service restart httpd`             #重启http服务
-
-
-
-
-
-
-
-
-  
