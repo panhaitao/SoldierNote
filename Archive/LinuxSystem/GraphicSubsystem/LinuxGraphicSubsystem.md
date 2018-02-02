@@ -339,3 +339,48 @@ EndSection
 
 
 
+　　1. 调节屏幕对比度参数gamma值
+
+　　》 xgamma -gamma .75
+
+　　如果不理想可以尝试将.75修改成0.5~1.0之间测试一下。我用1.0后感觉和Vista下亮度一致。
+
+　　该命令无须管理员权限。
+
+　　2. 调节本本屏幕背光亮度pci
+
+　　》 sudo setpci -s 00:02.0 F4.B=xx
+
+　　xx就是16进制表示的屏幕亮度值，范围0（最亮）～FF（最暗）。
+
+　　00:02.0是你的显示器VGA设备代码。
+
+　　用lspci命令查一下你的VGA设备代码：
+
+　　》 lspci 00:00.0 Host bridge： Intel Corporation Mobile PM965/GM965/GL960 Memory Controller Hub （rev 03） 00:02.0 VGA compatible controller： Intel Corporation Mobile GM965/GL960 Integrated Graphics Controller （rev 03） 00:02.1 Display controller： Intel Corporation Mobile GM965/GL960 Integrated Graphics Controller （rev 03） 00:1a.0 USB Controller： Intel Corporation 82801H （ICH8 Family） USB UHCI Controller #4 （rev 03）
+
+　　注意第二行00:02.0 VGA compatible controller。
+
+　　sudo setpci -s 00:02.0 F4.B=FF
+
+　　解释一下：
+
+　　setpci是修改设备属性的命令
+
+　　-s表示接下来输入的是设备的地址
+
+　　00:02.0 VGA设备地址（：。）
+
+　　F4 要修改的属性的地址，这里应该表示“亮度”
+
+　　.B 修改的长度（B应该是字节（Byte），还有W（应该是Word，两个字节）、L（应该是Long，4个字节））
+
+　　=FF 要修改的值（可以改）
+
+　　我这里00是最暗，FF是最亮，不同的电脑可能不一样。
+
+　　比如说我嫌FF太闪眼了，我就可以sudo setpci -s 00:02.0 F4.B=CC，就会暗一些
+
+　　上面就是Ubuntu使用命令调节屏幕亮度的方法介绍了，本文一共介绍了2种方法，使用任何一种都能够实现屏幕亮度的调节。
+
+
