@@ -384,3 +384,12 @@ EndSection
 　　上面就是Ubuntu使用命令调节屏幕亮度的方法介绍了，本文一共介绍了2种方法，使用任何一种都能够实现屏幕亮度的调节。
 
 
+
+
+       联想服务器主机的问题，可以尝试使用设置分辨率的办法来解决, 虚拟机验证通过，具体是否生效还要在两项服务器上验证，还得麻烦潘帅去现场验证一下！
+
+       修改配置文件 /etc/lightdm/lightdm.conf  变更如下配置项：
+
+        [Seat:*]
+       display-setup-script=xrandr -s 800x600
+       session-setup-script=xrandr -s 800x600
