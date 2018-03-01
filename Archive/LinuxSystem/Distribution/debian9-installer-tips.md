@@ -38,3 +38,7 @@
 cp /cdrom/firmware/mr3108fw.rom /target/lib/firmware/
 ```
 4. 确认修改无误，重新安装系统即可
+
+# 内核有模块，但是需要默认包含在initramfs文件里
+
+修改 /etc/initramfs-tools/modules 文件 添加内核模块 后执行 update-initramfs -u 生成新的内核模块
