@@ -9,7 +9,7 @@
   -------- -------------- --------- ------------ ----------
   分区一   fat32          33M       bios\_grub   
   分区二   fat32          64M       boot esp     
-  分区三   ext4           &gt; 5G                DEEPINOS
+  分区三   ext4           &gt; 5G                DATAFS
 
 将 grub 引导程序安装到U盘上
 ---------------------------
@@ -35,8 +35,6 @@
 
 ### rhel/centos系列发行版操作
 
-以深度操作系统服务器版软件V16环境为例。
-
 安装BIOS引导文件，操作参考如下，需要使用grub2-pc软件包提供的命令：
 
     grub2-install --target=i386-pc --removable --boot-directory=/mnt/ /dev/sdb
@@ -48,23 +46,23 @@
 最后将ISO文件拷贝到 /mnt/ 目录，在/mnt/grub2/ 目录下创建 grub.cfg
 启动菜单文件。
 
-grub.cfg 参考实例
+grub.cfg 参考实例(以 CentOS7 和 深度桌面版本 15.5 为例)
 -----------------
 
-    menuentry "Deepin Server 16 (Auto Install for EFI)" {
+    menuentry "CentOS 7 (Auto Install for EFI)" {
         insmod ext2
         insmod loopback
-        set isofile=/deepin-server-enterprise-amd64-16-BJ-20171127-B63.iso
+        set isofile=/CentOS-7.iso
         loopback loop $isofile
-        linuxefi (loop)/images/pxeboot/vmlinuz inst.stage2=hd:LABEL=DEEPINOS:/$isofile inst.ks=hd:LABEL=DEEPINOS:/ks-uefi-install.cfg noeject 
+        linuxefi (loop)/images/pxeboot/vmlinuz inst.stage2=hd:LABEL=CentOS7.4:/$isofile inst.ks=hd:LABEL=DEEPINOS:/ks-uefi-install.cfg noeject 
         initrdefi (loop)/images/pxeboot/initrd.img
     }
 
-    menuentry "Deepin Server 16 (Auto Install for BIOS)" {
+    menuentry "CentOS 7 (Auto Install for BIOS)" {
         insmod ext2
         insmod loopback
         insmod iso9660
-        set isofile=/deepin-server-enterprise-amd64-16-BJ-20171127-B63.iso
+        set isofile=/CentOS-7.iso
         loopback loop $isofile
         linux (loop)/isolinux/vmlinuz inst.stage2=hd:LABEL=DEEPINOS:/$isofile inst.ks=hd:LABEL=DEEPINOS:/ks-bios-install.cfg noeject 
         initrd (loop)/isolinux/initrd.img
@@ -87,28 +85,29 @@ grub.cfg 参考实例
 使用dd工具制作启动U盘
 =====================
 
+-   一般来说，主流的linux发行版都支持dd到U盘启动
+
+    dd if=install.iso of=/dev/sdX
+
+
+如果较老的版本不支持这种方式，可以使用如下方式处理后在进行 dd 操作
+
 -   针对BIOS主板的U盘启动制作方式：
 
-<!-- -->
-
-     isohybrid deepin-server-xxx.iso
-     dd if=deepin-server-xxx.iso of=/dev/sdX
+    isohybrid install.iso
 
 -   针对UEFI主板的U盘启动制作方式
 
-<!-- -->
-
-    isohybrid --uefi deepin-server-xxx.iso
-    dd if=deepn-server-xxx.iso of=/dev/sdX
+    isohybrid --uefi install.iso
 
 使用syslinux工具制作启动U盘
 ===========================
 
-首先确保系统已经安装 syslinux 和 dosfstools 两个软件包
+首先确保系统已经安装 syslinux 和 dosfstools 两个软件包,以debian9为例
 
     mkfs.vfat /dev/sdb1 
     syslinux -i /dev/sdb1
-    fatlabel /dev/sdb1 DEEPINOS
+    fatlabel /dev/sdb1 Debian9
     parted /dev/sdb set 1 boot on
     dd if=/usr/lib/SYSLINUX/mbr.bin of=/dev/sdb conv=notrunc bs=440 count=1 
 
