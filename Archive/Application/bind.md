@@ -5,6 +5,23 @@ BIND是一种开源的DNS（Domain Name System）协议的实现，包含对域�
 * Secondary DNS Server(Slave) 一个域的从服务器一般都是作为冗余负载使用，从该域的主服务器上同步记录，从服务器不会进行任何信息的更改
 * Caching only Server         DNS缓存服务器不存在任何的zone配置文件，仅仅依靠缓存来为客户端提供服务，它通常用于负载均衡及加速访问操作
 
+
+## 基础概念
+
+1. 递归查询
+2. 迭代查询
+
+## 域名服务器分类
+  * 权威域名服务器
+  * 缓存域名服务器
+  * 转发域名服务器 
+
+* 基础配置
+* 安全加固配置(chroot方式)
+* 简单负载均衡
+* 全局负载均衡(GSLB)
+* DNS服务监控
+
 ## 实例一：BIND的基本安装和配置
 
 * 安装`yum install bind -y`
@@ -25,6 +42,20 @@ www     IN      A       192.168.1.2
 ftp     IN      A       192.168.1.3
 
 ```
+
+
+* $TTL 1D ；缓存时间  
+* @       IN SOA  @ rname.invalid. (               ；SOA是Start Of Authority 的缩写  
+*                                          0       ; serial 序号 如果master上的zone文件序号比slave上的大，那么数据就会同步。  
+*                                          1D      ; refresh 刷新Slave的时间  
+*                                          1H      ; retry Slave更新失败后多久再进行一次更新  
+*                                          1W      ; expire 失败多少次后不再尝试更新，一周  
+*                                          3H )    ; minimum 缓存时间，如果没有设定$TTL 这个值就可当作$TTL  
+*          NS      @  ；就是zone中定义的域名，如localhost.localdomain和localhost 
+
+
+
+
    * 添加一个反向解析库文件`/var/named/1.168.192.zone`
 ```
 $TTL    604800
