@@ -1,7 +1,9 @@
-public: html
-	rsync -av HTML/* root@207.246.93.246:/usr/share/nginx/html/ --delete
+public: html 
+	cp -av Solution/images/ HTML/Solution/
+	cp -av Application/images HTML/Application/
+	rsync -av HTML/* root@207.246.93.246:/usr/share/nginx/html/ --delete 
 
-html: clean
+html: 
 	bash ../Scripts/md2web.sh
 
 clean:

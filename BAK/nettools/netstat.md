@@ -1,3 +1,10 @@
+# netstat 命令
+
+## 查看Apache的并发请求数及其TCP连接状态
+
+netstat -n | awk '/^tcp/ {++S[$NF]} END {for (a in S) print a, S[a]}'
+
+
 
 netstat后跟不同参数时，能够显示网络连接状态、路由表、接口状态、无效连接和多播成员。
  
