@@ -203,3 +203,23 @@ TCP_Wrappers配置
 这里主要涉及到两个配置文件/etc/hosts.allow和/etc/hosts.deny。/usr/sbin/tcpd进程会根据这两个文件判断是否对访问请求提供服务。
 /usr/sbin/tcpd进程先检查文件/etc/hosts.allow，如果请求访问的主机名或IP包含在此文件中，则允许访问。
 如果请求访问的主机名或IP不包含在/etc/hosts.allow中，那么tcpd进程就检查/etc/hosts.deny。看请求访问的主机名或IP有没有包含在hosts.deny文件中。如果包含，那么访问就被拒绝；如果既不包含在/etc/hosts.allow中，又不包含在/etc/hosts.deny中，那么此访问也被允许。 
+## 系统安全 
+
+linux系统重要的会留下你的痕迹日志有：lastlog、utmp、wtmp、messages、syslog、sulog，所以不能完全依赖工具。
+
+
+默认的日志存放地点是：
+ 
+*  /var/log/wtmp    系统成功登陆的记录,此文件默认打开时乱码，可以使用`last`命令进行查询操作
+*  /var/log/btmp    系统登陆失败的记录,此文件默认打开时乱码，可以使用`lastb`命令进行查询操作
+*  /var/log/lastlog 可以使用`lastlog`命令进行查询操作
+*  ~/.bash_history  用户目录下的shell命令历史记录
+    * history -c                   #清除记录 
+    * history -r /root/history.txt #导入记录 
+    * history                      #查询结果
+
+## 设置 Bash 不记录操作历史 
+
+1. ln -s /dev/null  ~/.bash_history
+2. unset HISTFILE
+3. 修改 /etc/profile 文件中的 HISTSIZE=1000 ，将1000改为0
