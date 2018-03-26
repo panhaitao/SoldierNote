@@ -27,6 +27,12 @@ deb:
   * 打包工具: dpkg-buildpackage
   * 仓库管理: reprepro
 
+## 文档
+
+docker+k8s: https://wiki.deepin.io/mediawiki/index.php?title=容器云方案部署文档
+
+## 源码
+
 ## ISO制作方法：
 
 * centos7 系列
@@ -135,7 +141,7 @@ find . -type f | grep -v -e ^\./\.disk -e ^\./dists | xargs md5sum >> md5sum.txt
 #生成最终定制版本的ISO
 
 cd ${WORKDIR}/
-xorriso -as mkisofs -r -V "$volid"                                                                           \
+xorriso -as mkisofs -r -V "$volid"                                                                        \
     -J -isohybrid-mbr /usr/lib/ISOLINUX/isohdpfx.bin                                                      \
     -J -joliet-long                                                                                       \
     -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot                                           \
