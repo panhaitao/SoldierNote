@@ -39,3 +39,19 @@ Jinja2 模板
 
 * HTTP / RESTful URL
 * TCP/IP 基础
+
+##  其他
+工作中将涉及的技术：
+
+- AWS
+- Ansible
+- Gin-Gonic
+- Play Framework 
+- Webpack 
+- React
+- Angular
+- ES6
+- RESTful API
+- OAuth 2.0 协议
+- LDAP
+- 支付宝、微信支付相关开发
