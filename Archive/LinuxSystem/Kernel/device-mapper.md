@@ -64,6 +64,37 @@ lvchange --metadataprofile docker-thinpool docker/thinpool
 
 lvs -o+seg_monitor
 
+## 
+
+
+lvm thin pool 如何删除
+Skip to end of metadata
+Created by Zheng Wang, last modified on Jan 04, 2018 Go to start of metadata
+用direct lvm，重装docker，会发生Base Device UUID and Filesystem verification failed的问题，导致docker起不来。这样处理。
+
+systemctl stop docker
+
+vgcfgbackup -f  vg.bak   docker
+
+修改vg.bak，把里面thin相关的lv内容删除
+
+vgcfgrestore -f vg.bak docker
+
+dmsetup remove docker-thinpool
+
+dmsetup remove docker-thinpool_tmeta
+
+dmsetup remove docker-thinpool_tdata
+
+到这一步，lv就删除掉了。然后按照文档重建lv
+
+lvcreate --wipesignatures y -n thinpool docker -l 90%VG 
+lvcreate --wipesignatures y -n thinpoolmeta docker -l 5%VG
+
+lvconvert -y --zero n -c 512K --thinpool docker/thinpool --poolmetadata docker/thinpoolmeta
+
+然后systemctl start docker，就应该可以启动了。
+
 ##  参考文档
 
 * IBM 文档  ：https://www.ibm.com/developerworks/cn/linux/l-devmapper/index.html
