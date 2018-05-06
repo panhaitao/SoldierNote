@@ -1,25 +1,22 @@
 # gpg howto 
 
+# ubuntu 18.04 
 
+```
 gpg --full-generate-key
 gpg --edit-key FBF9E8C3DA4DC9FDCBD8E8676FAC6BA9E71D2168
-
+```
 
 备份密钥分为备份公钥和私钥两个部分，
 
-# 备份公钥：
-gpg -a -o keyfilename --export KeyID
-
-如果没有KeyID则是备份所有的公钥，-o表示输出到文件keyfilename中，如果加上-a的参数则输出文本格式的信息，否则输出的是二进制格式信息。
-
-# 备份私钥：
-
-gpg -a -o keyfilename --export-secret-keys KeyID
+* 备份公钥： `gpg -a -o keyfilename --export KeyID`
+* 备份私钥： `gpg -a -o keyfilename --export-secret-keys KeyID`
 
 如果没有KeyID则是备份所有的私钥，-o表示输出到文件keyfilename中，如果加上-a的参数则输出文本格式的信息，否则输出的是二进制格式信息。
 
 # 导入
 然后在别的机器上可以通过
+
 gpg --import filename
 
 导入这些信息。
