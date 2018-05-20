@@ -39,4 +39,24 @@ systemd 	234-0.1
 util-linux      2.29-2.el7 
 ```
 
+## add apt key
+
+```
+wget -qO - http://deb.opera.com/archive.key | sudo apt-key add -
+```
+
+```
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7C24E5AB949045F5
+```
+
+```
+gpg --keyserver-options http-proxy --keyserver keyserver.ubuntu.com --recv 40976EAF437D05B5
+gpg --export --armor 40976EAF437D05B5 | sudo apt-key add -
+```
+
+```
+gpg --delete-key --armor 40976EAF437D05B5
+sudo apt-key del 40976EAF437D05B5
+```
+
 
