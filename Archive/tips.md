@@ -24,3 +24,19 @@ umount /mnt
 btrfs subvolume delete /mnt/backup/
 ```
 
+## facebook centos 升级systemd 234
+
+* https://copr.fedorainfracloud.org/coprs/jsynacek/systemd-backports-for-centos-7/ 
+* 仓库     https://copr-be.cloud.fedoraproject.org/results/jsynacek/systemd-backports-for-centos-7/epel-7-x86_64/
+* 仓库配置 https://copr.fedorainfracloud.org/coprs/jsynacek/systemd-backports-for-centos-7/repo/epel-7/jsynacek-systemd-backports-for-centos-7-epel-7.repo
+
+```
+curl 	        7.47.1-1.1.el7 	
+libgudev 	230-3.fc26
+lz4 	        1.7.4.2-1.fc26
+python-systemd 	234-1
+systemd 	234-0.1
+util-linux      2.29-2.el7 
+```
+
+
