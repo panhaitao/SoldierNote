@@ -67,4 +67,6 @@ vim 命令模式 `:PluginInstall`
 
 * Vim go语言基础IDE开发环境安装(Vundle/vim-go):  <http://aiezu.com/article/vim_golang_ide_vundle_vim_go.html>
 * vim go语言IDE环境Tagbar插件和NERDTree插件安装: <http://aiezu.com/article/linux_vim_golang_tagbar_nerdtree.html>
+* http://aiezu.com/article/vim_common_option_sets.html
+* http://aiezu.com/article/vim_shortcut_keys.html
 
