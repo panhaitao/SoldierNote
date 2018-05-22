@@ -1,22 +1,10 @@
 # pdsh 使用笔记
 
-```
-#!/bin/bash
-
-export hostfile=$1
-export command=$2
-
-pdsh -R ssh -w `cat $hostfile` -l root $command | dshbak -c
-```
-
-* -R ssh    : 指定rcmd的模块名，默认使用rsh, 在这里我们要使用 ssh
-* dshbak -c : pdsh的缺省输出格式为主机名加该主机的输出，在主机或输出多时会比较混乱，可以采用dshbak做一些格式化，让输出更清晰。
-
-
 ## Pdsh 使用方法
 
 PDSH(Parallel Distributed SHell)可并行的执行对目标主机的操作，对于批量执行命令和分发任务有很大的帮助，在使用前需要配置ssh无密码登录
 
+```
 pdsh -h
 Usage: pdsh [-options] command ...
 -S                return largest of remote command return values
@@ -39,6 +27,7 @@ Usage: pdsh [-options] command ...
 -X groupname      exclude hosts in dsh group "groupname"    排除组，一般和-a连用
 
 available rcmd modules: exec,xcpu,ssh (default: rsh)        可用的执行命令模块，默认为rsh
+```
 
 ## 分组执行
  
@@ -57,3 +46,17 @@ $ pdsh -g dsh-test -l root uptime
 192.168.0.234:  16:21:39 up 32 days, 22:21, ? users,  load average: 0.15, 0.19, 0.19
 192.168.0.233:  16:21:40 up 32 days, 22:22, ? users,  load average: 0.15, 0.15, 0.10
 ```
+## 使用dshbak 合并相似的输出信息
+
+```
+#!/bin/bash
+
+export hostfile=$1
+export command=$2
+
+pdsh -R ssh -w `cat $hostfile` -l root $command | dshbak -c
+```
+
+* -R ssh    : 指定rcmd的模块名，默认使用rsh, 在这里我们要使用 ssh
+* dshbak -c : pdsh的缺省输出格式为主机名加该主机的输出，在主机或输出多时会比较混乱，可以采用dshbak做一些格式化，让输出更清晰。
+
