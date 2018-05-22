@@ -3,10 +3,8 @@
 
 ## shadowsocks 
 
-* vps 推荐：Vultr 
-
-作为一个合格的程序员，怎么可以不会科学上网？自己搭建一个shadowsocks，ss可以不限人数，不限系统（Linux、Windows、iPhone、Android、Mac都可以）。岂不美滋滋？
-在Ubuntu上的安装步骤（全程root权限）：
+* 项目主页: https://github.com/shadowsocks/
+* 国外VPS推荐：Vultr 
 
 ## 服务端配置
 
@@ -80,13 +78,26 @@ exit 0
 
 ## 客户端
 
-下载地址: https://shadowsocks.org/en/download/clients.html
 
 * windows配置
+
+下载地址: https://shadowsocks.org/en/download/clients.html
 
 安装好客户端后，在状态栏右击shadowsocks，勾选开机启动和启动系统代理，在系统代理模式中选择PAC模式，服务器->编辑服务器，用shadowsocks.json中配置的相应的ip、密码、加密方法填好，保存即可。
 
 * linux 配置
 
-* 其他 shadowsocks&开启BBR加速
+下载地址：https://sourceforge.net/projects/shadowsocksgui/files/dist/
+
+```
+./shadowsocks-local-linux64-1.1.3 -d=true -k="服务器的密码" -m="aes-256-cfb" -l=8700 -p=服务器的端口 -s="服务器的ip"
+```
+
+* android 客户端
+
+https://github.com/shadowsocks/shadowsocks-android/releases
+
+# 其他 topic
+
+shadowsocks&开启BBR加速
 
