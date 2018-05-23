@@ -112,9 +112,22 @@ exit 0
 
 https://github.com/shadowsocks/shadowsocks-android/releases
 
-# 其他 topic
+# 其他 topic: shadowsocks&开启BBR加速
 
-shadowsocks&开启BBR加速
+BBR是来自于谷歌社区的黑科技，大家可以在GitHub上关注这个持续发展的 TCP 拥塞技术,下面是具体的使用方法
 
+`wget -N --no-check-certificate https://github.com/teddysun/across/raw/master/bbr.sh && chmod +x bbr.sh && bash bbr.sh
+
+在这个脚本运行完成后，你的系统会后会提示你输入（n/y）来reboot生效.
+
+检查BBR是否启用
+
+```
+uname -r                                         #查看内核版本，>= 4.9.0 就表示 OK 了
+sysctl net.ipv4.tcp_available_congestion_control # 返回值一般为： net.ipv4.tcp_available_congestion_control = bbr cubic reno
+sysctl net.ipv4.tcp_congestion_control           # 返回值一般为： net.ipv4.tcp_congestion_control = bbr
+sysctl net.core.default_qdisc                    # 返回值一般为：# net.core.default_qdisc = fq
+lsmod | grep bbr                                 # !!!返回值有 tcp_bbr 模块即说明bbr已启动!!!
+```
 
 
