@@ -87,11 +87,26 @@ exit 0
 
 * linux 配置
 
-下载地址：https://sourceforge.net/projects/shadowsocksgui/files/dist/
+1. 安装客户端软件包 `apt install shadowsocks`
+
+`sslocal -s server_ip -p server_port  -l 1080 -k password -t 600 -m aes-256-cfb`
+
+2. 启动SS客户端
 
 ```
-./shadowsocks-local-linux64-1.1.3 -d=true -k="服务器的密码" -m="aes-256-cfb" -l=8700 -p=服务器的端口 -s="服务器的ip"
+-s 表示服务IP, 
+-p 指的是服务端的端口，
+-l 是本地端口默认是1080（可以替换成任何端口号，只需保证端口不冲突）, 
+-k 是密码（要加""）, 
+-t 超时默认300,
+-m 是加密方法默认aes-256-cfb，
 ```
+
+3. 配置浏览器
+
+* firefox 60, 首选项-> 网络代理-> 设置手动代理：(socks v5) 127.0.0.1：1080
+
+其他客户端程序，https://sourceforge.net/projects/shadowsocksgui/files/dist/
 
 * android 客户端
 
@@ -100,4 +115,6 @@ https://github.com/shadowsocks/shadowsocks-android/releases
 # 其他 topic
 
 shadowsocks&开启BBR加速
+
+
 
