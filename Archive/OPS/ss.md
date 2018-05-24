@@ -81,9 +81,8 @@ EOF
 * linux 配置
 
 1. 安装客户端软件包 `apt install shadowsocks`
-2. 启动SS客户端
 
-`sslocal -s server_ip -p server_port  -l 1080 -k password -t 600 -m aes-256-cfb`
+2. 启动SS客户端 `sslocal -s server_ip -p server_port  -l 1080 -k password -t 600 -m aes-256-cfb`
 
 ```
 -s 表示服务IP, 
@@ -93,22 +92,42 @@ EOF
 -t 超时默认300,
 -m 是加密方法默认aes-256-cfb，
 ```
-3. 配置浏览器
 
-* firefox 60, 首选项-> 网络代理-> 设置手动代理：(socks v5) 127.0.0.1：1080
-
+3. 配置浏览器firefox 60, 首选项-> 网络代理-> 设置手动代理：(socks v5) 127.0.0.1：1080
 4. 设置开机自启动:
 
 ```
-cat > /etc/rc.local << EOF
-#!/bin/sh -e
-# rc.local
-# By default this script does nothing.
-sslocal -s server_ip -p server_port  -l 1080 -k password -t 600 -m aes-256-cfb &> /var/log/shadowsocks.log &
-exit 0
+cat > /etc/shadowsocks/config.json << EOF
+{
+    "server":"server_ip",
+    "server_port":8388,
+    "local_port":1080,
+    "local_address":"127.0.0.1",
+    "password":"passwd",
+    "method": "aes-256-cfb",
+    "timeout":600
+}
 EOF
 ```
 
+```
+cat > /lib/systemd/system/sslocal.service << EOF 
+[Unit]
+Description=shadowsocks client
+After=network.target
+
+[Service]
+User=root
+Type=forking
+PermissionsStartOnly=true
+ExecStart=/usr/bin/sslocal -c /etc/shadowsocks/config.json -d start --log-file /var/log/shadowsocks.log
+ExecReload=/usr/bin/sslocal -c /etc/shadowsocks/config.json -d restart --log-file /var/log/shadowsocks.log
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
+EOF
+```
 
 其他客户端程序，https://sourceforge.net/projects/shadowsocksgui/files/dist/
 
