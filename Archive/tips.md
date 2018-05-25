@@ -59,4 +59,10 @@ gpg --delete-key --armor 40976EAF437D05B5
 sudo apt-key del 40976EAF437D05B5
 ```
 
+## SSH 代理
+
+```
+ssh -L 28090:远端内网IP:28090 alauda@远端外部IP -N
+
+```
 
