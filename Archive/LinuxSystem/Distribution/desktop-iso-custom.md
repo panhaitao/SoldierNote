@@ -67,10 +67,10 @@ dpkg-buildpackage -sa
 
 顺便分享一下我工作中用到的软件：
 
-*   微信：           snap install electronic-wechat
-*   钉钉：           https://github.com/nashaofu/dingtalk
+*   钉钉：          https://github.com/nashaofu/dingtalk
+*   微信：          https://github.com/trazyn/weweChat/releases 
 *   onedrive        https://github.com/skilion/onedrive.git
-*   Teamviewer https://download.teamviewer.com/download/linux/teamviewer_amd64.deb
+*   Teamviewer      https://download.teamviewer.com/download/
 
 
 这几年用习惯了MacOS和Linux，只要找到linux下的软件替代品，依旧不想回到windows下工作！
