@@ -66,3 +66,17 @@ ssh -L 28090:远端内网IP:28090 alauda@远端外部IP -N
 
 ```
 
+
+## MATE 桌面环境设置 compiz 窗口管理器
+
+使用下面的 GSettings 命令可以将默认的窗口管理器 marco 改为 Compiz。
+
+    $ gsettings set org.mate.session.required-components windowmanager compiz
+
+使用 mate-session-properties 注意: 当使用这种方法时，Marco会首先启动，然后自动被Compiz替换。
+
+另一种做法是使用mate-session-properties来启用Compiz。 在终端中输入下面的命令：
+
+    $ mate-session-properties
+
+单击“添加”按钮，并在“命令”文本框中输入 compiz --replace & 命令。 名称和介绍栏目并不重要，只是用来说明的，不要在意这些细节。 注销再登陆，Compiz应该就会顺利启动了。 
