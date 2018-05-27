@@ -80,3 +80,16 @@ ssh -L 28090:远端内网IP:28090 alauda@远端外部IP -N
     $ mate-session-properties
 
 单击“添加”按钮，并在“命令”文本框中输入 compiz --replace & 命令。 名称和介绍栏目并不重要，只是用来说明的，不要在意这些细节。 注销再登陆，Compiz应该就会顺利启动了。 
+
+## HOME 目录从中文切换到英文
+
+```
+export LC_ALL=en_US.UTF-8
+xdg-user-dirs-update --force
+```
+
+重新打开一个 terminal 进行操作，完了关闭即可，不需要额外再恢复中文显示什么的。如果不想再次登入后被提示更新目录，当前环境为中文则执行 echo zh_CN > ~/.config/user-dirs.locale，英文则执行 echo en_US > ~/.config/user-dirs.locale。
+
+相关配置：
+* ~/.config/user-dirs.dirs 
+* ~/.config/user-dirs.locale
