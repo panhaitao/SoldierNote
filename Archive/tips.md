@@ -90,6 +90,8 @@ xdg-user-dirs-update --force
 
 重新打开一个 terminal 进行操作，完了关闭即可，不需要额外再恢复中文显示什么的。如果不想再次登入后被提示更新目录，当前环境为中文则执行 echo zh_CN > ~/.config/user-dirs.locale，英文则执行 echo en_US > ~/.config/user-dirs.locale。
 
+注销重新登陆桌面，会提示将标准文件夹更新到当前语言，勾选”下次不要询问我”，并 选择保留旧的名称，即可！
+
 相关配置：
 * ~/.config/user-dirs.dirs 
 * ~/.config/user-dirs.locale
