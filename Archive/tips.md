@@ -95,3 +95,9 @@ xdg-user-dirs-update --force
 相关配置：
 * ~/.config/user-dirs.dirs 
 * ~/.config/user-dirs.locale
+
+##  离线安装chrome 浏览器扩展
+
+1. 修改 .crx 后缀名为 .zip，解压到一个文件夹中
+2. 打开 Chrome “设置” —— “扩展程序”，勾选右上角的“开发者模式”
+3. 点击“加载正在开发的扩展程序”，选择插件文件夹 
