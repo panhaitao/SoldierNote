@@ -369,3 +369,20 @@ http://lihaoquan.me/2017/2/25/create-kubernetes-single-node-mode.html
 Feed (/feed.xml) | Sitemap (/sitemap.xml)
 Powered by PuGo 0.10.0 (beta) (https://github.com/go-xiaohei/pugo). Theme by Default.
 http://lihaoquan.me/2017/2/25/create-kubernetes-single-node-mode.html
+
+
+排错命令：
+
+kubectl get nodes
+kubectl get service
+kubectl get deploy
+kubectl get pods
+kubectl get pods --namespace=xxx
+kubectl get pods --namespace=kube-system
+kubectl get pods --all-namespaces -o wide
+kubectl describe pod <pod-name>
+kubectl describe deployment/<deployment-name>
+kubectl describe replicaset/<replicaset-name>
+kubectl logs <pod-name>
+kubectl logs <pod-name> --previous
+kubectl describe pods nginx-deployment-64ff85b579-mbms2
