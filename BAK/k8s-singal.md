@@ -1,59 +1,52 @@
+# k8s 单机
+
+## 准备工作 
+
+* 禁用firewalld服务,使用iptables来替代 
+
+```
+systemctl disable firewalld.service
+systemctl stop firewalld.service
+yum install -y iptables-services
+systemctl start iptables.service
+systemctl enable iptables.service
+```
+
+* 安装 etcd，Kubernetes 软件和 docker $ yum install -y etcd docker kubernetes
 
 
-学习前 , 为了对 Kubernetes 的工作有一个大概的认识 , 我们需要先安装一个单节点的实例服务 ,
-用于平常的开发与测试。在官网 中,有各种各样的搭建方式,但这里我们想要有更贴近实际
-的例子,只有这样才能让 docker 和 k8s 体现出关系的紧密。
-我们先看 k8s 的架构图,以便对它的部署有个直观的了解
-Kubernetes
-http://lihaoquan.me/2017/2/25/create-kubernetes-single-node-mode.html
-1/102018/5/30
-环境准备
-深入学习Kubernetes(一):单节点k8s安装-domac的菜园子
-本文的例子是基于 Centos 7 的 Linux 版本,大家也可以使用 ubuntu 或其他发行版,软件搭建的
-方式基本是差不多的,为了让例子更简单, 本文省去了网络 Fannel 的安装与配置,只做基本
-通用的开发环境搭建,希望对大家有帮助。
-本例子用于测试的服务器 ip 为: 192.168.139.149
-yum
-源
-为了让国内下载 etcd 和 kubernetes 更流畅,我们先切换阿里云的 yum 源
-$ wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
-$ yum makecache
-关闭防火墙服务
-默认使用 firewall 为防火墙,而 Kubernetes 的 Master 与工作 Node 之间会有大量的网络
-通信,安全的做法是在防火墙上配置各种需要相互通讯的端口号,在一个安全的内部网络环
-境中可以关闭防火墙服务;
-这里我们将其更改为 iptables ,具体步骤如下:
-centos7
-$ systemctl disable firewalld.service
-$ systemctl stop firewalld.service
-安装 iptables ,其操作为:
-$ yum install -y iptables-services
-$ systemctl start iptables.service
-$ systemctl enable iptables.service
-安装 etcd 和 Kubernetes 软件( docker 会在安装 kubernetes 的过程
-中被安装)
-$ yum install -y etcd kubernetes
-配置修改
-http://lihaoquan.me/2017/2/25/create-kubernetes-single-node-mode.html
-2/102018/5/30
-深入学习Kubernetes(一):单节点k8s安装-domac的菜园子
-安装完服务组件后,我们需要修改相关的配置
-Docker 配置文件 /etc/sysconfig/docker ,其中的 OPTIONS 的内容设置为:
-$ vim /etc/sysconfig/docker
+## 基础配置
+
+安装完服务组件后,单机版本相关的配置
+
+* Docker 配置文件 /etc/sysconfig/docker ,其中的 OPTIONS 的内容设置为:
+```
 OPTIONS='--selinux-enabled=false --insecure-registry gcr.io'
-Kubernetes
+```
+
+* Kubernetes
+
 修改 apiserver 的配置文件,在 /etc/kubernetes/apiserver 中
-$ vim /etc/kubernetes/apiserver
-KUBE_ADMISSION_CONTROL="--admission_control=NamespaceLifecycle,NamespaceExists,
-LimitRanger,SecurityContextDeny,ServiceAccount,ResourceQuota"
+
+```
+KUBE_ADMISSION_CONTROL="--admission_control=NamespaceLifecycle,NamespaceExists,LimitRanger,SecurityContextDeny,ServiceAccount,ResourceQuota"
+```
+
 去掉 ServiceAccount 选项。否则会在往后的 pod 创建中,会出现类似以下的错误:
+
+```
 Error from server: error when creating "mysql-rc.yaml": Pod "mysql" is forbidden:
 no API token found for service account default/default,
 retry after the token is automatically created and added to the service account
+```
+
 切换 docker hub 镜像源
 在国内为了稳定 pull 镜像,我们最好使用 Daocloud 的镜像服务 :)
 curl -sSL https://get.daocloud.io/daotools/set_mirror.sh | sh -s http://dbe35452.m.daocloud.io
-按顺序启动所有服务
+
+* 按顺序启动所有服务
+
+```
 systemctl start etcd
 systemctl start docker
 systemctl start kube-apiserver.service
@@ -61,18 +54,21 @@ systemctl start kube-controller-manager.service
 systemctl start kube-scheduler.service
 systemctl start kubelet.service
 systemctl start kube-proxy.service
-然后,我们检验下 kubernetes 的服务是否跑起来
-ps -ef | grep kube
-http://lihaoquan.me/2017/2/25/create-kubernetes-single-node-mode.html
-3/102018/5/30
-深入学习Kubernetes(一):单节点k8s安装-domac的菜园子
-到目前为止,一个单机版的 Kubernetes 的环境就安装启动完成了。接下来,我就基于这个单
-机版,撸起袖子,认真干!!!
-启动 MySQL 容器服务
-我们先拉取 mysql 的服务镜像 :
+```
+
+## 验证集群运行状态 
+
+```
+curl 127.0.0.1:8080/healthz
+```
+
+返回 OK 说明集群状态运行正常
+
+## 
+
 sudo docker pull mysql
-或
 docker pull hub.c.163.com/library/mysql:latest
+
 启动 MySQL 服务
 首先为 MySQL 服务创建一个 RC 定义文件: mysql-rc.yaml ,下面给出了该文件的完整内容
 1 apiVersion: v1
