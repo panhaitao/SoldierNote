@@ -140,7 +140,7 @@ admin,admin,2
 system,system,3
 修改 API Server 的配置，采用上述文件进行安全认证
 $ vi /etc/kubernetes/apiserver
-KUBE_API_ARGS="--secure-port=443 --token_auth_file=/root/token_auth_file"
+KUBE_API_ARGS="--secure-port=443 --token-auth-file=/root/token_auth_file"
 重启 API Server 服务
 # systemctl restart kube-apiserver
 用 curl 验证连接 API Server
