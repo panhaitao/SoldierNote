@@ -31,14 +31,12 @@ EOF
 for d in `ls`
 do
     case $d in
-        Application) title="应用程序" ;;
-        CentOS6)     title="CentOS6"  ;;
-        CentOS7)     title="CentOS7"  ;;
-        Debian9)     title="Debian9"  ;;
-        DEV)         title="开发"     ;;
-        OPS)         title="运维"     ;; 
         Essay)       title="个人随笔" ;;
         LinuxSystem) title="系统"     ;;
+        PaaS)        title="PaaS"     ;;
+        Application) title="应用程序" ;;
+        DEV)         title="开发"     ;;
+        OPS)         title="运维"     ;; 
         Solution)    title="解决方案" ;;
         Viewpoint)   title="视角"     ;;
     esac
