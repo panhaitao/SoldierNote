@@ -35,8 +35,9 @@ do
         LinuxSystem) title="系统"     ;;
         PaaS)        title="PaaS"     ;;
         Application) title="应用程序" ;;
-        DEV)         title="开发"     ;;
+        Langage)     title="语言"     ;;
         OPS)         title="运维"     ;; 
+        DB)          title="数据库"   ;; 
         Solution)    title="解决方案" ;;
         Viewpoint)   title="视角"     ;;
     esac
