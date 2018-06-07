@@ -101,3 +101,10 @@ xdg-user-dirs-update --force
 1. 修改 .crx 后缀名为 .zip，解压到一个文件夹中
 2. 打开 Chrome “设置” —— “扩展程序”，勾选右上角的“开发者模式”
 3. 点击“加载正在开发的扩展程序”，选择插件文件夹 
+
+
+## 运行jnlp 文件
+
+1. 安装JRE/JDK
+2. 在需要打开的jnlp文件夹，按shift 键，右键打开命令窗口
+3. 在命令窗口输入javaws  xxx.inlp  即可
