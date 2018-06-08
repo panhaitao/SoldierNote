@@ -31,15 +31,15 @@ EOF
 for d in `ls`
 do
     case $d in
-        Essay)       title="个人随笔" ;;
-        LinuxSystem) title="系统"     ;;
-        PaaS)        title="PaaS"     ;;
-        Application) title="应用程序" ;;
-        Langage)     title="语言"     ;;
-        OPS)         title="运维"     ;; 
-        DB)          title="数据库"   ;; 
-        Solution)    title="解决方案" ;;
-        Viewpoint)   title="视角"     ;;
+        OS      )       title="系统"     ;;
+        DB      )       title="数据库"   ;; 
+        Storage )       title="存储"     ;;
+        PaaS    )       title="PaaS"     ;;
+        Application)    title="应用程序" ;;
+        Langage    )    title="语言"     ;;
+        OPS        )    title="运维"     ;; 
+        Solution   )    title="方案"     ;;
+        Other      )    title="其他"     ;;
     esac
     echo "<h2> $title </h2> <hr />" >> index.html
 
