@@ -32,39 +32,44 @@ func main() {
 ```
 package
 import
-interface
+
+const
 var
-break
+interface
+struct
+type
+
 default
 func
-select
-case
 defer
-go
 map
-struct
 chan
+
 if
 else
-goto
 switch
-const
+case
+for
+goto
+return
+continue
+break
+select
+
+go
 fallthrough
 range
-type
-continue
-for
-return
 ```
 
 ### 声明，赋值
 
 四个主要声明：
+* 常量(const)
+  * 在编译时被创建,只能是数字、字符串或布尔值
+* 类型(type)
 * 变量(var)
   * var name type = expression
   * var name := expression
-* 常量(const)
-* 类型(type)
 * 函数(func)
 
 ### 包和文件
