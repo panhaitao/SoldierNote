@@ -40,9 +40,9 @@ etcd是一个分布式可靠的键值存储，用于存储分布式系统的关�
 10.10.0.3 节点3
 </pre>
 
-* 节点1 操作
-1. 创建etcd配置文件：/etc/etcd/conf.yml，写入如下内容:
-<code>
+### 节点1 操作
+* 创建etcd配置文件：/etc/etcd/conf.yml，写入如下内容:
+```
 name: etcd-1  
 data-dir: /data/etcd-1  
 listen-client-urls: http://10.10.0.1:2379,http://127.0.0.1:2379  
@@ -52,12 +52,12 @@ initial-advertise-peer-urls: http://10.10.0.1:2380
 initial-cluster: etcd-1=http://10.10.0.1:2380,etcd-2=http://10.10.0.2:2380,etcd-3=http://10.10.0.3:2380  
 initial-cluster-token: etcd-cluster-token  
 initial-cluster-state: new  
-</code>
-2. 启动：`etcd --config-file /etc/etcd/conf.yml`
+```
+* 启动：`etcd --config-file /etc/etcd/conf.yml`
 
-* 节点2 操作
-1. 创建etcd配置文件：/etc/etcd/conf.yml，写入如下内容：
-<code>
+### 节点2 操作
+* 创建etcd配置文件：/etc/etcd/conf.yml，写入如下内容：
+```
 name: etcd-2  
 data-dir: /data/etcd-2  
 listen-client-urls: http://10.10.0.2:2379,http://127.0.0.1:2379  
@@ -67,13 +67,13 @@ initial-advertise-peer-urls: http://10.10.0.2:2380
 initial-cluster: etcd-1=http://10.10.0.1:2380,etcd-2=http://10.10.0.2:2380,etcd-3=http://10.10.0.3:2380  
 initial-cluster-token: etcd-cluster-token  
 initial-cluster-state: new  
-</code>
-2. 启动： `etcd --config-file /etc/etcd/conf.yml`
+```
+* 启动： `etcd --config-file /etc/etcd/conf.yml`
 
-* 节点3 操作
+### 节点3 操作
 
-1. 创建etcd配置文件：/etc/etcd/conf.yml，写入如下内容：
-<code>
+* 创建etcd配置文件：/etc/etcd/conf.yml，写入如下内容：
+```
 name: etcd-3  
 data-dir: /data/etcd-3  
 listen-client-urls: http://10.10.0.3:2379,http://127.0.0.1:2379  
@@ -83,18 +83,17 @@ initial-advertise-peer-urls: http://10.10.0.3:2380
 initial-cluster: etcd-1=http://10.10.0.1:2380,etcd-2=http://10.10.0.2:2380,etcd-3=http://10.10.0.3:2380  
 initial-cluster-token: etcd-cluster-token  
 initial-cluster-state: new  
-</code>
-2. 启动： `etcd --config-file /etc/etcd/conf.yml`
+```
+* 启动： `etcd --config-file /etc/etcd/conf.yml`
 
-* 更新etcd系统默认配置：
-     
-    系统默认的是v2，当前使用的是etcd v3版本，可以通过下面命令修改配置。
+### Etcd API 版本设置
+
+系统默认的是v2，当前使用的是etcd v3版本，可以通过下面命令修改配置。
 
 1. 编辑 `/etc/profile` 在末尾追加`export ETCDCTL_API=3`
 2. 执行命令 `source /etc/profile` 生效
 
 ## etcdctl 命令
-
 
 * 检查版本: `etcdctl -version`
 * 查看集群成员信息：`etcdctl member list`
