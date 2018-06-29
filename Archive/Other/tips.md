@@ -137,3 +137,24 @@ EndSection
 
 - 命令：synclient touchpadoff=1 －－关闭触摸板
 - 命令：synclient touchpadoff=0 －－开启触摸板
+
+
+## ssh 分发公钥后　登录失败
+
+现象
+```
+debug3: send packet: type 50                                                                                                                                                                   
+debug2: we sent a publickey packet, wait for reply                                             
+debug3: receive packet: type 51   
+...
+
+Permission denied (publickey,gssapi-keyex,gssapi-with-mic).
+```
+
+仔细检查后 ssh 秘钥公钥正确，最后经过各种google找到原因是.ssh/权限问题
+
+chmod 0700 ~/.ssh/ 
+chmod 0600 ~/.ssh/authorized_keys 
+chmod 0400 ~/.ssh/id_rsa 
+
+另外还是注意属组的问题, 如果.ssh目录和下面的文件属主错误也会导致权限文件
