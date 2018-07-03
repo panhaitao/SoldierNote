@@ -1,4 +1,6 @@
-# 简介
+# ElasticSearch 
+
+## 简介
 
 * 官网：http://www.elasticsearch.org
 
@@ -41,7 +43,7 @@ network.host: 0.0.0.0
 http.port: 9200
 discovery.zen.ping.unicast.hosts: ["10.10.0.1", "10.10.0.2","10.10.0.3"]
 ```
-以es用户身份启动：`su -l es -c "/data/elasticsearch-6.3.0/bin/elasticsearch -d"`
+以es用户身份启动：`su -l es -c "/data/elasticsearch-6.3.0/bin/elasticsearch -d"`                                                                                                       
 
 ### es-node2 操作 
 
@@ -54,7 +56,7 @@ network.host: 0.0.0.0
 http.port: 9200
 discovery.zen.ping.unicast.hosts: ["10.10.0.1", "10.10.0.2","10.10.0.3"]
 ```
-以es用户身份启动：`su -l es -c "/data/elasticsearch-6.3.0/bin/elasticsearch -d"`
+以es用户身份启动：`su -l es -c "/data/elasticsearch-6.3.0/bin/elasticsearch -d"`                                                                                                       
 
 ### es-node3 操作 
 
@@ -67,7 +69,7 @@ network.host: 0.0.0.0
 http.port: 9200
 discovery.zen.ping.unicast.hosts: ["10.10.0.1", "10.10.0.2","10.10.0.3"]
 ```
-以es用户身份启动：`su -l es -c "/data/elasticsearch-6.3.0/bin/elasticsearch -d"`
+以es用户身份启动：`su -l es -c "/data/elasticsearch-6.3.0/bin/elasticsearch -d"`                                                                                                       
 
 ##  ES集群状态检查  
 
@@ -91,4 +93,17 @@ discovery.zen.ping.unicast.hosts: ["10.10.0.1", "10.10.0.2","10.10.0.3"]
 5. `cluster`代表一个集群，集群中有多个节点，其中有一个会被选为主节点，这个主节点是可以通过选举产生的，主从节点是对于集群内部来说的。 
 6. `shards`代表索引分片，es可以把一个完整的索引分成多个分片，这样的好处是可以把一个大的索引拆分成多个，分布到不同的节点上，构成分布式搜索。分片的数量只能在索引创建前指定，并且索引创建后不能更改。 
 7. `replicas`代表索引副本，es可以设置多个索引的副本，副本的作用一是提高系统的容错性，当个某个节点某个分片损坏或丢失时可以从副本中恢复。二是提高es的查询效率，es会自动对搜索请求进行负载均衡。
+
+
+2.复合查询
+
+这里可使用restful风格对数据进行增删改查操作，具体操作可参考 
+
+http://blog.csdn.net/wuyzhen_csdn/article/details/51586082
+
+GET格式：index/_type/_id
+
+原文来自：https://blog.csdn.net/lanqibaoer/article/details/73526549，感谢！
+
+
 
