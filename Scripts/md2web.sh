@@ -1,13 +1,13 @@
 #!/bin/bash
 
+set +x
+
 for f in `find . | grep .md`
 do
     dir=$(dirname $f)
     name=$(basename $f | awk -F. '{print $1}')
     mkdir -pv HTML/${dir}
-    mkdir -pv WIKI/${dir}
-    pandoc -toc -f markdown -t html5 -o HTML/${dir}/${name}.html -s $f
-    pandoc -toc -f markdown -t mediawiki -o WIKI/${dir}/${name}.wiki -s $f
+    pandoc --toc --standalone --quiet -f markdown -t html5 -s $f -o HTML/${dir}/${name}.html
 done
 
 cd HTML 
@@ -31,10 +31,10 @@ EOF
 for d in `ls`
 do
     case $d in
-        OS      )       title="系统"     ;;
-        DB      )       title="数据库"   ;; 
-        Storage )       title="存储"     ;;
-        PaaS    )       title="PaaS"     ;;
+        OS         )    title="系统"     ;;
+        DB         )    title="数据库"   ;; 
+        Storage    )    title="存储"     ;;
+        PaaS       )    title="PaaS"     ;;
         Application)    title="应用程序" ;;
         Langage    )    title="语言"     ;;
         OPS        )    title="运维"     ;; 
@@ -45,10 +45,7 @@ do
 
     for f in `find $d | grep .html`
     do
-        
-        #num=`cat HTML/Application/openssl-howto.html | grep -n \<body\> | awk -F: '{print $1}'`
-        #line_num=[ $num + 1 ]
-        title=`sed -n '14p' $f | awk -F'>' '{print $2}' | awk -F'<' '{print $1}'`
+        title=`cat $f | grep h1 | awk -F"\>" '{print $2}' | awk -F"\<" '{print $1}'`
         echo "<a href=\"$f\"> $title </a> <br>" >> index.html
     done
 done
