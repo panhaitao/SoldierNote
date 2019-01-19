@@ -1,9 +1,3 @@
----
-title: bash 编程
-date: 2018/10/10
-categories: 开发
----
-
 # bash shell 编程笔记
 
 

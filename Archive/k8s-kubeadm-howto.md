@@ -1,9 +1,4 @@
----
-title: 使用Kubeadm部署k8s
-date: 2018/10/10
-categories: 部署
----
-
+# 使用Kubeadm部署k8s
 
 ## 准备工作
 

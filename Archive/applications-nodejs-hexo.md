@@ -1,8 +1,4 @@
----
-title: 使用hexo搭建个人博客
-date: 2018/09/28
-categories: 部署应用
----
+# 使用hexo搭建个人博客
 
 ##  安装nodejs8版本
 

@@ -1,8 +1,4 @@
----
-title: 使用Configmap 管理服务配置文件
-date: 2018/10/10
-categories: 配置管理
----
+# 使用Configmap 管理服务配置文件
 
 ## 创建配置
 
