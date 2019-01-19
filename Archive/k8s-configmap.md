@@ -1,4 +1,8 @@
-# 使用Configmap 管理服务配置文件
+---
+title: 使用Configmap 管理服务配置文件
+date: 2018/10/10
+categories: 配置管理
+---
 
 ## 创建配置
 
@@ -13,13 +17,23 @@
 更新服务或者创建服务的时候，编辑对应的 yaml 配置文件，对应　containers　段添加如下参考配置，例如：
 
 ```
-volumeMounts:
-  - mountPath: /etc/nginx/conf.d
-    name: config-volume
-volumes:
-- configMap:
-    name: nginx
-  name: config-volume
+...
+      containers:
+      - env:
+        name: logstash
+        volumeMounts:
+        - mountPath: /usr/share/logstash/config/
+          name: logstash-config-volume
+        - mountPath: /usr/share/logstash/pipeline/
+          name: logstash-pipeline-volume
+      volumes:
+      - configMap:
+          name: logstash-config
+        name: logstash-config-volume
+      - configMap:
+          name: logstash-pipeline
+        name: logstash-pipeline-volume
+...
 ```
 
 其中　 

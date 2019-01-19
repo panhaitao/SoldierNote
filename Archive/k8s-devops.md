@@ -1,4 +1,6 @@
-# 议题背景
+# k8s运维自动化实践
+
+## 议题背景
 
    在客户现场运维的时候，经常面临各种各样的问题，有些甚至是不段重复的机械劳动,这个时候就需要我们想尽办法去偷懒，去达到即快又好的解决问题，又能让自己在客户现场运维的节奏更轻松，更自在些！
   
@@ -46,12 +48,14 @@ playbook add-ssh-key.yaml:
 
 ## 批量重启集群内所有服务
 
-1.获取a6_dev_cluster集群中a6-dev项目中的服务总数
+1. 获取a6_dev_cluster集群中a6-dev项目中的服务总数
+
 ```
 let NUM=`curl -X "GET" "http://<lb_ip>:20081/v2/services/?cluster=a6_dev_cluster&project_name=a6-dev&page_size=100&num_pages=1" -H 'Authorization:Token 20958ce5dffd231ab5de6a03e9353db016df01b0' | jq '.count'`
 ```
 
-2.打印每个服务的对应的名称和UUID
+2. 打印每个服务的对应的名称和UUID
+
 ```
 for((i=0;i<$NUM;i++))
 do
@@ -60,15 +64,16 @@ do
   echo $srv_name  $srv_uuid
 done
 ```
+
 从以上结果中查询到要操作的服务对应的UUID
 
-3.停止一个服务
+3. 停止一个服务
 以运行在 a6-dev 项目中的一个服务UUID为　ea849a05-22ac-4977-9f87-da83714bccaf 的服务为例,对服务进行停止操作：
 ```
 curl -X "PUT" "http://<lb_ip>:20081/v2/services/ea849a05-22ac-4977-9f87-da83714bccaf/stop/?project_name=a6-dev" -H 'Authorization:Token 20958ce5dffd231ab5de6a03e9353db016df01b0'
 ```
 
-4.启动一个服务
+4. 启动一个服务
 以运行在 a6-dev 项目中的一个服务UUID为　ea849a05-22ac-4977-9f87-da83714bccaf 的服务为例,对服务进行停止操作：
 ```
 curl -X "PUT" "http://<lb_ip>:20081/v2/services/ea849a05-22ac-4977-9f87-da83714bccaf/start/?project_name=a6-dev" -H 'Authorization:Token 20958ce5dffd231ab5de6a03e9353db016df01b0'
