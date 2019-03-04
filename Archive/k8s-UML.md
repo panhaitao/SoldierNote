@@ -55,3 +55,10 @@
 * 同第二步一起，```kube-controller-manager```将该```Pod```从```service```的端点列表中删除，不再被视为```replication controller```的运行```pod```集的一部分。
 * 过了30秒宽限期后，将会向```pod```中依然运行的进程发送SIGKILL信号而杀掉进程。
 * ```Kublete```会在```API server```中完成```pod```的的删除，通过将优雅周期设置为0（立即删除）。```pod```在API中消失，并且在客户端也不可见。
+
+
+
+
+#####
+
+k8s DNS设置: https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/
