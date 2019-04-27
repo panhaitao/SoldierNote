@@ -8,6 +8,12 @@ fastboot flash boot boot.img
 fastboot flash system system.img
 ```
 
+## fastboot recovery 
+
+```
+fastboot flash recovery twrp-3.2.3-0-polaris.img
+```
+
 ## wifi 问题
 
 ```
@@ -17,7 +23,11 @@ adb shell settings put global captive_portal_https_url https://www.google.cn/gen
 参考: http://www.pixcn.cn/article-2990-1.html
 
 
-## MIUI国际版mi pay解决方案
+## Google Play
+
+* https://opengapps.org/ 选择 gapps pico 版本，使用 recovery 刷入
+
+## MIUI国际版mi pay解决方案 
 
 1. 准备：
 
@@ -39,5 +49,4 @@ linux版本下直接挂载就直接可以提取里面的软件了，windows版�
 用root explorer这个软件用文本形式查看/system/build.prop文件，其中ro.se.type=eSE,HCE,UICC这一行中，如果有eSE选项的话，就不用修改，跳过这一步，如果是ro.se.type=HCE,UICC没有eSE这个选项的话，则自己用文本编辑形式打开，然后添加即可，注意选项之间添加逗号，如果不会修改，可以用我修改好的文件（arv8）（如果用我的文件的话，我不能保证成功，所以最好自己修改，如果用我的文件的话，记得该权限，设定为0600）
 完成上面步骤的话，现在就可以重启了，重启之后就可以用了，如果开机直接卡米，不用急，直接进入recovery直接恢复system区就可以拯救了
 本人实验环境：手机：小米6MIUI国际版8.4.19，电脑系统：linux（ubuntu），提取包系统：MIUI国内版8.58
-
 
