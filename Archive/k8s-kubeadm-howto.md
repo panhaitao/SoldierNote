@@ -112,3 +112,7 @@ systemctl restart kubelet
 2. 永久禁用交换分区,打开/etc/fstab文件并找到包含swap文本行在开头注释掉
 
 3. 禁用防火墙 `ufw disable`
+
+
+## 参考
+https://blog.sctux.com/2018/12/30/kubernetes-bootstrapping/
