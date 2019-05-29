@@ -18,11 +18,19 @@
 
 ###  初始化系统配置
 
-- 禁用交换分区: 临时禁用执行命令 swapoff -a  彻底禁用删除 /etc/fstab swap 一行
-- 禁用selinux : debian9.x 无需操作; centos7.x 执行命令, 临时禁用执行命令 setenforce  0 彻底禁用执行命令`sed -i 's/SELINUX=enforcing/SELINUX=disabled/' /etc/selinux/config` 重启生效
-- 禁用防火墙: debian 9.x 无需操作; centos 7.x 执行命令, systemctl stop firewalld; systemctl disable firewalld
-- 开启端口转发: 修改 /etc/sysctl.conf 文件, 修改 net.ipv4.ip_forward=1 执行命令 sysctl --system 生效
-- 配置内核参数: 修改 /etc/sysctl.d/k8s.conf 文件，修改 net.bridge.bridge-nf-call-ip6tables = 1 net.bridge.bridge-nf-call-iptables = 1 执行命令 sysctl --system 生效
+1. 禁用交换分区:
+ 1. 临时禁用执行命令`swapoff -a`
+ 2. 彻底禁用删除`/etc/fstab swap`一行
+2. 禁用selinux:
+ 1. debian9.x 无需操作
+ 2. centos7.x 执行命令
+  1. 临时禁用执行命令 setenforce  0
+  2. 彻底禁用执行命令 sed -i 's/SELINUX=enforcing/SELINUX=disabled/' /etc/selinux/config 重启生效
+3. 禁用防火墙:
+ - debian 9.x 无需操作
+ - centos 7.x 执行命令, systemctl stop firewalld; systemctl disable firewalld
+4. 配置内核参数: 修改 /etc/sysctl.d/k8s.conf 文件，修改 net.bridge.bridge-nf-call-ip6tables = 1 net.bridge.bridge-nf-call-iptables = 1 执行命令 sysctl --system 生效
+ - 开启端口转发: 修改 /etc/sysctl.conf 文件, 修改 net.ipv4.ip_forward=1 执行命令 sysctl --system 生效
 
 ###  安装软件包
 
