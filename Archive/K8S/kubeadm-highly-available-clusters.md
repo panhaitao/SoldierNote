@@ -1,18 +1,27 @@
-# 使用Kubeadm部署k8s集群
+# 使用Kubeadm部署k8s高可用集群
 
-以系统 debian 9.x  centos 7.x 为例，记录部署docker-18.09.6 + k8s-1.14 单master集群的简要操作步骤
+截止至最新的1.14版本,k8s自身依旧没有实现真正的api-server高可用机制，目前的集群方案大多还是采用第三方LB+多master节点实现高可用和api-server的负载均衡,本文以系统 debian 9.x  centos 7.x 为例，记录部署docker-18.09.6 + k8s-1.14 高可用集群的简要操作步骤
 
-## 单master节点的k8s集群 
+![K8S HA Cluster](https://d33wubrfki0l68.cloudfront.net/d1411cded83856552f37911eb4522d9887ca4e83/b94b2/images/kubeadm/kubeadm-ha-topology-stacked-etcd.svg)
 
-使用kubeadm 部署单机集群，需要完成如下步骤:
 
-1. 准备一台配置不低于2核4G的主机
-2. 初始化系统配置，禁用交换分区，关闭selinux，关闭防火墙，开启端口转发等
-3. 安装docker，kubeadm软件包
-4. 解决翻墙问题，确保docker可以拉取相应镜像
-5. 执行kubeadm init 命令，完成初始化
-6. 选择一个cni网络插件，部署到k8s集群中
-7. 去除master的污点标记，确保master可以调度pod 
+## 高可用k8s集群部署简介 
+
+使用kubeadm 部署高可用集群，需要完成如下步骤:
+
+1. 准备一个高可用的LB(haproxy,nginx+,或者第三方云服务提供的负载均衡组件,有条件的可以使用F5硬件设备)
+2. 准备3台配置不低于2核4G的主机，供etcd和k8s master节点使用
+3. 准备N台配置不低于4核8G的主机，供k8s node节点使用
+4. 设置所有节点，确保/sys/class/dmi/id/product_uuid唯一，hostname 唯一
+5. 设置所有节点主机名可以解析，可以借助dns或者修改/etc/hosts完成 
+5. 所有节点初始化系统配置，禁用交换分区，关闭selinux，关闭防火墙，开启端口转发等
+6. 多有节点安装docker，kubeadm软件包
+7. 解决翻墙问题，确保docker可以拉取相应镜像
+8. 在master节点生成Etcd static Pod 配置,启动etcd集群
+9. 生成k8s组件的证书，分发到所有master节点 
+9. 执行kubeadm init 命令，完成集群初始化
+10. 选择一个cni网络插件，部署到k8s集群中
+11. 将nodes节点添加到k8s集群中
 
 ## 单master 节点的详细部署步骤
 
@@ -126,4 +135,6 @@ kubeadm join 194.168.1.15:6443 --token ninsl0.hgnutou2p9f9u8d4 --discovery-token
 5. 重置集群:`kubeadm reset`, 清空目录 /var/lib/etcd/ /var/lib/kubelet/ /etc/kubernetes/ 
 
 ## 参考
+
+官方文档链接<https://kubernetes.io/docs/setup/independent/ha-topology/#stacked-etcd-topology>
 https://blog.sctux.com/2018/12/30/kubernetes-bootstrapping/

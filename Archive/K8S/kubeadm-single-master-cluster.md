@@ -1,4 +1,4 @@
-# kubeadm-single-master-cluster
+# 使用Kubeadm部署k8s单master集群
 
 以系统 debian 9.x  centos 7.x 为例，记录部署docker-18.09.6 + k8s-1.14 单master集群的简要操作步骤
 
@@ -18,19 +18,28 @@
 
 ###  初始化系统配置
 
-1. 禁用交换分区:
- 1. 临时禁用执行命令`swapoff -a`
- 2. 彻底禁用删除`/etc/fstab swap`一行
-2. 禁用selinux:
- 1. debian9.x 无需操作
- 2. centos7.x 执行命令
-  1. 临时禁用执行命令 setenforce  0
-  2. 彻底禁用执行命令 sed -i 's/SELINUX=enforcing/SELINUX=disabled/' /etc/selinux/config 重启生效
-3. 禁用防火墙:
- - debian 9.x 无需操作
- - centos 7.x 执行命令, systemctl stop firewalld; systemctl disable firewalld
-4. 配置内核参数: 修改 /etc/sysctl.d/k8s.conf 文件，修改 net.bridge.bridge-nf-call-ip6tables = 1 net.bridge.bridge-nf-call-iptables = 1 执行命令 sysctl --system 生效
- - 开启端口转发: 修改 /etc/sysctl.conf 文件, 修改 net.ipv4.ip_forward=1 执行命令 sysctl --system 生效
+1  禁用交换分区:
+```
+临时禁用执行命令`swapoff -a`
+彻底禁用删除`/etc/fstab swap`一行
+```
+2  禁用selinux:
+```
+debian9.x 无需操作;
+centos7.x 执行命令
+  临时禁用执行命令 setenforce  0
+  彻底禁用执行命令 sed -i 's/SELINUX=enforcing/SELINUX=disabled/' /etc/selinux/config 重启生效
+```
+3  禁用防火墙:
+```
+debian 9.x 无需操作
+centos 7.x 执行命令, systemctl stop firewalld; systemctl disable firewalld
+```
+4  配置内核参数: 
+```
+修改 /etc/sysctl.d/k8s.conf 文件，修改 net.bridge.bridge-nf-call-ip6tables = 1 net.bridge.bridge-nf-call-iptables = 1 执行命令 sysctl --system 生效
+开启端口转发: 修改 /etc/sysctl.conf 文件, 修改 net.ipv4.ip_forward=1 执行命令 sysctl --system 生效
+```
 
 ###  安装软件包
 
@@ -124,13 +133,14 @@ kubectl get pods --all-namespaces  #检查所有pod是否运行正常
 6. 返回master节点，执行命令: `kubectl get nodes` 确认新添加节点是否添加成功
 
 
-## 排除故障操作参考
+## 排除故障操作和其他操作参考
 
 1. 清除iptables规则: `iptables -F && iptables -t nat -F && iptables -t mangle -F && iptables -X`
 2. 清除ipvs规则: `ipvsadm --clear`
 3. 查看docker运行日志: `journalctl  -fu docker`
 4. 查看kubelet运行日志: `journalctl  -fu kubelet`
 5. 重置集群:`kubeadm reset`, 清空目录 /var/lib/etcd/ /var/lib/kubelet/ /etc/kubernetes/ 
+6. 禁止master部署pod `kubectl taint nodes <master-name> node-role.kubernetes.io/master=true:NoSchedule`
 
 ## 参考
 
