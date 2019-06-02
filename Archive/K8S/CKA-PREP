@@ -1,0 +1,18 @@
+# 备考CKA
+
+* Chapter 1：课程介绍
+* Chapter 2：Kubernetes 基本概念
+* Chapter 3：Kubernetes 架构及原理
+* Chapter 4：Kubernetes 安装和配置
+* Chapter 5：Kubernetes API 及集群访问
+* Chapter 6：ReplicaController，ReplicaSets 和 Deployments
+* Chapter 7：Volume、配置文件及密钥
+* Chapter 8：Service 及服务发现
+* Chapter 9：Ingress 及负载均衡
+* Chapter 10：DaemonSets，StatefulSets，Jobs，HPA，RBAC
+* Chapter 11：Kubernetes 调度
+* Chapter 12：Kubernetes 安全
+* Chapter 13：日志、监控、Troubleshooting
+* Chapter 14：自定义资源 CRD
+* Chapter 15：Kubernetes Federation
+* Chapter 16：应用编排 Helm，Chart
