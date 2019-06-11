@@ -7,7 +7,7 @@
 
 ## 高可用k8s集群部署简介 
 
-使用kubeadm 部署高可用集群，需要完成如下步骤:
+使用kubeadm 1.9.6 部署高可用集群，需要完成如下步骤:
 
 1. 准备一个高可用的LB(haproxy,nginx+,或者第三方云服务提供的负载均衡组件,有条件的可以使用F5硬件设备)
 2. 准备3台配置不低于2核4G的主机，供etcd和k8s master节点使用
@@ -20,10 +20,32 @@
 8. 在master节点生成Etcd static Pod 配置,启动etcd集群
 9. 生成k8s组件的证书，分发到所有master节点 
 9. 执行kubeadm init 命令，完成集群初始化
-10. 选择一个cni网络插件，部署到k8s集群中
-11. 将nodes节点添加到k8s集群中
+10. 将nodes节点添加到k8s集群中
+11. 选择一个cni网络插件，部署到k8s集群中
 
-## 单master 节点的详细部署步骤
+使用kubeadm 1.14.x 部署高可用集群，需要完成如下步骤:
+
+1. 准备一个高可用的LB(haproxy,nginx+,或者第三方云服务提供的负载均衡组件,有条件的可以使用F5硬件设备)
+2. 准备3台配置不低于2核4G的主机，供etcd和k8s master节点使用
+3. 准备N台配置不低于4核8G的主机，供k8s node节点使用
+4. 设置所有节点，确保/sys/class/dmi/id/product_uuid唯一，hostname 唯一
+5. 设置所有节点主机名可以解析，可以借助dns或者修改/etc/hosts完成 
+5. 所有节点初始化系统配置，禁用交换分区，关闭selinux，关闭防火墙，开启端口转发等
+6. 多有节点安装docker，kubeadm软件包
+7. 解决翻墙问题，确保docker可以拉取相应镜像
+8. 在master1节点初始化配置:
+ * kubeadm config print init-defaults > kubeadm-init.yaml
+ * kubeadm init --config=kubeadm-config.yaml --experimental-upload-certs 
+9. master节点加入集群中: 执行从master节点获取的 `kubeadm token create --print-join-command` 命令+ --experimental-control-plane --certificate-key
+`kubeadm init phase upload-certs --experimental-upload-certs 最后一行`
+10. nodes节点添加到k8s集群中:执行从master节点获取的 `kubeadm token create --print-join-command` 命令
+11. 选择一个cni网络插件，部署到k8s集群中
+
+## 高可用k8s集群的详细部署步骤
+
+### 准备计算资源，网络资源
+
+创建一个高可用集群，至少需要准备一个LB,三个配置不低于2C4G的计算节点供master使用，
 
 ###  初始化系统配置
 
@@ -32,7 +54,7 @@
 - 禁用防火墙: debian 9.x 无需操作; centos 7.x 执行命令, systemctl stop firewalld; systemctl disable firewalld
 - 开启端口转发: 修改 /etc/sysctl.conf 文件, 修改 net.ipv4.ip_forward=1 执行命令 sysctl --system 生效
 - 配置内核参数: 修改 /etc/sysctl.d/k8s.conf 文件，修改 net.bridge.bridge-nf-call-ip6tables = 1 net.bridge.bridge-nf-call-iptables = 1 执行命令 sysctl --system 生效
-- 单master集群官方参考文档: <https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/>
+- 更多准备工作检查参考: <https://kubernetes.io/docs/setup/independent/install-kubeadm/#check-required-ports>
 
 ###  安装软件包
 
