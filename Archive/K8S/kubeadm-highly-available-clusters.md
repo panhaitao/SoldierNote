@@ -35,10 +35,16 @@
 7. 解决翻墙问题，确保docker可以拉取相应镜像
 8. 在master1节点初始化配置:
  * kubeadm config print init-defaults > kubeadm-init.yaml
+　 修改 localAPIEndpoint.advertiseAddress: 172.26.84.150 -> Maste1_IP
+        controlPlaneEndpoint: "172.26.84.149:6443" -> LB_IP
+        imageRepository: 172.26.84.150:5000 -> 换为集群可用的镜像仓库地址   
+        networking: podSubnet: "10.244.0.0/16" 定义位CNI 网络插件一致的网段
  * kubeadm init --config=kubeadm-config.yaml --experimental-upload-certs 
 9. master节点加入集群中: 执行从master节点获取的 `kubeadm token create --print-join-command` 命令+ --experimental-control-plane --certificate-key
 `kubeadm init phase upload-certs --experimental-upload-certs 最后一行`
-10. nodes节点添加到k8s集群中:执行从master节点获取的 `kubeadm token create --print-join-command` 命令
+10. nodes节点添加到k8s集群中:
+执行从master节点获取的 `kubeadm token create --print-join-command` 命令
+然后在为节点打上标签　kubectl label node --overwrite node1 node-role.kubernetes.io/node=
 11. 选择一个cni网络插件，部署到k8s集群中
 
 ## 高可用k8s集群的详细部署步骤
