@@ -69,7 +69,7 @@
 
 ###  初始化集群
 
-1. 初始化第一个master1节点
+1) 初始化第一个master1节点
 
 执行命令`kubeadm config print init-defaults > kubeadm-init.yaml`　导出默认的参考配置,修改如下部分
 
@@ -85,14 +85,14 @@ Your Kubernetes control-plane has initialized successfully!
 ...
 ```
 
-2. 将其他master节点加入集群中: 
+2) 将其他master节点加入集群中: 
 
 执行从master1 节点获取的 `kubeadm token create --print-join-command` 命令返回结果 --experimental-control-plane --certificate-key `kubeadm init phase upload-certs --experimental-upload-certs 最后一行`
 
-3. 将nodes节点添加到k8s集群中
+3) 将nodes节点添加到k8s集群中
 执行从master节点获取的 `kubeadm token create --print-join-command` 命令
 
-4. 初始化kubectl 配置
+4) 初始化kubectl 配置
 
 在所有master节点上执行如下命令，确保kubectl命令能够和apisever认证交互:
 ```
@@ -101,7 +101,7 @@ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 ```
 
-5. 为所有node节点打上标签
+5) 为所有node节点打上标签
 
 在任意一个master节点执行命令
 
@@ -112,7 +112,7 @@ kubectl label node --overwrite node1 node-role.kubernetes.io/node=
 kubectl label node --overwrite nodeN node-role.kubernetes.io/node=
 ```
 
-6. 选择一个cni网络插件，部署到k8s集群中
+6) 选择一个cni网络插件，部署到k8s集群中
 
 在任意一个master节点执行命令：`kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/62e44c867a2846fefb68bd5f178daf4da3095ccb/Documentation/kube-flannel.yml`　返回结果如下：
 ```
