@@ -33,25 +33,23 @@
 5. 所有节点初始化系统配置，禁用交换分区，关闭selinux，关闭防火墙，开启端口转发等
 6. 多有节点安装docker，kubeadm软件包
 7. 解决翻墙问题，确保docker可以拉取相应镜像
-8. 在master1节点初始化配置:
- * kubeadm config print init-defaults > kubeadm-init.yaml
-　 修改 localAPIEndpoint.advertiseAddress: 172.26.84.150 -> Maste1_IP
-        controlPlaneEndpoint: "172.26.84.149:6443" -> LB_IP
-        imageRepository: 172.26.84.150:5000 -> 换为集群可用的镜像仓库地址   
-        networking: podSubnet: "10.244.0.0/16" 定义位CNI 网络插件一致的网段
- * kubeadm init --config=kubeadm-config.yaml --experimental-upload-certs 
-9. master节点加入集群中: 执行从master节点获取的 `kubeadm token create --print-join-command` 命令+ --experimental-control-plane --certificate-key
-`kubeadm init phase upload-certs --experimental-upload-certs 最后一行`
-10. nodes节点添加到k8s集群中:
-执行从master节点获取的 `kubeadm token create --print-join-command` 命令
-然后在为节点打上标签　kubectl label node --overwrite node1 node-role.kubernetes.io/node=
-11. 选择一个cni网络插件，部署到k8s集群中
+8. 在master1节点初始化配置
+9. 将其他master节点加入集群中
+10. 将其他nodes节点添加到k8s集群中:
+11. 为所有node节点打上标
+12. 选择一个cni网络插件，部署到k8s集群中
 
 ## 高可用k8s集群的详细部署步骤
 
 ### 准备计算资源，网络资源
 
-创建一个高可用集群，至少需要准备一个LB,三个配置不低于2C4G的计算节点供master使用，
+创建一个高可用集群，至少需要准备一个LB,三个配置不低于2C4G的计算节点供master使用，根据实际需要创建三个或者更多的配置不低于4C8G的结算节点
+
+ | 类型        | 数量    |  最低参考配置     |  备注                                  | 
+ | --------    | -----:  | :---------------: | :------------------------------------: |
+ | lb          | 1       |  1C1G             | 用于转发到三台master api server:6443   |
+ | master      | 3       |  2C4G             | k8s master 节点　　　　　　　　　　　  |
+ | node        | >=3     |  4C8G             | k8s node　节点　　    　　　　　　　　 |
 
 ###  初始化系统配置
 
@@ -71,36 +69,52 @@
 
 ###  初始化集群
 
-执行命令 `kubeadm init --pod-network-cidr=10.244.0.0/16` 完成k8s集群初始化,返回如下结果表示出初始化成功
+1. 初始化第一个master1节点
 
+执行命令`kubeadm config print init-defaults > kubeadm-init.yaml`　导出默认的参考配置,修改如下部分
+
+* localAPIEndpoint.advertiseAddress: 172.26.84.150 -> Maste1_IP
+* controlPlaneEndpoint: "172.26.84.149:6443" -> LB_IP
+* imageRepository: 172.26.84.150:5000 -> 换为集群可用的镜像仓库地址   
+* networking: podSubnet: "10.244.0.0/16" 定义为和 CNI 网络插件一致的网段
+
+执行命令: `kubeadm init --config=kubeadm-config.yaml --experimental-upload-certs` 完成master1节点初始化,返回如下结果表示出初始化成功
 ```
+...
 Your Kubernetes control-plane has initialized successfully!
+...
 ```
 
-在master节点执行上面返回结果如下部分，确保kubectl命令能够和apisever认证交互:
+2. 将其他master节点加入集群中: 
 
+执行从master1 节点获取的 `kubeadm token create --print-join-command` 命令返回结果 --experimental-control-plane --certificate-key `kubeadm init phase upload-certs --experimental-upload-certs 最后一行`
+
+3. 将nodes节点添加到k8s集群中
+执行从master节点获取的 `kubeadm token create --print-join-command` 命令
+
+4. 初始化kubectl 配置
+
+在所有master节点上执行如下命令，确保kubectl命令能够和apisever认证交互:
 ```
 mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 ```
 
-执行以上操作后，检查pod运行状态, 执行命令，kubectl get pods --all-namespaces 返回结果如下： 
-```
-NAMESPACE     NAME                              READY   STATUS    RESTARTS   AGE
-kube-system   coredns-fb8b8dccf-dkmmn           0/1     Pending   0          3m14s
-kube-system   coredns-fb8b8dccf-p5vqs           0/1     Pending   0          3m14s
-kube-system   etcd-master1                      1/1     Running   0          2m23s
-kube-system   kube-apiserver-master1            1/1     Running   0          2m11s
-kube-system   kube-controller-manager-master1   1/1     Running   0          2m7s
-kube-system   kube-proxy-4hq4z                  1/1     Running   0          3m14s
-kube-system   kube-scheduler-master1            1/1     Running   0          2m34s
-```
-其中，除了coredns没有运行外，其他组件都为running状态为正常，此时容器网络未就绪，需要部署网络插件
+5. 为所有node节点打上标签
 
-### 部署网络插件
+在任意一个master节点执行命令
 
-执行命令：`kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/62e44c867a2846fefb68bd5f178daf4da3095ccb/Documentation/kube-flannel.yml`　返回结果如下：
+```
+kubectl label node --overwrite node1 node-role.kubernetes.io/node=
+kubectl label node --overwrite node1 node-role.kubernetes.io/node=
+...
+kubectl label node --overwrite nodeN node-role.kubernetes.io/node=
+```
+
+6. 选择一个cni网络插件，部署到k8s集群中
+
+在任意一个master节点执行命令：`kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/62e44c867a2846fefb68bd5f178daf4da3095ccb/Documentation/kube-flannel.yml`　返回结果如下：
 ```
 podsecuritypolicy.extensions/psp.flannel.unprivileged created
 clusterrole.rbac.authorization.k8s.io/flannel created
@@ -111,20 +125,7 @@ daemonset.extensions/kube-flannel-ds-amd64 created
 ...
 ```
 
-* 执行命令，kubectl get pods --all-namespaces 会发现新增pod: kube-flannel-ds-amd64-xxxx ,　coredns 也会变成 running 状态
-* 执行命令，kubectl get nodes 返回结果如下，master 节点变成Ready状态
-```
-NAME      STATUS   ROLES    AGE   VERSION
-master1   Ready    master   12m   v1.14.2
-```
-
-### 去除master污点
-
-Master 节点不参与工作负载，默认只运行一些管理必须的pod, 需要执行命令,解除限制：
-
-`kubectl taint nodes --all node-role.kubernetes.io/master-`
-
-### 检查master
+### 检查集群运行状态
 
 ```
 kubectl get cs                     #检查集群健康状态
@@ -134,12 +135,12 @@ kubectl get pods --all-namespaces  #检查所有pod是否运行正常
 
 ## 添加节点
 
-对master节点进行扩容worker节点需要完整如下操作：
+对集群worker节点扩容需要完整如下操作：
 
 1. 初始化系统配置，禁用交换分区，关闭selinux，关闭防火墙，开启端口转发等
 2. 安装docker，kubeadm软件包
 3. 在master节点获取添加节点的命令
-4. 在node 节点执行添加节点的命令
+4. 在node节点执行添加节点的命令
 
 ### 添加node节点详细操作步骤
 
@@ -151,8 +152,8 @@ kubectl get pods --all-namespaces  #检查所有pod是否运行正常
 kubeadm join 194.168.1.15:6443 --token ninsl0.hgnutou2p9f9u8d4 --discovery-token-ca-cert-hash sha256:ba73076c46a143260ba876d09174f558deb1941794621591cbc104d63c50adaa
 ```
 5. 在nodes节点执行上一步骤返回的命令
-6. 返回master节点，执行命令: `kubectl get nodes` 确认新添加节点是否添加成功
-
+6. 为新增加node节点打标签: `kubectl label node --overwrite nodeN node-role.kubernetes.io/node=`
+7. 返回master节点，执行命令: `kubectl get nodes` 确认新添加节点是否添加成功
 
 ## 排除故障操作参考
 
@@ -165,4 +166,3 @@ kubeadm join 194.168.1.15:6443 --token ninsl0.hgnutou2p9f9u8d4 --discovery-token
 ## 参考
 
 官方文档链接<https://kubernetes.io/docs/setup/independent/ha-topology/#stacked-etcd-topology>
-https://blog.sctux.com/2018/12/30/kubernetes-bootstrapping/
