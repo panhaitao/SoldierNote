@@ -2,7 +2,7 @@
 
 * yum install iscsi-initiator-utils -y
 * iscsiadm -m discovery -t sendtargets -p 172.16.1.191:3260
-* iscsiadm -m node –T iqiqn.2019-07.com.aisino:91577924332b  172.16.1.191:3260 -l
+* iscsiadm -m node –T iqn.2019-07.com.aisino:91577924332b  172.16.1.191:3260 -l
 
 发现设备后检查 /proc/scsi/scsi 
 
