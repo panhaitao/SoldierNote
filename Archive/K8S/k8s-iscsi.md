@@ -7,7 +7,7 @@
 
 ## k8s yaml
 
-···
+```
 public-registry.yaml
 apiVersion: v1
 kind: PersistentVolume
@@ -37,4 +37,4 @@ spec:
   resources:
     requests:
       storage: 90Gi
-···
+```
