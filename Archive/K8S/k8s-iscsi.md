@@ -9,6 +9,7 @@
 
 * iscsiadm -m node --logoutall=all
 
+https://www.cnblogs.com/sting2me/p/6937578.html
 
 
 ## k8s yaml
