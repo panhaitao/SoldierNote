@@ -32,3 +32,11 @@ docker run -d --name kibana -p 5601:5601 kibana:7.2.0
 { "logger.discovery" : "INFO" }
 }
 确认修改，点击执行，重新执行步骤1 ，确认配置已经变更
+
+api获取：http://ip:9200/_cluster/health?pretty 或者 Kibana的开发工具Dev Tools中执行 ：
+
+查看集群健康状态
+
+GET _cluster/health
+
+* https://blog.51cto.com/michaelkang/2164200?source=dra
