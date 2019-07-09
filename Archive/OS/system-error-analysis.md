@@ -22,7 +22,7 @@ echo 30 > /proc/sys/kernel/watchdog_thresh
 
 1. 观察系统top 负载异常高，free 查看内存只有 几百M free 
 2. 观察日志 journalctl -fu kubelet 看到不断有pod crashoff 其中有kafka nxs 等 
-3. 观察系统 dmmsg 不断返回某java进程 被内核OOM 机制杀掉
+3. 观察系统 dmesg 不断返回某java进程 被内核OOM 机制杀掉
 4. 查看kafka 配置参数不合理，容器资源限制8G kafka运行参数却只分了一个1G，将1G->6G kafka 重新调度到其他节点，kakfa运行正常，故障节点问题依旧没有缓解，排除kafka 引发
 5. 执行docker stats 能看到 某个业务容器实例 BLOCK/IO 达到10G 
 6. 执行top -> F 选中DATA  空格确认 -> ESC -> M 发现某个java 进程 DATA 使用量惊人 和docker  stats看到的一致，猜测和可能刚才这个业务有关，将对应容器停掉，节点负载恢复正常
