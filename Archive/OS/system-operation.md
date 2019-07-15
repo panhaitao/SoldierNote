@@ -17,7 +17,7 @@ systemd --> systemd-journald --> ram DB --> rsyslog -> /var/log
  * 进程和操作系统内核需能够为发生的事件记录日志,可用于系统审计和故障排除
  * RHEL6版本之前的日志系统基于 syslog 协议，许多程序使用此系统记录事件，默认日志存储在 /var/log 目录中
 
-## 系统日志（systemd-journald)架构:
+### 系统日志（systemd-journald)架构:
  * 一种改进的日志管理服务，是 syslog 的补充，收集来自内核、启动过程早期阶段、标准输出、系统日志，守护进程启动和运行期间错误的信息
  * 默认情况下，systemd将消息写入到结构化的事件日志中（数据库),保存在 /run/log/journal 中，系统重启就会清除，可以通过新建 /var/log/journal ，日志会自动记录到这个目录中，并永久存储。
  * RHEL7之后的日志系统由systemd-journald和 rsyslog 共同组成，syslog 的信息可以由 systemd-journald 转发到 rsyslog 中进一步处理,保持向后兼容
