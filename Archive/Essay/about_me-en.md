@@ -43,12 +43,12 @@
     1. Alauda Container Platform Software implementation and deployment 
     2. On-site operation and maintenance program customization and technical support
     3. maintenance Docker/K8s, DevOPS, middleware of Enterprise operating environment
-    Project experience: 
-    1. Great Wall Insurance,	
-    2. Wuhan Construction Bank, 
-    3. PetroChina, 
-    4. Online National Network, 
-    5. Everbright Bank and other enterprise container cloud projects have 
+    4. Project experience: 
+    * Great Wall Insurance Company	
+    * China National Petroleum Corporation 
+    * State grid corporation of china
+    * Wuhan Communications Bank 
+    * China Everbright Bank 
 
 ## Self-evaluation
     1. With extensive experience in implementation and operation, the ability to quickly analyze and solve problems encountered in engineering deployment.
