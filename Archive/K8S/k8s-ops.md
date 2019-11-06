@@ -1,9 +1,27 @@
-# k8s运维自动化实践
-
-## 议题背景
+# 灵雀云 K8S 日常运维巡检
 
    在客户现场运维的时候，经常面临各种各样的问题，有些甚至是不段重复的机械劳动,这个时候就需要我们想尽办法去偷懒，去达到即快又好的解决问题，又能让自己在客户现场运维的节奏更轻松，更自在些！
   
+## 查询平台过去一段时间调度次数
+
+使用ACE接口查询
+
+curl -XGET -H "Authorization: Token token_str-xxxxxxxx" "http://lb_ip:32001/v2/kevents/?start_time=<unix时间>&end_time=<unix时间>&cluster=<集群名称>&page=1&page_size=1000" | jq ".total_items"
+
+token 在平台用户中心查询 集群名称 ACE2.X版本 参考管理视图-> 集群
+
+unix时间戳：  
+```
+当前时间: date +%s
+一周前: date -d "1 week ago" +%s
+反解时间戳: date -d @<unix 时间戳>
+``` 
+
+unix时间戳参考 
+
+* http://www.linuxso.com/command/date.html
+* https://www.cnblogs.com/ckie/p/6552678.html
+
 # 主机操作 
    
 ## 查看所有主机运行状态
