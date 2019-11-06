@@ -1,67 +1,21 @@
-# 灵雀云 K8S 日常运维巡检
+# 灵雀云日常维护操作记录
 
-   在客户现场运维的时候，经常面临各种各样的问题，有些甚至是不段重复的机械劳动,这个时候就需要我们想尽办法去偷懒，去达到即快又好的解决问题，又能让自己在客户现场运维的节奏更轻松，更自在些！
-  
 ## 查询平台过去一段时间调度次数
 
-使用ACE接口查询
-
+使用ACE2.X接口查询
+```
 curl -XGET -H "Authorization: Token token_str-xxxxxxxx" "http://lb_ip:32001/v2/kevents/?start_time=<unix时间>&end_time=<unix时间>&cluster=<集群名称>&page=1&page_size=1000" | jq ".total_items"
-
-token 在平台用户中心查询 集群名称 ACE2.X版本 参考管理视图-> 集群
-
-unix时间戳：  
+```
+* token 在平台用户中心查询 集群名称 ACE2.X版本 参考管理视图-> 集群
+* unix时间戳：  
 ```
 当前时间: date +%s
 一周前: date -d "1 week ago" +%s
 反解时间戳: date -d @<unix 时间戳>
 ``` 
-
-unix时间戳参考 
-
-* http://www.linuxso.com/command/date.html
-* https://www.cnblogs.com/ckie/p/6552678.html
-
-# 主机操作 
-   
-## 查看所有主机运行状态
-
-`ansible all -m shell -a "uptime;mpstat;free" -o`
-
-## 找出分区占用过大的主机
-
-执行命令: `ansible all -m script -a "check_disk_use.sh" `
-
-脚本,check_disk_use.sh 内容
-```
-#!/bin/bash
-df -h  |  awk 'NR>1 { print $5" "$6 }' | while read line
-do
-    part_use=`echo $line | awk '{print $1}' | awk -F% '{print $1}'`
-	part_mount=`echo $line | awk '{print $2}'`
-	    
-	if [[ ${part_use} -ge 70 ]];then
-	    	echo "       Local Dir $part_mount Usage is over $part_use %  "
-	fi
-done
-```
-## 为所有主机添加SSH-key
-
-执行命令: ansible-playbook add-ssh-key.yaml
-
-playbook add-ssh-key.yaml:  
-```
-- name: add ssh pubkey
-  hosts: all
-  user: root
-  tasks:
-  - name: Set authorized key took from file
-    authorized_key:
-      user: root
-      state: present
-      key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
-```
-
+* unix时间戳参考 
+** http://www.linuxso.com/command/date.html
+** https://www.cnblogs.com/ckie/p/6552678.html
 # 集群操作
 
 ## 批量重启集群内所有服务
