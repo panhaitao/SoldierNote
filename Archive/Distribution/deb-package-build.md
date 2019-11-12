@@ -1,4 +1,4 @@
-# Debian发行版基础系列:DEB包与APT仓库基础
+# Debian发行版基础系列一:DEB包与APT仓库基础
 
 ## 准备开发环境
 
@@ -171,47 +171,7 @@ override_dh_auto_clean:
 
 ##  仓库同步
 
-### 使用 reprepro工具同步  
-
-###  使用 apt-mirror工具来同步
-
-#### 基本配置：
-
-/etc/apt/mirror.list
-
-    ############# config ##################
-    #
-    # set base_path    /var/spool/apt-mirror
-    #
-    # set mirror_path  $base_path/mirror
-    # set skel_path    $base_path/skel
-    # set var_path     $base_path/var
-    # set cleanscript $var_path/clean.sh
-    # set defaultarch  <running host architecture>
-    # set postmirror_script $var_path/postmirror.sh
-    # set run_postmirror 0
-    set base_path    /data/upstream/
-    set mirror_path  $base_path/mirror
-    set skel_path    $base_path/skel
-    set var_path     $base_path/var
-    set nthreads     20
-    set run_postmirror 0
-    
-    ############# end config ##############
-    
-    deb http://security.ubuntu.com/ubuntu precise-security main restricted universe multiverse
-    deb-src http://security.ubuntu.com/ubuntu precise-security main restricted universe multiverse
-
-
-#### 结合crond 每天自动同步
-
-```
-/etc/cron.d/apt-mirror
-0 1 * * * root /usr/bin/apt-mirror &> /data/log/cron.log &
-```
-
-
-## deb 签名
+## 签名 
 
 ### 生成签名所需的密钥
 ```
@@ -235,12 +195,12 @@ apt-key add key.pub
 参考文档 [ http://blog.csdn.net/michaelwubo/article/details/keyid ]
 
 
-#### 其他进阶工具
+### 其他进阶工具
 
 * debootstrap    构建临时环境
-* devscripts      辅助脚本集合
-* pbuilder         用于创建和维护chroot环境的程序。在此chroot环境中构建Debian可以检查构建软件包的依赖关系的正确性
-* ccache            用于缓存编译临时文件，加快编译
+* devscripts     辅助脚本集合
+* pbuilder       用于创建和维护chroot环境的程序。在此chroot环境中构建Debian可以检查构建软件包的依赖关系的正确性
+* ccache         用于缓存编译临时文件，加快编译
 
 #### 介绍下pbuilder 的基本用法
 
@@ -249,14 +209,6 @@ apt-key add key.pub
 
 * https://wiki.ubuntu.com/PbuilderHowto
 
-
-
-## 参考文档：
-
-
-http://live-systems.org/build/
-http://www.buildd.net/
-https://wiki.debian.org/buildd
  
 ##  仓库管理
 
@@ -271,7 +223,7 @@ https://wiki.debian.org/buildd
 <pre>
 cd /var/www/repo/
 cat > conf/distributions << "EOF"
-Origin: deepin
+Origin: <your_origin_name>
 Label:  jessie
 Codename: jessie
 Architectures: i386 amd64 source
@@ -282,7 +234,7 @@ Version: 2015.4.17
 Description: local repo 2015.4.17
 SignWith: 48FE4F60
 
-Origin: deepin
+Origin: <your_origin_name>
 Label:  jessie-updates
 Codename: jessie-updates
 Architectures: i386 amd64 source
@@ -293,7 +245,7 @@ Version: 2015.4.17
 Description: local repo update 2015.4.17
 SignWith: 48FE4F60
 
-Origin: deepin
+Origin: <your_origin_name>
 Label:  jessie-security
 Codename: jessie-security
 Architectures: i386 amd64 source
@@ -319,17 +271,28 @@ SignWith: key_id  仓库签名
 UDebComponents: main   Udeb包相关
 </pre>
 
-    /var/www/repo/
-    conf/  
-    db/..  
-    dists/..  
-    pool/..
-
 
 ## 创建ISO
 
-    build-simple-cdd --conf ./custom.conf
+```
+git clone https://github.com/panhaitao/isobuilder
+cd debian-custom-iso/
+编辑 CONF/debian9.conf
+make debian9
+```
 
+也十分简单，命令格式为：
+
+sudo debootstrap --arch [平台] [发行版本代号] [目录]
+比如下面的命令
+sudo debootstrap --arch i386 trusty /mnt
+
+
+## 参考文档：
+
+* http://live-systems.org/build/
+* http://www.buildd.net/
+* https://wiki.debian.org/buildd
 * https://wiki.debian.org/Debootstrap/
 * https://wiki.debian.org/Simple-CDD/Howto
 * https://wiki.debian.org/DebianCustomCD
@@ -337,11 +300,3 @@ UDebComponents: main   Udeb包相关
 * <https://wiki.debian.org/tasksel> 安装定制相关
 * <http://www.infrastructureanywhere.com/documentation/additional/mirrors.html#reprepro> reprepro udeb deb dsc
 * <https://www.debian.org/releases/wheezy/example-preseed.txt> preseed 参考文档
-
-
-
-也十分简单，命令格式为：
-
-sudo debootstrap --arch [平台] [发行版本代号] [目录]
-比如下面的命令
-sudo debootstrap --arch i386 trusty /mnt

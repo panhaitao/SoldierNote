@@ -1,4 +1,4 @@
-# debian-cd 工作原理分析
+# Debian发行版基础系列四:debian-cd 工作原理分析
 
 debian-cd 是debian的官方的制作ISO的工具。
 

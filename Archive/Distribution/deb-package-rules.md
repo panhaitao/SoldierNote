@@ -1,4 +1,4 @@
-### 详解 debian/rules 
+# Debian发行版基础系列二: 详解 debian/rules 
 
 一个通用的源码包可能使用如下方式编译安装:
 

@@ -1,4 +1,4 @@
-# debian-installer 原理分析
+# Debian发行版基础系列三:debian-installer 原理分析
 
 ## 安装器的组成
 
@@ -24,9 +24,9 @@
 ## 重要记录：
 
 * ext2/3/4分区格式化参数： 修改 e2fsprogs 源码包 misc/mke2fs.conf.in 
-* 修改安装器默认背景logo： git@bj.git.sndu.cn:Debian9-Server-Packages/rootskel-gtk.git
-* 调整安装器自动挂载磁盘： git@bj.git.sndu.cn:Debian9-Server-Packages/mountmedia.git
-* 添加U盘安装支持功能:     git@bj.git.sndu.cn:Debian9-Server-Packages/cdrom-detect.git
+* 修改安装器默认背景logo： https://github.com/SixKnot/rootskel-gtk
+* 调整安装器自动挂载磁盘： https://github.com/SixKnot/mountmedia
+* 添加U盘安装支持功能:     https://github.com/SixKnot/cdrom-detect
 * 修改默认分区格式:        git@bj.git.sndu.cn:Debian9-Server-Packages/partman-base.git
 * 修改分区提示信息:        git@bj.git.sndu.cn:Debian9-Server-Packages/partman-ext3.git 
 * 选择内核软件包：         git@@bj.git.sndu.cn:Debian9-Server-Packages/base-installer.git
