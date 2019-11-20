@@ -1,6 +1,28 @@
 # Linux使用过程记录的小问题
 
 
+## 使用脚本批量创建用户
+```
+for user in `cat /tmp/user.list`
+    do
+      echo "Starting add user $user";
+      useradd $user -G docker -N;
+      echo "$user" | passwd --stdin $user;
+      echo "The user $user add success !";
+done
+```
+
+## 使用脚本批量更改密码
+
+```
+#!/bin/bash
+# filename: change_passwd.sh
+useradd zhs
+echo "zhs:Zhs123456" | chpasswd
+usermod zhs -G docker
+echo "zhs  ALL=(ALL)       ALL" >> /etc/sudoers
+```
+
 ## 远程终端超时问题
 
 1. $TMOUT 系统环境变量，如果输出空或0表示不超时，大于0的数字n表示n秒没有收入则超时
