@@ -97,3 +97,10 @@ kubectl apply -f prometheus-k8s-svc.yaml
 [upl-image-preview url=https://kubesphere.com.cn/forum/assets/files/2019-12-22/1576988975-70963-2019-12-22122911.png]
 
 **至此一个可以用于创建自定义exporter和 调试grafana面板的单机调试环境建立完毕！**
+
+## 使用PromQL统计资源
+
+统计方式：
+
+* cpu使用： sum ( rate (container_cpu_seconds_total){image!="",container_name="name_xx" }[5m] ) *  cpu核心数
+* 内存使用：sum ( container_memory_usage_bytes{image!="",container_name="name_xx" } ) /1024^3
