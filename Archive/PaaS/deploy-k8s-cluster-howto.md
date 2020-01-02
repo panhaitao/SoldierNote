@@ -48,6 +48,7 @@ systemctl stop firewalld.service && systemctl disable firewalld.service
 更多细节参考：https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#check-required-ports
 
 ```
+yum install yum-utils -y
 yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
 cat > /etc/yum.repos.d/kubernetes.repo<<EOF
 [kubernetes]
