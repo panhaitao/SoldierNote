@@ -138,8 +138,9 @@ mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 wget https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
-kubectl apply -f kube-flannel.yml
 ```
+
+修改文件中Network配置后，执行kubectl apply -f kube-flannel.yml
 
 执行完毕后记录下 kubeadm 返回的信息，后续添加节点需要使用 
 
