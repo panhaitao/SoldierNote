@@ -62,7 +62,6 @@ gpgkey=http://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg
 EOF
 yum makecache
 yum install docker-ce ipvsadm kubelet-1.15.6 kubeadm-1.15.6 kubectl-1.15.6 ipset -y
-systemctl restart docker && systemctl enable docker
 swapoff -a  && sed -i 's/.*swap.*/#&/' /etc/fstab
 cat > /etc/sysconfig/modules/ipvs.modules <<EOF
 #!/bin/bash
@@ -80,8 +79,9 @@ net.bridge.bridge-nf-call-iptables = 1
 net.bridge.bridge-nf-call-ip6tables = 1
 EOF
 sysctl --system
-systemctl  stop firewalld.service && systemctl  disable firewalld.service
-setenforce  0 && sed -i 's/SELINUX=enforcing/SELINUX=disabled/' /etc/selinux/config 
+systemctl restart docker && systemctl enable docker
+systemctl stop firewalld.service && systemctl  disable firewalld.service
+setenforce 0 && sed -i 's/SELINUX=enforcing/SELINUX=disabled/' /etc/selinux/config 
 systemctl enable kubelet.service
 ```
 
