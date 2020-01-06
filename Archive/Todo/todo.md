@@ -10,6 +10,7 @@
   * debian/ubuntu
   * rhel/centos
 * os
+  * Linux CPU、内存、磁盘、使用率计算 https://www.jianshu.com/p/541d8efcbb78 
 * docker/k8s
 * net
  * [] tcp
@@ -18,11 +19,19 @@
 * 监控
   * prometheus
   * grafana
+  * Weave Scope
 * 故障分析
 * 性能优化
 
-# 需要技能
+# web开发技能
 
+从这里开始
+* vue example
+  * https://github.com/PanJiaChen/vue-element-admin
+* django
+
+## 开源项目 
+ 
 * kubesphere UI: 
   * [] React + Mobx.js
   * [] Jest + Enzyme 单元测试
@@ -31,7 +40,8 @@
   * [] python
   * [] go
 
-# 开发技能
+# 开发基础技能
+
 * 代码工程能力
   * git/gitlib使用
   * 编译调试
