@@ -22,7 +22,7 @@ DATABASES = {
 
 ```shell
 # 登陆django-shell
-pythonn3 manage.py shell
+python3 manage.py shell
 
 from django.contrib.auth.models import User
 user = User.objects.create_user("rose", "15151889248@139.com", "rosemary")
