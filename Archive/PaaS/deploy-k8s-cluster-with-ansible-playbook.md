@@ -94,13 +94,12 @@ ansible_ssh_user=root
 
 ```
 内容有点多, 关键参考配置如下：
+
 1. registry 如果有自己的docker镜像仓库，替换为实际即可
 2. 这里docker version:19.03.5 , k8s version:1.15.6 如果你想要测试其他版本，自行选择组合即可 
 3. master_group，node_group 要和hosts/k8s-hosts 中定义的一致
-4. api_vip 这个是k8s_apiserver_LB, 如果使用了集群提供的LB，填入对应vip即可
+4. api_vip 这个是k8s_apiserver_LB, 如果使用了集群外提供的LB，填入对应的vip ; 如果使用集群内的自建LB，填入对应即可lb_host_ip即可
 5. service_subnet， pod_subnet 分别是k8s 集群的service网段和pod网段，根据实际情况修改保证和主机网络不冲突即可
 6. 这里k8s网络插件默认是flannel，以后我可以考虑补充calico，nsx-t等可选的CNI插件
 
-* 进入 ansible-playbook-store目录,执行命令：`ansible-playbook  -i hosts/k8s-hosts todo/deploy-k8s-cluster.yml -D`
-
-如果一切顺利，6～8分钟后，即可部署完一个k8s集群.
+* 进入 ansible-playbook-store目录,执行命令：`ansible-playbook  -i hosts/k8s-hosts todo/deploy-k8s-cluster.yml -D` 如果一切顺利，6～8分钟后，即可部署完一个k8s集群.
