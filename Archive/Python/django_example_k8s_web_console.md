@@ -1,5 +1,6 @@
-# k8s集群管理 MacOS dev
-a simple multi k8s cluster web console
+# Django example: k8s_web_console 
+
+k8s集群管理: a simple multi k8s cluster web console
 
 # 第一节: 准备环境
 
@@ -18,9 +19,11 @@ pip3 install djangorestframework
 
 ## 初始化项目
 
+```
 django-admin startproject k8s_web_console
 cd k8s_web_console
 manager.py startapp cluster # 执行前，修改manager.py 首行为如下` #!/usr/bin/env python3`
+```
 
 ## 在项目配置中加入rest框架
 
@@ -61,8 +64,10 @@ python3 manage.py migrate
 
 # 第四节: 创建一个新的dashboard 便于页面刷新和管理
 
+```
 cd k8s_web_console
 python3 manager.py startapp dashboard
+```
 
 1. dashboard/views.py              dashboard 应用添加对集群信息的引用
 2. dashboard/urls.py               dashboard 应用设置urls
