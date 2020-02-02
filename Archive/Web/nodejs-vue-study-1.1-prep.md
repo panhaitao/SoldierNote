@@ -1,4 +1,4 @@
-# 准备nodejs vue 开发环境 
+# Vue:准备nodejs/vue开发环境 
 
 ## 简介和安装
 

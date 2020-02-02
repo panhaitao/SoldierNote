@@ -1,4 +1,4 @@
-# Django Note
+# Django:Note
 
 #### 接入MySQL数据库
 

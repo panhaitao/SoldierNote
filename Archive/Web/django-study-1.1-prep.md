@@ -1,4 +1,4 @@
-# 准备python Django 开发环境 
+# Django:创建开发环境 
 
 ## Django 简介和安装
 

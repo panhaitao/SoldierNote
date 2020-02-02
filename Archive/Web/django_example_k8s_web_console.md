@@ -1,6 +1,6 @@
-# Django example: k8s_web_console 
+# Django:创建一个k8s集群项目
 
-k8s集群管理: a simple multi k8s cluster web console
+a simple multi k8s cluster web console
 
 # 第一节: 准备环境
 
