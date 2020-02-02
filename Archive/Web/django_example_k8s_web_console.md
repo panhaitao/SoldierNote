@@ -1,4 +1,4 @@
-# Django:创建一个k8s集群项目
+# Django:一个简单的K8S多集群管理平台
 
 a simple multi k8s cluster web console
 
