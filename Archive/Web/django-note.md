@@ -1,4 +1,4 @@
-## <center>Django</center>
+# Django Note
 
 #### 接入MySQL数据库
 
