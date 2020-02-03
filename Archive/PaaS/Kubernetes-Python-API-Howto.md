@@ -11,6 +11,8 @@ pip install git+https://github.com/kubernetes-client/python.git
 pip install kubernetes
 
 ## 使用kubeconfig.yaml访问k8s api
+
+kubeconfig.yaml文件: `在集群master /etc/kubernetes/admin.conf 或者 $HOME/.kube/config(kubectl默认使用文件)`
  
 from kubernetes import client, config
 config.kube_config.load_kube_config(config_file="kubeconfig.yaml")
@@ -22,6 +24,12 @@ for i in ret.items:
   print("%s\t%s\t%s" % (i.status.pod_ip, i.metadata.namespace, i.metadata.name))
 
 ## 使用 token 访问k8s API
+
+token获取方式参考:
+```
+secrets=`kubectl -n kube-system get sa clusterrole-aggregation-controller -o yaml | tail -n 1 | awk '{print $3}'`
+token=`kubectl -n kube-system get secrets $secrets -o yaml | grep token: | awk '{print $2}' | base64 -d `  
+```
 
 from kubernetes.client import Configuration, ApiClient, CoreV1Api
 
