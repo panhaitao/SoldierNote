@@ -1,3 +1,32 @@
+# k8s 学习笔记
+
+处理问题的点击记录
+
+## 使用kubectl patch 更新资源
+
+```
+spec:
+  template:
+    spec:
+      containers:
+      - name: patch-demo-ctr-2
+        image: redis
+```
+
+kubectl patch deployment patch-demo --patch "$(cat patch-file.yaml)"
+
+* 参考 https://kubernetes.io/docs/tasks/run-application/update-api-object-kubectl-patch/
+
+## yaml 内引用 api 数据
+
+```
+name: HOST_IP
+valueFrom:
+  fieldRef:
+    apiVersion: v1
+    fieldPath: status.hostIP
+```
+* 参考:  https://kubernetes.io/docs/tasks/inject-data-application/downward-api-volume-expose-pod-information/#store-pod-fields
 # Paas 部署问题
 
 # k8s 问题
