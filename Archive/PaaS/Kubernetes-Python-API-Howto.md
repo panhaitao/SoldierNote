@@ -1,7 +1,9 @@
 # Kubernetes Python API 快速入门
 
 * 官方网站: https://github.com/kubernetes-client/python
-* 主要的操作接口: https://github.com/kubernetes-client/python/blob/master/kubernetes/docs/CoreV1Api.md
+* 主要的操作接口: 
+* https://github.com/kubernetes-client/python/blob/master/kubernetes/docs/CoreV1Api.md
+* https://github.com/kubernetes-client/python/blob/master/kubernetes/docs/AppsV1Api.md
 
 ## 安装
 

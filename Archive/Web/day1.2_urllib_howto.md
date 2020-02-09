@@ -1,6 +1,6 @@
-# 浏览器的模拟
+# python module: urllib howto  
 
-## 使用python3 urllib 库
+使用python3 urllib 模拟浏览器Agent
 
 ```
 #!/usr/bin/env python3
