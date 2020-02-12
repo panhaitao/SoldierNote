@@ -7,28 +7,27 @@ kube Prometheus和Prometheus Operator 都是CoreOS 开发的为Kubernetes监控�
 * prometheus-operator只包含一个operator，该operator管理和操作Prometheus集群
 * kube Prometheus以Prometheus Operator和提供一系列manifests文件为基础，完成对Prometheus集群的部署模式，监控规则，告警规则等设置
 
-相关项目地址：
-* https://github.com/coreos/kube-prometheus
-* https://github.com/coreos/prometheus-operator
+相关项目资源：
 
-# 部署 Prometheus Operator
+* kube-prometheus开源地址: https://github.com/coreos/kube-prometheus
+* prometheus-operator源码: https://github.com/coreos/prometheus-operator
+* prometheus-operator chart
+  * https://github.com/helm/charts/tree/master/stable/prometheus-operator
+  * https://hub.helm.sh/charts/stable/prometheus-operator
 
-前期准备
+## 使用chart部署Prometheus 
 
-* 导入相关镜像 # docker load -i prometheus-operator.tar
+* 前期准备
 
+1. Kubernetes 1.10+ with Beta APIs
+2. Helm 2.12+
 
-1. 为方便管理，创建一个单独的 Namespace monitoring，Prometheus Operator 相关的组件都会部署到这个 Namespace。
+*  安装 Prometheus Operator
 
-# kubectl create namespace monitoring
+1. 创建一个单独的 Namespace, 执行命令: `kubectl create namespace monitoring`
+2. 使用 Helm 安装 Prometheus Operator, 执行命令: `helm install --name prometheus-operator --namespace=monitoring stable/prometheus-operator`
 
-安装 Prometheus Operator
-1. 使用 Helm 安装 Prometheus Operator
-
-Prometheus Operator 所有的组件都打包成 Helm Chart，安装部署非常方便。
-
-# helm install --name prometheus-operator --namespace=monitoring stable/prometheus-operator
-
+* 
 
 
 helm install coreos/kube-prometheus --name kube-prometheus --namespace monitoring      \
