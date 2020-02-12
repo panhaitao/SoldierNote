@@ -17,17 +17,49 @@ kube Prometheus和Prometheus Operator 都是CoreOS 开发的为Kubernetes监控�
 
 ## 使用chart部署Prometheus 
 
-* 前期准备
+### 前期准备
 
 1. Kubernetes 1.10+ with Beta APIs
 2. Helm 2.12+
+3. chart仓库
+4. docker iamges:
+  * grafana/grafana:6.5.2"
+  * kiwigrid/k8s-sidecar:0.1.20"
+  * prometheus/node-exporter:v0.18.1"
+  * quay.io/coreos/configmap-reload:v0.0.1"
+  * quay.io/coreos/kube-state-metrics:v1.9.3"
+  * quay.io/prometheus/alertmanager:v0.20.0"
+  * quay.io/prometheus/node-exporter:v0.18.1"
+  * quay.io/prometheus/prometheus:v2.15.2"
+  * squareup/ghostunnel:v1.5.2"
 
-*  安装 Prometheus Operator
+### 安装 Prometheus Operator
 
 1. 创建一个单独的 Namespace, 执行命令: `kubectl create namespace monitoring`
-2. 使用 Helm 安装 Prometheus Operator, 执行命令: `helm install --name prometheus-operator --namespace=monitoring stable/prometheus-operator`
-
+2. 使用 Helm 安装 Prometheus Operator, 由于翻墙问题，这里使用微软azure的chart仓库，执行命令: 
+```
+helm repo add azure http://mirror.azure.cn/kubernetes/charts/
+helm repo update
+helm install --name prometheus-operator --namespace=monitoring  azure/prometheus-operator  --version 8.7.0
+```
 * 
+
+
+
+* 安装失败的处理
+
+如何因为各种意外安装失败，执行如下命令进行清理:
+```
+kubectl delete ns monitoring
+kubectl delete crd prometheuses.monitoring.coreos.com -n monitoring
+kubectl delete crd prometheusrules.monitoring.coreos.com -n monitoring
+kubectl delete crd podmonitors.monitoring.coreos.com -n monitoring
+kubectl delete crd servicemonitors.monitoring.coreos.com -n monitoring
+kubectl delete crd alertmanagers.monitoring.coreos.com -n monitoring
+helm del --purge prometheus-operator
+```
+然后重复执行上一步,安装 Prometheus Operator的操作
+
 
 
 helm install coreos/kube-prometheus --name kube-prometheus --namespace monitoring      \
