@@ -1,11 +1,11 @@
-# Nebula mesh VPN howto
+# Nebula 分布式VPN 
 
 * 项目源码：https://github.com/slackhq/nebula
 * 二进制包: https://github.com/slackhq/nebula/releases
 
 ## 简介
 
-分布式 VPN 网状网工具 Nebula，源代码发布在 GitHub 上，采用 MIT 许可证。对于 Nebula 的开发动机，工程师解释说，他们问了自己一个问题：有什么最简单的方法安全连接不同云服务商在全球数十个位置的数万台计算机？Nebula 就是他们自己给出的答案。它是一个可携式可伸缩的叠加网工具，支持 Linux、MacOS 和 Windows，未来将加入对移动平台的支持。Nebula 传输的数据使用 Noise 协议框架完整加密，该框架也被 Signal 和 WireGuard 等项目使用。Nebula 能自动动态的发现不同节点之间的可用路线，在任何两个节点之间以最高效的路径发送流量，不需要经过一个中心的分配点。举例来说，你在笔记本电脑、家用 PC 和一个云端节点都运行了 Nebula，当你在家里使用笔记本电脑时，它会通过家用主机以 LAN 的速度进行通信。
+  分布式 VPN 网状网工具 Nebula，源代码发布在 GitHub 上，采用 MIT 许可证。对于 Nebula 的开发动机，工程师解释说，他们问了自己一个问题：有什么最简单的方法安全连接不同云服务商在全球数十个位置的数万台计算机？Nebula 就是他们自己给出的答案。它是一个可携式可伸缩的叠加网工具，支持 Linux、MacOS 和 Windows，未来将加入对移动平台的支持。Nebula 传输的数据使用 Noise 协议框架完整加密，该框架也被 Signal 和 WireGuard 等项目使用。Nebula 能自动动态的发现不同节点之间的可用路线，在任何两个节点之间以最高效的路径发送流量，不需要经过一个中心的分配点。举例来说，你在笔记本电脑、家用 PC 和一个云端节点都运行了 Nebula，当你在家里使用笔记本电脑时，它会通过家用主机以 LAN 的速度进行通信。
 
 ## Nebula mesh VPN init
 
