@@ -132,6 +132,10 @@ firewall:
         - home
 ```
 
-参考：https://github.com/slackhq/nebula/blob/master/examples/config.yml
 
 4. 最后每个节点：./nebula -config /path/to/config.yaml
+
+## 参考
+
+* https://github.com/slackhq/nebula/blob/master/examples/config.yml
+* https://arstechnica.com/gadgets/2019/12/how-to-set-up-your-own-nebula-mesh-vpn-step-by-step/
