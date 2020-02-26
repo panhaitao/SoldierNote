@@ -21,45 +21,34 @@ nebula-cert sign -name "workstation-pc"  -ip "192.168.98.4/24"
 
 3. 创建config.yml
 
+节点机分为灯塔机和节点两种类型，灯塔机(lighthouse)参考配置如下：
+
 ```
 pki:
   ca: /etc/nebula/ca.crt
-  cert: /etc/nebula/host.crt
-  key: /etc/nebula/host.key
+  cert: /etc/nebula/lighthouse.crt
+  key: /etc/nebula/lighthouse.key
 
 static_host_map:
-  "192.168.100.1": ["100.64.22.11:4242"]
-
+  "192.168.168.1": ["45.76.101.137:4242"]
+  "192.168.168.2": ["47.92.74.23:4242"]
+  "192.168.168.3": ["111.199.184.15:4242"]
 
 lighthouse:
-  am_lighthouse: false
+  am_lighthouse: true
   #serve_dns: false
   #dns:
     #host: 0.0.0.0
     #port: 53
   interval: 60
   hosts:
-    - "192.168.100.1"
+    - "192.168.168.1"
 
 listen:
   host: 0.0.0.0
   port: 4242
-  #batch: 64
-  #read_buffer: 10485760
-  #write_buffer: 10485760
 
 punchy: true
-#punch_back: true
-#cipher: chachapoly
-#local_range: "172.16.0.0/24"
-#sshd:
-  #enabled: true
-  #listen: 127.0.0.1:2222
-  #host_key: ./ssh_host_ed25519_key
-  #authorized_users:
-    #- user: steeeeve
-      #keys:
-        #- "ssh public key string"
 
 tun:
   dev: nebula1
@@ -67,44 +56,11 @@ tun:
   drop_multicast: false
   tx_queue: 500
   mtu: 1300
-  routes:
-    #- mtu: 8800
-    #  route: 10.0.0.0/16
-  unsafe_routes:
-    #- route: 172.16.1.0/24
-    #  via: 192.168.100.99
-    #  mtu: 1300 #mtu will default to tun mtu if this option is not sepcified
 
 logging:
-  # panic, fatal, error, warning, info, or debug. Default is info
   level: info
-  # json or text formats currently available. Default is text
   format: text
 
-#stats:
-  #type: graphite
-  #prefix: nebula
-  #protocol: tcp
-  #host: 127.0.0.1:9999
-  #interval: 10s
-
-  #type: prometheus
-  #listen: 127.0.0.1:8080
-  #path: /metrics
-  #namespace: prometheusns
-  #subsystem: nebula
-  #interval: 10s
-
-# Handshake Manger Settings
-#handshakes:
-  # Total time to try a handshake = sequence of `try_interval * retries`
-  # With 100ms interval and 20 retries it is 23.5 seconds
-  #try_interval: 100ms
-  #retries: 20
-  # wait_rotation is the number of handshake attempts to do before starting to try non-local IP addresses
-  #wait_rotation: 5
-
-# Nebula security group configuration
 firewall:
   conntrack:
     tcp_timeout: 120h
@@ -113,27 +69,69 @@ firewall:
     max_connections: 100000
 
   outbound:
-    # Allow all outbound traffic from this node
     - port: any
       proto: any
       host: any
 
   inbound:
-    # Allow icmp between any nebula hosts
+    - port: any
+      proto: any
+      host: any
+```
+
+节点机参考配置如下：
+
+```
+pki:
+  ca: /etc/nebula/ca.crt
+  cert: /etc/nebula/node-x.crt
+  key: /etc/nebula/node-x.key
+
+static_host_map:
+  "192.168.168.1": ["45.76.101.137:4242"]
+  "192.168.168.2": ["47.92.74.23:4242"]
+  "192.168.168.3": ["111.199.184.15:4242"]
+
+lighthouse:
+  am_lighthouse: false
+
+listen:
+  host: 0.0.0.0
+  port: 4242
+
+punchy: true
+
+tun:
+  dev: nebula1
+  drop_local_broadcast: false
+  drop_multicast: false
+  tx_queue: 500
+  mtu: 1300
+
+logging:
+  level: info
+  format: text
+
+firewall:
+  conntrack:
+    tcp_timeout: 120h
+    udp_timeout: 3m
+    default_timeout: 10m
+    max_connections: 100000
+
+  outbound:
     - port: any
       proto: any
       host: any
 
-    # Allow tcp/443 from any host with BOTH laptop and home group
-    - port: 443
-      proto: tcp
-      groups:
-        - laptop
-        - home
+  inbound:
+    - port: any
+      proto: any
+      host: any
 ```
 
-
 4. 最后每个节点：./nebula -config /path/to/config.yaml
+5. 实际测试NAT后的主机，还是手动添加static_host_map配置才能打墙成功。
 
 ## 参考
 
