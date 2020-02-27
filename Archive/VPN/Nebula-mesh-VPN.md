@@ -31,9 +31,6 @@ pki:
 
 static_host_map:
   "192.168.168.1": ["45.76.101.137:4242"]
-  "192.168.168.2": ["10.0.0.7:4242"]
-  "192.168.168.3": ["10.0.0.10:4242"]
-  "192.168.168.4": ["111.199.184.15:4242"]
 
 lighthouse:
   am_lighthouse: true
@@ -50,6 +47,7 @@ listen:
   port: 4242
 
 punchy: true
+punch_back: true
 
 tun:
   dev: nebula1
@@ -106,6 +104,7 @@ listen:
   port: 4242
 
 punchy: true
+punch_back: true
 
 tun:
   dev: nebula1
