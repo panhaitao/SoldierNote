@@ -10,7 +10,7 @@
 ## Nebula mesh VPN init
 
 1. 获取应用程序，二进制包下载地址: https://github.com/slackhq/nebula/releases
-2. 创建证书:
+2. 创建证书，每个节点证书对应一个ovelay ip
 ```  
 nebula-cert ca -name "Nebula Mesh Network"
 nebula-cert sign -name "lighthouse"      -ip "192.168.98.1/24"
@@ -82,7 +82,8 @@ firewall:
 
 1. static_host_map 这需要记录灯塔机(lighthouse)的静态映射关系即可
 2. lighthouse.am_lighthouse 这里关闭即可，节点不需要在充当照亮别人的灯塔机
-3. lighthouse.hosts: 但是需要指定灯塔机的对应的overlay_ip
+3. lighthouse.hosts 但是需要指定灯塔机的对应的overlay_ip
+4. punch_back 这里默认打开就好，目前大多数云主机或者个人电脑都NAT模式接入
 
 ```
 pki:
@@ -141,3 +142,4 @@ firewall:
 
 * https://github.com/slackhq/nebula/blob/master/examples/config.yml
 * https://arstechnica.com/gadgets/2019/12/how-to-set-up-your-own-nebula-mesh-vpn-step-by-step/
+* https://arstechnica.com/gadgets/2019/12/nebula-vpn-routes-between-hosts-privately-flexibly-and-efficiently/
