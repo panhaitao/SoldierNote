@@ -23,8 +23,8 @@ openstack的节点主机:
 1. 关闭selinux      vi /etc/selinux/config SELINUX=disabled
 2. 关闭防火墙       systemctl stop firewalld;systemctl disable firewalld
 3. 关闭libvirtd服务 systemctl stop libvirtd.service; systemctl disable libvirtd.service
-4. 设置yum源        curl -o /etc/yum.repos.d/docker-ce.repo / http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo 
-5. 安装docker       yum makecache; yum instal docker-ce -y 
+4. 设置yum源        curl -o /etc/yum.repos.d/docker-ce.repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo 
+5. 安装docker       yum makecache; yum install docker-ce -y 
 6. 配置挂载共享
 ```
 tee /etc/systemd/system/docker.service.d/kolla.conf <<-'EOF'
@@ -91,20 +91,24 @@ enable_haproxy: "no"
 enable_placement: "yes"
 
 # 使用cinder存储
+```
 enable_cinder: "yes"
 enable_glance: "yes"
 enable_magnum: "yes"
 enable_heat: "yes"
+```
 
 # 如果使用lvm，需先创建cinder-volumes的卷组
 enable_cinder_backend_lvm: "yes"
 创建卷组的方法如下：
 
+```
 dd if=/dev/zero of=./disk.img count=200 bs=512MB
 losetup -f
 losetup /dev/loop0 disk.img
 pvcreate /dev/loop0
 vgcreate cinder-volumes /dev/loop0
+```
 
 10. 下载镜像
 
