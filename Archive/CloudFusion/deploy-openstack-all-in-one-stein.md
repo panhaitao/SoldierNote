@@ -5,6 +5,7 @@
 需要准备两台主机，一个运行ansible的ops主机，一台运行openstack的主机
 
 ops主机: 
+
   * 1C cpu cores
   * 2GB main memory
   * 40GB disk space
@@ -25,21 +26,24 @@ openstack的节点主机:
 4. 设置yum源        curl -o /etc/yum.repos.d/docker-ce.repo / http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo 
 5. 安装docker       yum makecache; yum instal docker-ce -y 
 6. 配置挂载共享
+```
 tee /etc/systemd/system/docker.service.d/kolla.conf <<-'EOF'
 [Service]
 MountFlags=shared
 EOF
 systemctl restart docker
-
+```
 ## ansible 主机准备
 
-1. 安装ansible
-yum install ansible git -y
+1. 安装ansible yum install ansible git -y
 2. 从github 获取Kolla和Kolla-Ansible
+```
 git clone https://github.com/openstack/kolla -b stable/stein
 git clone https://github.com/openstack/kolla-ansible -b stable/stein
+```
 
 3. 拷贝配置文件
+
 cp -r ./kolla-ansible/etc/kolla /etc/kolla 
 cp kolla-ansible/ansible/inventory/* .
 
@@ -47,15 +51,19 @@ cp kolla-ansible/ansible/inventory/* .
 检查playbook文件配置是否正确
 
 # 单节点
+
 ansible -i all-in-one all -m ping
+
 8. 生成随机密码
 
 kolla-genpwd
+
 使用kolla提供的密码生成工具自动生成，如果密码不填充，后面的部署环境检查时不会通过。为了后面登录方便，可以自定义keystone_admin_password密码，这里改为admin
 
 vi /etc/kolla/passwords.yml
 
 keystone_admin_password:admin
+
 9. 修改globals.yml
 vi /etc/kolla/globals.yml
 
@@ -99,9 +107,11 @@ pvcreate /dev/loop0
 vgcreate cinder-volumes /dev/loop0
 
 10. 下载镜像
+
 部署时，会检查本地有没有镜像，有的话，使用本地，没有，自动拉取，由于镜像特别大，先下载镜像到本地
 
 kolla-ansible pull
+
 11. 开始部署
 11.1 带有kolla的引导服务器部署依赖关系
 
