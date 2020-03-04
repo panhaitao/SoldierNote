@@ -19,7 +19,7 @@ openstack的节点主机:
   * 2 network interfaces
 
 ## 初始化openstack节点
-
+ 
 1. 关闭selinux      vi /etc/selinux/config SELINUX=disabled
 2. 关闭防火墙       systemctl stop firewalld;systemctl disable firewalld
 3. 关闭libvirtd服务 systemctl stop libvirtd.service; systemctl disable libvirtd.service
