@@ -2,14 +2,7 @@
 
 ## 系统准备
 
-需要准备两台主机，一个运行ansible的ops主机，一台运行openstack的主机
-
-ops主机: 
-
-  * 1C cpu cores
-  * 2GB main memory
-  * 40GB disk space
-  * 1 network interfaces
+需要准备一台主机，一个运行ansible的ops主机，一台运行openstack的主机
 
 openstack的节点主机:
 
@@ -32,6 +25,16 @@ tee /etc/systemd/system/docker.service.d/kolla.conf <<-'EOF'
 MountFlags=shared
 EOF
 systemctl restart docker
+```
+7. 如果机器只有一个接口，可以创建一个bridge和veth
+```
+yum install kmod-openvswitch openvswitch -y
+systemctl enable openvswitch && systemctl start openvswitch
+ovs-vsctl add-br br0
+ovs-vsctl add-port br0 veth1 -- set Interface veth1 ofport_request=1 将端口veth1添加到bridge br0中，并将veth1的OpenFlow端口设置成1 
+ovs-vsctl --columns=ofport list interface veth1
+ip link set br0 up
+ip link set veth1 up
 ```
 ## ansible 主机准备
 
@@ -65,30 +68,20 @@ vi /etc/kolla/passwords.yml
 keystone_admin_password:admin
 
 9. 修改globals.yml
+
 vi /etc/kolla/globals.yml
 
-# 指定镜像的系统版本
-kolla_base_distro: "centos"
 
-# 指定安装的方式，source为源码
-kolla_install_type: "source"
-
-# openstack版本
-openstack_release: "stein"
-
-# OpenStack使用的网络接口
-
-network_interface: "[Bond0]"
-
-# 宿主机IP
-kolla_internal_address: "[172.28.3.101]"
-
-# Neutron外部网络，必须是没有与network_interface Bond的可用网卡
-neutron_external_interface: "[enp26s0f1]"
-
-# 如果单点部署，高可用设为no
-enable_haproxy: "no"
-enable_placement: "yes"
+* docker_registry: "192.168.41.29:4000"   指定镜像的仓库的地址(配置使用私有仓库需要的选项) 
+* docker_namespace: "openstack_release"   指定镜像的仓库的命名空间(配置使用私有仓库需要的选项)
+* kolla_base_distro: "centos"             指定镜像的系统版本
+* kolla_install_type: "source"            指定安装的方式，source为源码
+* kolla_internal_address: "x.x.x.x"       宿主机IP
+* openstack_release: "stein"              openstack版本
+* network_interface: "eth0"               openStack使用的网络接口
+* neutron_external_interface: "veth1"     连接neutron的external bridge
+* enable_haproxy: "no"                    如果单点部署，高可用设为no
+* enable_placement: "yes"
 
 # 使用cinder存储
 ```
@@ -98,8 +91,8 @@ enable_magnum: "yes"
 enable_heat: "yes"
 ```
 
-# 如果使用lvm，需先创建cinder-volumes的卷组
-enable_cinder_backend_lvm: "yes"
+# 如果使用lvm，需先创建cinder-volumes的卷组 enable_cinder_backend_lvm: "yes"
+
 创建卷组的方法如下：
 
 ```
@@ -116,7 +109,16 @@ vgcreate cinder-volumes /dev/loop0
 
 kolla-ansible pull
 
+
+测试是否成功：
+
+# curl -k localhost:4000/v2/_catalog
+# curl -k localhost:4000/v2/lokolla/centos-source-fluentd/tags/list
+{"name":"lokolla/centos-source-fluentd","tags":["5.0.1"]}
+
+
 11. 开始部署
+
 11.1 带有kolla的引导服务器部署依赖关系
 
 kolla-ansible -i ./all-in-one bootstrap-servers
