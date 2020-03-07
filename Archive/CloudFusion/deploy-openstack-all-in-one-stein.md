@@ -16,45 +16,72 @@ openstack的节点主机:
 1. 关闭selinux      vi /etc/selinux/config SELINUX=disabled
 2. 关闭防火墙       systemctl stop firewalld;systemctl disable firewalld
 3. 关闭libvirtd服务 systemctl stop libvirtd.service; systemctl disable libvirtd.service
-4. 设置yum源        curl -o /etc/yum.repos.d/docker-ce.repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo 
-5. 安装docker       yum makecache; yum install docker-ce -y 
-6. 配置挂载共享
+4. 安装docker
+```        
+* CentOS: 
+    curl -o /etc/yum.repos.d/docker-ce.repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+    yum makecache; yum install docker-ce -y 
+* Debian: 
+    echo "deb [arch=amd64] https://download.docker.com/linux/debian buster stable" >> /etc/apt/sources.list
+    curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
+    apt update && apt install docker-ce docker-ce-cli containerd.io -y
 ```
+6. 配置挂载共享,添加私有仓库
+```
+mkdir /etc/systemd/system/docker.service.d
 tee /etc/systemd/system/docker.service.d/kolla.conf <<-'EOF'
 [Service]
 MountFlags=shared
 EOF
-systemctl restart docker
+
+mkdir -p /etc/docker
+tee /etc/docker/daemon.json <<-'EOF'
+{
+  "insecure-registries": [ "registry.cn-beijing.aliyuncs.com" ]
+}
+EOF
+
+systemctl enable docker.service
+systemctl restart docker.service
 ```
-7. 如果机器只有一个接口，可以创建一个bridge和veth
+7. 节点主机网卡配置:
 ```
-yum install kmod-openvswitch openvswitch -y
-systemctl enable openvswitch && systemctl start openvswitch
+/etc/network/interfaces
+auto eth0
+iface eth0 inet static
+        address 192.0.2.2
+        netmask 255.255.255.0
+        network 192.0.2.0
+        broadcast 192.0.2.255
+        gateway 192.0.2.1
+# Bring up eth1 without an IP address (You can have one if you want, but the point here is its not needed)
+auto eth1
+iface eth1 inet manual
+        up ifconfig eth1 up 
+```
+8. 如果机器只有一个接口，可以创建一个bridge和veth
+```
+yum install kmod-openvswitch openvswitch -y || apt install openvswitch-switch -y
+systemctl enable openvswitch ; systemctl start openvswitch || systemctl enable openvswitch-switch ; systemctl restart openvswitch-switch
 ovs-vsctl add-br br0
 ovs-vsctl add-port br0 veth1 -- set Interface veth1 ofport_request=1 将端口veth1添加到bridge br0中，并将veth1的OpenFlow端口设置成1 
 ovs-vsctl --columns=ofport list interface veth1
 ip link set br0 up
 ip link set veth1 up
 ```
-## ansible 主机准备
 
-1. 安装ansible yum install ansible git -y
-2. 从github 获取Kolla和Kolla-Ansible
+#  获取ansible和拷贝配置文件
 ```
 git clone https://github.com/openstack/kolla -b stable/stein
 git clone https://github.com/openstack/kolla-ansible -b stable/stein
-```
-
-3. 拷贝配置文件
-
-cp -r ./kolla-ansible/etc/kolla /etc/kolla 
+mkdir -p /etc/kolla
+cp -r kolla-ansible/etc/kolla/* /etc/kolla
 cp kolla-ansible/ansible/inventory/* .
-
-# 单节点默认使用all-in-one不用做修改，多节点部署需要修改multinode
-检查playbook文件配置是否正确
+```
 
 # 单节点
 
+单节点默认使用all-in-one不用做修改
 ansible -i all-in-one all -m ping
 
 8. 生成随机密码
@@ -71,15 +98,14 @@ keystone_admin_password:admin
 
 vi /etc/kolla/globals.yml
 
-
-* docker_registry: "192.168.41.29:4000"   指定镜像的仓库的地址(配置使用私有仓库需要的选项) 
+* openstack_release: "stein"              openstack版本
+* docker_registry: "registry.cn-beijing.aliyuncs.com"   指定镜像的仓库的地址(配置使用私有仓库需要的选项) 
 * docker_namespace: "openstack_release"   指定镜像的仓库的命名空间(配置使用私有仓库需要的选项)
 * kolla_base_distro: "centos"             指定镜像的系统版本
 * kolla_install_type: "source"            指定安装的方式，source为源码
 * kolla_internal_address: "x.x.x.x"       宿主机IP
-* openstack_release: "stein"              openstack版本
 * network_interface: "eth0"               openStack使用的网络接口
-* neutron_external_interface: "veth1"     连接neutron的external bridge
+* neutron_external_interface: "eth1"     连接neutron的external bridge
 * enable_haproxy: "no"                    如果单点部署，高可用设为no
 * enable_placement: "yes"
 
