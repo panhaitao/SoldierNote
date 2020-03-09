@@ -145,16 +145,15 @@ kolla-ansible pull
 
 11. 开始部署
 
-11.1 带有kolla的引导服务器部署依赖关系
 
-kolla-ansible -i ./all-in-one bootstrap-servers
-11.2 对主机执行预部署检查
+```
+cd kolla-ansible/tools
+./kolla-ansible -i ../../all-in-one bootstrap-servers    带有kolla的引导服务器部署依赖关系
+./kolla-ansible -i ../../all-in-one prechecks            #对主机执行预部署检查
+./kolla-ansible -i ../../all-in-one deploy               #执行OpenStack部署
+```
 
-kolla-ansible -i ./all-in-one prechecks
-11.3 执行OpenStack部署
-
-kolla-ansible -i ./all-in-one deploy
-12. 后续的配置
+后续的配置
 12.1 安装openstack CLI客户端：
 
 pip install python-openstackclient
@@ -165,3 +164,32 @@ kolla-ansible post-deploy
 . /etc/kolla/admin-openrc.sh
 12.3 在浏览器输入IP即可访问
 
+
+## 部署问题记录:
+
+* 问题记录1: TASK [prechecks : Checking docker SDK version]  Failed
+依赖Docker Python软件包:  安装python-docker 解决
+
+* 问题记录2：TASK [baremetal : Install pip]  "msg": "Failed to find required executable easy_install in paths
+系统节点缺失依赖包: debian下需要手动安装 pip install ez_setup || wget https://bitbucket.org/pypa/setuptools/downloads/ez_setup.py -O - | python
+
+* 问题记录3: 总是提示rabbitmq_cluster_cookie 未定义 
+mkdir -pv /var/lib/rabbitmq/
+touch /var/lib/rabbitmq/.erlang.cookie
+chmod 600 /var/lib/rabbitmq/.erlang.cookie 然后定义变量
+rabbitmq_cluster_cookie: /var/lib/rabbitmq/.erlang.cookie
+
+* 问题记录4: Ansible - playbook : Make sure your variable name does not contain invalid characters like '-'
+kolla-ansible -i /usr/local/share/kolla-ansible/ansible/inventory/all-in-one deploy  # 不要混用pip install kolla-ansible 和git拉取的kolla-ansible
+
+* 问题记录5: [nova : Creating Nova databases user and setting permissions]
+  FAILED! => {"censored": "the output has been hidden due to the fact that 'no_log: true' was specified for this result"}
+  nova_database_password 未定义, 需要将对应task yaml no_log: true 关闭可以看见打印错误 
+
+* 生成随机字符串
+
+head -c 32 /dev/random | base64 或者 openssl rand -hex 32 
+
+# 参考
+
+* https://docs.openstack.org/kolla-ansible/latest/user/quickstart.html

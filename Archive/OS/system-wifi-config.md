@@ -53,8 +53,12 @@ gateway 192.168.1.1
 pre-up wpa_supplicant -B -i wlan0 -c /etc/wpa_supplicant/wpa_supplicant.conf
 ```
 
+
+
 ## 参考文档
 
 * <http://blog.wp08.com/article/uncategorized/754.html>
 * <http://www.360doc.com/content/12/0709/15/9424702_223191508.shtml>
 * https://blog.csdn.net/fxfzz/article/details/6179055
+
+
