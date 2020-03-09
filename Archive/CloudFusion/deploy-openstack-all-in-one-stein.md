@@ -76,7 +76,6 @@ git clone https://github.com/openstack/kolla -b stable/stein
 git clone https://github.com/openstack/kolla-ansible -b stable/stein
 mkdir -p /etc/kolla
 cp -r kolla-ansible/etc/kolla/* /etc/kolla
-cp kolla-ansible/ansible/inventory/* .
 ```
 
 # 单节点
@@ -88,15 +87,52 @@ ansible -i all-in-one all -m ping
 
 kolla-genpwd
 
-使用kolla提供的密码生成工具自动生成，如果密码不填充，后面的部署环境检查时不会通过。为了后面登录方便，可以自定义keystone_admin_password密码，这里改为admin
+使用kolla提供的密码生成工具自动生成，如果密码不填充，后面的部署环境检查时不会通过。为了后面登录方便，可以自定义keystone_admin_password密码，这里改为admi
 
-vi /etc/kolla/passwords.yml
+修改 /etc/kolla/passwords.yml 确保如下配置要被配置
+```
+keystone_admin_password: admin
+docker_registry_password: password_xxx
+nova_ssh_key:
+  private_key: /root/.ssh/id_rsa
+  public_key: /root/.ssh/id_rsa.pub
+keystone_ssh_key:
+  private_key: /root/.ssh/id_rsa
+  public_key: /root/.ssh/id_rsa.pub
+kolla_ssh_key:
+  public_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCrbYNpgJ0917NALKT2Ys6dVQ5Ebd/Id5T4iZ+C27hmxevvF5Gx1Nmctv750bO+3Z/1ZPJiWUH/pNTn2r0Ek5l+b7N7AM1VQb7oEMZ3wLO3y7MqdAEcP5kMXith6vU9DKbxiKVVM2hRBOF8PqSgze/FN/YQdfJyu+6DzR/Jw3f0BNnprgp/DAVLFMHaaSg91eWbLHNprqVxCQUt4+RJi3EV7suHiop79NRekGr1YsvQvmyXsWArkAXBdRc3Bdnr5GqctsZM8hd6FaeykWtHU55vGGFKpvj0qcccleC5/r3oKDKmJCqi2IbMPcH82kPz47RV3pLa4/mYy4yeo4r/KTEL
+    root@shenlan-PC
+kolla_user: root
+rabbitmq_cluster_cookie: /var/lib/rabbitmq/.erlang.cookie
+database_password: password_xxx
+rabbitmq_password: password_xxx
+rabbitmq_monitoring_password: password_xxx
+redis_master_password: password_xxx
+keystone_database_password: password_xxx
+glance_keystone_password: password_xxx
+glance_database_password: password_xxx
+cinder_keystone_password: password_xxx
+nova_keystone_password: password_xxx
+cinder_database_password: password_xxx
+placement_keystone_password: password_xxx
+placement_database_password: password_xxx
+nova_api_database_password: password_xxx
+nova_database_password: password_xxx
+neutron_keystone_password: password_xxx
+neutron_database_password: password_xxx
+heat_keystone_password: password_xxx
+heat_domain_admin_password: password_xxx
+heat_database_password: password_xxx
+magnum_keystone_password: password_xxx
+magnum_database_password: password_xxx
+metadata_secret: WdCuS+G+EMOOZtZ3lIli2feZNUV+51R9dv/CR01SffU=
+memcache_secret_key: 9bdbb6dc9fbb6f6e8dbf93b36f3cceb11ecaf94f140c18b8213acba7dc5fbd00
+horizon_secret_key: xcSDDx06cKiHrZ7reOrN7mQ5laoahvt1Wp4RJqM5A0Y=
 
-keystone_admin_password:admin
+```
 
-9. 修改globals.yml
 
-vi /etc/kolla/globals.yml
+9. 修改 /etc/kolla/globals.yml
 
 * openstack_release: "stein"              openstack版本
 * docker_registry: "registry.cn-beijing.aliyuncs.com"   指定镜像的仓库的地址(配置使用私有仓库需要的选项) 
@@ -143,27 +179,23 @@ kolla-ansible pull
 {"name":"lokolla/centos-source-fluentd","tags":["5.0.1"]}
 
 
-11. 开始部署
-
+## 开始部署
 
 ```
-cd kolla-ansible/tools
-./kolla-ansible -i ../../all-in-one bootstrap-servers    带有kolla的引导服务器部署依赖关系
-./kolla-ansible -i ../../all-in-one prechecks            #对主机执行预部署检查
-./kolla-ansible -i ../../all-in-one deploy               #执行OpenStack部署
+kolla-ansible -i /all-in-one bootstrap-servers                                           #带有kolla的引导服务器部署依赖关系
+kolla-ansible -i ../../all-in-one prechecks                                              #对主机执行预部署检查
+kolla-ansible -i /usr/local/share/kolla-ansible/ansible/inventory/all-in-one deploy      #开始部署
 ```
 
-后续的配置
-12.1 安装openstack CLI客户端：
+## 后续的配置
 
-pip install python-openstackclient
-12.2 OpenStack需要一个openrc文件，其中设置了admin用户的凭证，依次执行：
+OpenStack需要一个openrc文件，其中设置了admin用户的凭证，依次执行：
 
-kolla-ansible post-deploy 
-
+pip install python-openstackclient                                                       #安装openstack CLI客户端：
+kolla-ansible -i /usr/local/share/kolla-ansible/ansible/inventory/all-in-one post-deploy #
 . /etc/kolla/admin-openrc.sh
-12.3 在浏览器输入IP即可访问
 
+在浏览器输入IP即可访问
 
 ## 部署问题记录:
 
@@ -186,9 +218,7 @@ kolla-ansible -i /usr/local/share/kolla-ansible/ansible/inventory/all-in-one dep
   FAILED! => {"censored": "the output has been hidden due to the fact that 'no_log: true' was specified for this result"}
   nova_database_password 未定义, 需要将对应task yaml no_log: true 关闭可以看见打印错误 
 
-* 生成随机字符串
-
-head -c 32 /dev/random | base64 或者 openssl rand -hex 32 
+* 生成随机字符串 head -c 32 /dev/random | base64 或者 openssl rand -hex 32 
 
 # 参考
 
