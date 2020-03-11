@@ -2,13 +2,16 @@
 
 ## 安装
 
+```
 apt install virtualbox -y
 wget https://dl.genymotion.com/releases/genymotion-3.0.4/genymotion-3.0.4-linux_x64.bin
 ./genymotion-3.0.4-linux_x64.bin
+```
+
 
 ## 运行
 
-cd /opt/.... 
+cd /opt/genymobile/genymotion && sudo ./genymotion 
 
 ## 安装
 
