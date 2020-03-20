@@ -17,7 +17,7 @@ noVNC 被普遍用在各大云计算、虚拟机控制面板中，比如 OpenSta
   * npm install optimist
   * npm install npm install mime-types  
 * noVNC：http://github.com/kanaka/noVNC/zipball/master
-* Websockify：https://github.com/novnc/websockify/archive/master.zip
+* Websockify：https://github.com/novnc/websockify-js
   * node websockify.js --web C:\Users\Administrator\node_modules\noVNC 9000 http://10.70.117.185:5900  
 ```
 
