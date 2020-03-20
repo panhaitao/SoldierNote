@@ -9,11 +9,12 @@ noVNC 被普遍用在各大云计算、虚拟机控制面板中，比如 OpenSta
 
 ## windows系统
  
-1、远程目标主机：Windows Server 2008 r2（用vmare中虚拟机测试）
-2、UltraVNC：http://www.uvnc.com/（Windows环境下的VNC Server，还有TightVNC、TigerVNC、RealVNC等，其中RealVNC不能通过noVNC）
-3、Node.js：https://nodejs.org/en/download/（用于执行Websockify.js）
-4、noVNC：http://github.com/kanaka/noVNC/zipball/master
-5、Websockify：https://github.com/novnc/websockify/archive/master.zip
+1. 远程目标主机：Windows Server 2008 r2（用vmare中虚拟机测试）
+2. UltraVNC：http://www.uvnc.com/（Windows环境下的VNC Server，还有TightVNC、TigerVNC、RealVNC等，其中RealVNC不能通过noVNC）
+3. Node.js：https://nodejs.org/en/download/（用于执行Websockify.js）
+4. noVNC：http://github.com/kanaka/noVNC/zipball/master
+5. Websockify：https://github.com/novnc/websockify/archive/master.zip
 
+* 参考文档: https://www.cnblogs.com/binaway/p/9772673.html
 
 
