@@ -16,3 +16,9 @@ command：命令
 oracle ALL=(root) NOPASSWD：/usr/sbin/useradd, PASSWD:/usr/sbin/userdel
 
 注：上面的意思就是：oracle用户可以在任何地方以root身份无密码执行useradd有密码执行usermod。
+
+# sed
+
+* sed -i '/^a.*/d' tmp.txt        删除行
+* sed -i 's/^a.*/haha/g' tmp.txt  替换匹配行  
+
