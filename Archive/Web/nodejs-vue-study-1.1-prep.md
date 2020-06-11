@@ -18,6 +18,7 @@ Webpack 是一个前端资源加载/打包工具。它将根据模块的依赖�
 
 构建一个docker镜像作为应用开发环境
 
+```
 cat > Dockerfile <<EOF
 FROM alpine
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
@@ -29,6 +30,7 @@ RUN npm install --global webpack-cli vue-cli
 WORKDIR /nodejs
 
 CMD ["sh"]
+```
 
 docker build -t nodejs-vue .
 
