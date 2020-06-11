@@ -29,7 +29,10 @@ RUN npm install --global webpack-cli vue-cli
 
 WORKDIR /nodejs
 
+EXPOSE 8080
+
 CMD ["sh"]
+EOF
 ```
 
 docker build -t nodejs-vue .
@@ -37,11 +40,29 @@ docker build -t nodejs-vue .
 ## 运行
 
 docker run -t -i -d --net=host --name=nodejs-vue nodejs-vue
-
+docker run -d --name=nodejs-vue nodejs-vue
 
 ## 构建一个项目
 
-cd frontend
+vue init webpack frontend
+
+```
+? Project name frontend
+? Project description A Vue.js project
+? Author
+? Vue build standalone
+? Install vue-router? Yes
+? Use ESLint to lint your code? Yes
+? Pick an ESLint preset Standard
+? Set up unit tests Yes
+? Pick a test runner jest
+? Setup e2e tests with Nightwatch? Yes
+? Should we run `npm install` for you after the project has been created? (recommended) npm
+
+   vue-cli · Generated "frontend".
+
+```
+
 npm install
 npm run build
 
