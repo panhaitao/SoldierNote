@@ -40,7 +40,7 @@ docker build -t nodejs-vue .
 ## 运行
 
 docker run -t -i -d --net=host --name=nodejs-vue nodejs-vue
-docker run -d --name=nodejs-vue nodejs-vue
+docker run -t -i -d -p 8080:8080 --name=nodejs-vue nodejs-vue
 
 ## 构建一个项目
 
