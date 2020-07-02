@@ -1,0 +1,125 @@
+# 联系题目
+
+## 1 
+
+openstack host list
+openstack endpoint list
+
+rabbitmqctl list_connections channels name | sort -k1,1nr 
+
+iptables -nvL INPUT -t filter --line-number
+iptables -nvL OUTPUT  --line-number
+
+iptables -I INPUT -p tcp  -s 192.168.23.100/32 -d 192.168.23.11/32 --sport 5672 -j DROP
+iptables -I OUTPUT -p tcp -s 192.168.23.11/32 -d 192.168.23.100/32 --dport 5672 -j DROP
+
+iptables -D INPUT 1
+iptables -D OUTPUT 1
+
+openstack compute service  list
+
+
+glance image-list
+glance image-download --file test-centos.img eedd7c64-39ba-425e-a17b-b730abb1f6ab
+qemu-img convert -f raw -O qcow2  centos7.8.img  centos7.8.qcow2
+openstack image create centos7.8 --container-format bare --disk-format qcow2 --file centos7.8.qcow2
+
+
+## DB 的使用
+
+mysql    基础云 自助云  监控云 各自独立
+mangodb  自助云
+redis    监控云
+
+## mysql 
+* 主从 master 读 salve 写 开启mysql  binlog (读写分离)
+* 多主 依赖wsreq   
+
+## crontab 格式
+分 时 日 月 周
+
+create database pht;
+use pht;
+create table tbl(
+	id int unsigned, 
+        name varchar(10),
+        age int, 
+        moblephone varchar(10),
+        adress  varchar(10)
+);
+insert tbl(id, name, age, moblephone, adress) values ( 1, "shenlan", 22, "22222", "xzxzxz" );
+
+30 22 * * 1,5,7  mysqldump -uroot -ptstack_mariadb --databases pht >/root/pht_db-$(date +"%Y-%m-%d_%H:%M:%S").sql
+
+
+##  mogodb 使用
+find() 中是key:value
+
+db.getCollection('resource').find({"serverName" : "yxvm3"})
+
+
+## 创建租户, 用户，设置
+1 创建组织
+2 创建部门
+3 创建用户，设置权限 http://op.tstack3.com/ -> 角色 权限配置 -> 当前系统(选自助平台)  -> 新增授权 
+4 IP系统-> 网络管理 -> 关联部门
+5 子网创建绑定
+6 AZ管理绑定
+http://op.tstack3.com/ ->  其他 机房管理 -> 查看详情 - 同步
+
+
+## mongodb 排故障
+
+./tstackcheck -c show -s sip_host01:8500
+
+systemctl status mongoconfig.service mongod-sip_host01.service mongod-sip_host02.service mongod-sip_host03.service mongos.service | grep active |wc  -l
+systemctl restart mongoconfig.service mongod-sip_host01.service mongod-sip_host02.service mongod-sip_host03.service mongos.service
+
+
+# rabbitmq 日常运维管理维护
+
+rabbitmqctl  add_user shenlan root@123
+rabbitmqctl  set_user_tags shenlan administrator
+
+# 虚拟迁移和疏散
+
+nova live-migration  69683a10-8047-4bf8-bf76-759e2d343b21  openstack-con01
+
+# LB 使用
+
+nohup  python -m SimpleHTTPServer &> /dev/null & 
+
+## add osd tree
+
+ceph-disk prepare /dev/sdc1 --filestore
+ceph-disk activate /dev/sdc1
+ceph osd crush add osd.1 1.09058 host=openstack-con01
+
+## remove osd tree
+
+ceph osd set noout
+i=${OSDID}
+ceph osd find $i
+systemctl stop ceph-osd@$i
+umount /var/lib/ceph/osd/ceph-$i
+ceph osd out osd.$i
+ceph auth del osd.$i
+ceph osd crush rm osd.$i ceph osd rm $i
+ceph osd unset noout
+
+
+## Ceph map 故障域划分 (未完成)
+
+https://blog.csdn.net/qq_33218245/article/details/103312942
+
+ceph osd crush add-bucket hdd root
+ceph osd crush add-bucket sata host
+ceph osd crush move sata root=hdd
+ceph osd crush create-or-move osd.1 1.09058 host=sata
+ceph osd crush rule create-simple rule-px hdd host firstn
+ceph osd pool create volume-px 64 64
+ceph osd pool set volume-px crush_rule rule_px
+
+
+ceph osd crush remove root-hdd
+
