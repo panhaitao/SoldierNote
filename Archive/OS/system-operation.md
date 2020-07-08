@@ -28,6 +28,28 @@ systemd --> systemd-journald --> ram DB --> rsyslog -> /var/log
 
 ## 文件系统
 
+### 使用mount bind 挂在迁移文件目录
 
+```
+mkdir -pv /new-dir
+rsync -av /old-dir/  /new-dir
+mv /old-dir/ /old-dir.bak
+rm -rvf /old-dir.bak
+mkdir -pv /old-dir/
+mount --bind /new-dir/ /old-dir/
+echo "/new-dir/ /old-dir/ none defaults,bind 0 0" >> /etc/fstab
+mount -a
+```
 
 ## 内核配置 
+
+
+
+## 磁盘测试
+
+dd命令测试宿主机磁盘IO，发现每秒读写极低
+
+dd bs=64k count=4k if=/dev/zero of=/tmp/dd-test oflag=direct
+dd bs=64k count=4k if=/dev/zero of=/tmp/dd-test oflag=dsync
+
+
