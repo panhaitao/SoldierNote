@@ -43,13 +43,3 @@ mount -a
 
 ## 内核配置 
 
-
-
-## 磁盘测试
-
-dd命令测试宿主机磁盘IO，发现每秒读写极低
-
-dd bs=64k count=4k if=/dev/zero of=/tmp/dd-test oflag=direct
-dd bs=64k count=4k if=/dev/zero of=/tmp/dd-test oflag=dsync
-
-
