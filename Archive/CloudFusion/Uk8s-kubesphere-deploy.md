@@ -12,6 +12,7 @@ docker login uhub.service.ucloud.cn -u 用户名 -p "密码"
 
 ## kubesphere 3.0 离线部署镜像列表
 
+```
 library/haproxy:2.0.4
 library/redis:5.0.5-alpine
 osixia/openldap:1.3.0
@@ -32,6 +33,9 @@ kubespheredev/ks-console:latest
 kubespheredev/ks-controller-manager:latest
 kubespheredev/ks-installer:latest
 kubespheredev/tower:latest
+```
+
+保存为images.list 然后使用下面的脚本上传镜像
 
 
 ```
