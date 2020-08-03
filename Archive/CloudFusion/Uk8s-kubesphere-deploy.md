@@ -71,5 +71,7 @@ clusterRole: member
 4. 安装installer: 修改 kubesphere-installer.yaml
 image: uhub.service.ucloud.cn/kubespheredev/ks-installer:latest
 5. 安装kubesphere: 修改 cluster-configuration.yaml
-local_registry: uhub.service.ucloud.cn
+```
+local_registry: myhub.com
 clusterRole: none -> clusterRole: host
+```
