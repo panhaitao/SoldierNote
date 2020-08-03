@@ -33,9 +33,15 @@ C类：192.168.0.1--192.168.255.254
 2 iperf 网络带宽测试
 3 sar   观察网络状态
 
-* PPS 测试 服务端 netserver -p 11256     客户端 netperf -H 172.0.0.1 -p 11256 -t UDP_STREAM -l 300 -- -m 1 
-* BPS 测试 服务端 netserver -p 11257     客户端 netperf -H 172.0.0.1 -p 11256 -t UDP_STREAM -l 300 -- -m 0 
-* 带宽测试 服务端 perf3 -s -i 1 -p 16001 客户端 perf3 -u -l 16 -b 100m -t 120 -c 172.0.0.1 -i 1 -p 16001 -A 1     
+* PPS 测试 服务端 netserver -p 11256        客户端 netperf -H 172.0.0.1 -p 11256 -t UDP_STREAM -l 300 -- -m 1 
+* BPS 测试 服务端 netserver -p 11257        客户端 netperf -H 172.0.0.1 -p 11256 -t UDP_STREAM -l 300 -- -m 0 
+* 带宽测试 服务端 iperf3 -s -i 1 -p 16001   客户端 iperf3 -u -b 100m -t 120 -c 172.0.0.1 -i 1 -p 16001      
+* 带宽测试 服务端 iperf -s -u -i 1 -p 16002 客户端 iperf -u -t 120 -c 172.0.0.1 -i 1 -p 16002  
 * 观察结果 服务端 sar -n DEV 1 320
+
+4 https://github.com/microsoft/ethr/releases/
+
+*  服务端: ethr -s -ui 客户端: ethr -c localhost -t c -n 64
+
 
  
