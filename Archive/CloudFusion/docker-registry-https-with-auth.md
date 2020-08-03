@@ -1,6 +1,7 @@
 # Run https registry with base auth  
 
-由于目前Uhub提供的镜像加速功能不够灵活，原本搭建一个简单http的registry，但是个人觉得添加docker配置项insecure-registries的方式不够原生，不够优雅，还是花时间验证如何搭建https的registry 用于完成内网环境下kubespshre部署在Uk8s集群上。
+由于目前Uhub提供的镜像加速功能不够灵活，原本搭建一个简单http的registry，但是个人觉得添加docker配置项insecure-registries的方式不够优雅，长时间运行不够安全，还是花时间验证如何搭建https的registry 用于完成内网环境下kubespshre部署在Uk8s集群上。
+
 ## 搭建过程概述
 
 * 需要一台Ucloud云主机，最好使用云存储，方便扩容
@@ -35,6 +36,8 @@ mkdir -pv /data/docker/registry/
 ```
 
 ## 创建自签名证书
+
+这里是使用自签名证书，创建证书过程如下:
 
 ```
 cd /data/certs/

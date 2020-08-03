@@ -17,6 +17,8 @@ library/haproxy:2.0.4
 library/redis:5.0.5-alpine
 osixia/openldap:1.3.0
 jimmidyson/configmap-reload:v0.3.0
+csiplugin/snapshot-controller:v2.0.1
+mirrorgooglecontainers/defaultbackend-amd64:1.4
 kubesphere/alertmanager:v0.21.0
 kubesphere/kube-rbac-proxy:v0.4.1
 kubesphere/kube-state-metrics:v1.9.6
@@ -67,8 +69,8 @@ clusterRole: member
 
 1. 创建UK8S 集群
 2. 给启动一台master 绑定eip
-3. 登陆UK8S 集群master 修改默认 storage storageclass.kubernetes.io/is-default-class: "true"
-4. 安装installer: 修改 kubesphere-installer.yaml
+3. 登陆UK8S 集群master 设置默认storage，执行命令： kubectl edit sc 添加 ` storageclass.kubernetes.io/is-default-class: "true" `
+4. 修改 kubesphere-installer.yaml
 image: uhub.service.ucloud.cn/kubespheredev/ks-installer:latest
 5. 安装kubesphere: 修改 cluster-configuration.yaml
 ```
