@@ -1,8 +1,14 @@
 # Run https registry with base auth  
 
-## 准备工作:
+由于目前Uhub提供的镜像加速功能不够灵活，原本搭建一个简单http的registry，但是个人觉得添加docker配置项insecure-registries的方式不够原生，不够优雅，还是花时间验证如何搭建https的registry 用于完成内网环境下kubespshre部署在Uk8s集群上。
+## 搭建过程概述
 
-* 需要一台主机，最好使用存储
+* 需要一台Ucloud云主机，最好使用云存储，方便扩容
+* 安装docker  用于运行registry 
+* httpd-tools 用于生成http auth文件
+* 创建自签名证书,并添加到系统信息
+* 启动registry
+* 客户端主机添加配置
 
 ## 安装docker  
 
@@ -26,7 +32,7 @@ systemctl  restart docker && docker pull registry  &> /dev/null &
 mkdir -pv /data/certs/
 mkdir -pv /data/auth/
 mkdir -pv /data/docker/registry/
-``
+```
 
 ## 创建自签名证书
 
@@ -41,7 +47,9 @@ openssl req -new -x509 -nodes -sha1 -days 365 -key domain.key -out domain.crt
 
 ## 创建认证
 
+```
 htpasswd -Bbn admin a4h3ljbn > /data/auth/htpasswd
+```
 
 ## 启动registry
 
@@ -66,14 +74,11 @@ registry
 
 docker版本 (1.13.1 18.09 19.03 )验证通过:
 
-```
-echo  "10.10.184.169 myhub.com" >> /etc/hosts
-cat /data/certs/domain.crt  >> /etc/pki/tls/certs/ca-bundle.crt 
-systemctl restart docker
-docker login myhub.com -u admin -p "a4h3ljbn" 
-```
 
-执行成功后 认证信息会记录在 ~/.docker/config.json
+1. 添加myhub.com解析记录,执行命令: ` echo  "10.10.184.169 myhub.com" >> /etc/hosts `
+2. 将domain.crt分发到节点,执行命令: ``cat /data/certs/domain.crt  /etc/pki/tls/certs/ca-bundle.crt ` 
+3. 重启docker服务生效执行命令: ` systemctl restart docker`
+4. 仓库登陆认证，执行命令: ` docker login myhub.com -u user -p "password" ` 执行成功后认证信息会记录在 ~/.docker/config.json
 
 如果是k8s节点还需要完成如下操作:
 
