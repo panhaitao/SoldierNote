@@ -143,15 +143,18 @@ fi
 
 ## 初始化Uk8s节点配置 
 
-在申请完毕Uk8s集群后，每个集群可以完成乳出初始化配置
+在申请完毕Uk8s集群后，每个集群可以完成以下初始化配置
 
-1. 设置默认storage，登陆UK8S 集群master 执行命令： kubectl edit sc 添加 ` storageclass.kubernetes.io/is-default-class: "true" `
-2. 添加myhub.com解析记录,执行命令: ` echo  "10.10.184.169 myhub.com" >> /etc/hosts `
-3. 将domain.crt分发到节点,执行命令: ` cat /data/certs/domain.crt  /etc/pki/tls/certs/ca-bundle.crt ` 
-4. 重启docker服务生效执行命令: ` systemctl restart docker`
-5. 仓库登陆认证，执行命令: ` docker login myhub.com -u user -p "password" ` 执行成功后认证信息会记录在 ~/.docker/config.json
-6. cp /root/.docker/config.json /var/lib/kubelet/
-7. systemctl daemon-reload && systemctl restart kubelet"
+* 登陆UK8S集群 其中一台master(可以从registry节点主机做跳板登陆)
+1. 设置默认storage， 执行命令： kubectl edit sc 添加 ` storageclass.kubernetes.io/is-default-class: "true" `
+
+* 登陆UK8S集群 所有节点，玩成如下配置： 
+1. 添加myhub.com解析记录,执行命令: ` echo  "10.10.184.169 myhub.com" >> /etc/hosts `
+2. 将domain.crt分发到节点,执行命令: ` cat /data/certs/domain.crt  /etc/pki/tls/certs/ca-bundle.crt ` 
+3. 重启docker服务生效执行命令: ` systemctl restart docker`
+4. 仓库登陆认证，执行命令: ` docker login myhub.com -u user -p "password" ` 执行成功后认证信息会记录在 ~/.docker/config.json
+5. cp /root/.docker/config.json /var/lib/kubelet/
+6. systemctl daemon-reload && systemctl restart kubelet"
 
 ## 部署主控集群
 
