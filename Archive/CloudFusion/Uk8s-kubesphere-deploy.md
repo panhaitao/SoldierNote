@@ -1,17 +1,8 @@
 # Uk8s kubesphere 部署篇
 
-## 容器镜像库-UHub
+搭建好内网的registery后，在申请 Uk8s 集群的时候就不用每个节点都需要绑定EIP了，接下来将 kubesphere 3.0 镜像同步到registery中，同步操作如下：
 
-如果使用的基础镜像在公网拉去速度比较慢,使用UHub镜像仓库加速功能, 加速后的地址
-
-uhub.service.ucloud.cn
-
-镜像同步完毕后, 所有k8s集群节点需要
-
-docker login uhub.service.ucloud.cn -u 用户名 -p "密码"
-
-## kubesphere 3.0 离线部署镜像列表
-
+将如下文件保存为images.list
 ```
 library/haproxy:2.0.4
 library/redis:5.0.5-alpine
@@ -37,8 +28,7 @@ kubespheredev/ks-installer:latest
 kubespheredev/tower:latest
 ```
 
-保存为images.list 然后使用下面的脚本上传镜像
-
+然后使用下面的脚本上传镜像
 
 ```
 #!/bin/bash
@@ -61,15 +51,19 @@ if [[ "$pri_repo" != "" ]];then
 fi
 ```
 
-多集群管理
-clusterRole: host
-clusterRole: member
+## 初始化Uk8s节点配置 
 
-部署主控集群
+在申请完毕Uk8s集群后，每个集群可以完成乳出初始化配置
+
+1. 设置默认storage，登陆UK8S 集群master 执行命令： kubectl edit sc 添加 ` storageclass.kubernetes.io/is-default-class: "true" 
+2. 
+
+
+## 部署主控集群
 
 1. 创建UK8S 集群
 2. 给启动一台master 绑定eip
-3. 登陆UK8S 集群master 设置默认storage，执行命令： kubectl edit sc 添加 ` storageclass.kubernetes.io/is-default-class: "true" `
+3. `
 4. 修改 kubesphere-installer.yaml
 image: uhub.service.ucloud.cn/kubespheredev/ks-installer:latest
 5. 安装kubesphere: 修改 cluster-configuration.yaml
@@ -77,3 +71,9 @@ image: uhub.service.ucloud.cn/kubespheredev/ks-installer:latest
 local_registry: myhub.com
 clusterRole: none -> clusterRole: host
 ```
+
+## 多集群管理
+
+clusterRole: host
+clusterRole: member
+
