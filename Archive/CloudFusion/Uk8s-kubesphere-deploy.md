@@ -55,7 +55,7 @@ fi
 
 在申请完毕Uk8s集群后，每个集群可以完成乳出初始化配置
 
-1. 设置默认storage，登陆UK8S 集群master 执行命令： kubectl edit sc 添加 ` storageclass.kubernetes.io/is-default-class: "true" 
+1. 设置默认storage，登陆UK8S 集群master 执行命令： kubectl edit sc 添加 ` storageclass.kubernetes.io/is-default-class: "true" `
 2. 
 
 
