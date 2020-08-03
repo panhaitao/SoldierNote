@@ -64,13 +64,12 @@ clusterRole: host
 clusterRole: member
 
 部署主控集群
-1 创建UK8S 集群
-2 给启动一台master 绑定eip
-3 登陆UK8S 集群master 修改默认 storage storageclass.kubernetes.io/is-default-class: "true"
-4 安装installer: 修改 kubesphere-installer.yaml
+
+1. 创建UK8S 集群
+2. 给启动一台master 绑定eip
+3. 登陆UK8S 集群master 修改默认 storage storageclass.kubernetes.io/is-default-class: "true"
+4. 安装installer: 修改 kubesphere-installer.yaml
 image: uhub.service.ucloud.cn/kubespheredev/ks-installer:latest
-5 安装kubesphere: 修改 cluster-configuration.yaml
+5. 安装kubesphere: 修改 cluster-configuration.yaml
 local_registry: uhub.service.ucloud.cn
 clusterRole: none -> clusterRole: host
-
-
