@@ -11,6 +11,7 @@
 * 启动registry
 * 申请需要数量的Uk8s集群
 * 集群节点主机添加配置
+* 
 
 ##  搭建registry
 
@@ -158,18 +159,14 @@ fi
 
 ## 部署主控集群
 
-1. 创建UK8S 集群
-2. 给启动一台master 绑定eip
-3. 修改 kubesphere-installer.yaml
-image: uhub.service.ucloud.cn/kubespheredev/ks-installer:latest
-4. 安装kubesphere: 修改 cluster-configuration.yaml
+1. 创建UK8S 集群，给一台 master 节点，绑定eip
+2. 重复`初始化Uk8s节点配置`
+3. 修改 kubesphere-installer.yaml `image: myhub.com/kubespheredev/ks-installer:latest`
+4. 修改 cluster-configuration.yaml
 ```
-local_registry: myhub.com
-clusterRole: none -> clusterRole: host
+添加 local_registry: myhub.com
+将 clusterRole: none 修改为 clusterRole: member
 ```
+5. 部署kubesphere，执行命令: `kubectl  apply -f  kubesphere-installer.yaml ;  kubectl  apply -f  kubesphere-installer.yaml `
 
-## 多集群管理
-
-clusterRole: host
-clusterRole: member
 
