@@ -6,18 +6,18 @@
 
 * 需要一台Ucloud云主机
 * 安装docker  用于运行registry 
-* httpd-tools 用于生成http auth文件
+* 安装httpd-tools 用于生成http auth文件
 * 创建自签名证书,并添加到系统信息
 * 启动registry
 * 申请需要数量的Uk8s集群
 * 集群节点主机添加配置
-* 
+* 完后kubesphere的部署 
 
 ##  搭建registry
 
 需要一台Ucloud云主机，绑定eip,最好使用云存储，方便扩容
 
-### 安装docker  
+### 安装必备的软件 
 
 ```
 CentOS8 install docker
@@ -147,7 +147,7 @@ fi
 在申请完毕Uk8s集群后，每个集群可以完成以下初始化配置
 
 * 登陆UK8S集群 其中一台master(可以从registry节点主机做跳板登陆)
-1. 设置默认storage， 执行命令： kubectl edit sc 添加 ` storageclass.kubernetes.io/is-default-class: "true" `
+1. 设置默认storage， 执行命令：`kubectl  edit sc ssd-csi-udisk` 添加 ` storageclass.kubernetes.io/is-default-class: "true" `
 
 * 登陆UK8S集群 所有节点，玩成如下配置： 
 1. 添加myhub.com解析记录,执行命令: ` echo  "10.10.184.169 myhub.com" >> /etc/hosts `
@@ -157,16 +157,34 @@ fi
 5. cp /root/.docker/config.json /var/lib/kubelet/
 6. systemctl daemon-reload && systemctl restart kubelet"
 
-## 部署主控集群
+## 部署host集群
 
-1. 创建UK8S 集群，给一台 master 节点，绑定eip
-2. 重复`初始化Uk8s节点配置`
+1. 创建UK8S 集群，给一台 master 节点，绑定eip,设置外网防火墙，允许30880端口访问
+2. 重复`初始化Uk8s节点配置`一节步骤
 3. 修改 kubesphere-installer.yaml `image: myhub.com/kubespheredev/ks-installer:latest`
 4. 修改 cluster-configuration.yaml
 ```
 添加 local_registry: myhub.com
+将 clusterRole: none 修改为 clusterRole: host
+```
+5. 部署kubesphere，执行命令: `kubectl  apply -f  kubesphere-installer.yaml ;  kubectl  apply -f  kubesphere-installer.yaml `
+6. 部署完毕host集群后，执行命令: `kubectl -n kubesphere-system get cm kubesphere-config -o yaml | grep -v "apiVersion" | grep jwtSecret` 记下返回的结果` jwtSecret: "xxxxxxxxxxxxxxxxxxx"` 后面配置member集群需要修改的参数  
+
+## 部署member集群
+
+1. 创建UK8S 集群
+2. 重复`初始化Uk8s节点配置`一节步骤
+3. 修改 kubesphere-installer.yaml `image: myhub.com/kubespheredev/ks-installer:latest`
+4. 修改 cluster-configuration.yaml
+```
+添加 local_registry: myhub.com
+修改 jwtSecret：写入部署完毕host集群后最后一步返回的结果 
 将 clusterRole: none 修改为 clusterRole: member
 ```
 5. 部署kubesphere，执行命令: `kubectl  apply -f  kubesphere-installer.yaml ;  kubectl  apply -f  kubesphere-installer.yaml `
 
+## 将member集群加入主控集群
 
+1 使用浏览器访问 http://主控集群_eip:30880 默认用户名 admin 密码 P@88w0rd
+2 平台管理 -> 集群管理 -> 添加集群 (完成自定义设置)-> 下一步 -> 默认-> 添加从member集群 master节点文件 /root/.kube/config 的内容  
+3 添加其他member集群，重复以上操作
