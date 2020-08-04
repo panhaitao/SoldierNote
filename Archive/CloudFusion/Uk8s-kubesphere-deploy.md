@@ -57,7 +57,7 @@ openssl req -new -x509 -nodes -sha1 -days 365 -key domain.key -out domain.crt
 ### 创建认证
 
 ```
-htpasswd -Bbn admin a4h3ljbn > /data/auth/htpasswd
+htpasswd -Bbn user password > /data/auth/htpasswd
 ```
 
 ### 启动registry
