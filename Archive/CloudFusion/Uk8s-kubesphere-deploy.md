@@ -185,6 +185,6 @@ fi
 
 ## 将member集群加入主控集群
 
-1 使用浏览器访问 http://主控集群_eip:30880 默认用户名 admin 密码 P@88w0rd
-2 平台管理 -> 集群管理 -> 添加集群 (完成自定义设置)-> 下一步 -> 默认-> 添加从member集群 master节点文件 /root/.kube/config 的内容  
-3 添加其他member集群，重复以上操作
+1. 使用浏览器访问 http://主控集群_eip:30880 默认用户名 admin 密码 P@88w0rd
+2. 平台管理 -> 集群管理 -> 添加集群 (完成自定义设置)-> 下一步 -> 默认-> 添加从member集群 master节点文件 /root/.kube/config 的内容  
+3. 添加其他member集群，重复以上操作
