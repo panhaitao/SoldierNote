@@ -22,11 +22,11 @@
 ```
 CentOS8 install docker
 
-dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo
+dnf config-manager --add-repo=http://mirrors.ustc.edu.cn/docker-ce/linux/centos/docker-ce.repo
 dnf install docker-ce --nobest -y
 
 CentOS7 install docker 
-yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+yum-config-manager --add-repo http://mirrors.ustc.edu.cn/docker-ce/linux/centos/docker-ce.repo
 yum install docker-ce -y
 
 dnf install httpd-tools -y
