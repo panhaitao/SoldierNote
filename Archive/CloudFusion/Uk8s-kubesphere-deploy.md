@@ -142,14 +142,17 @@ if [[ "$pri_repo" != "" ]];then
 fi
 ```
 
-## 初始化Uk8s节点配置 
+## 申请Uk8s集群并完成初始化配置 
 
 在申请完毕Uk8s集群后，每个集群可以完成以下初始化配置
 
-* 登陆UK8S集群 其中一台master(可以从registry节点主机做跳板登陆)
-1. 设置默认storage， 执行命令：`kubectl  edit sc ssd-csi-udisk` 添加 ` storageclass.kubernetes.io/is-default-class: "true" `
+### 设置默认storage
+1. 登陆UK8S集群 其中一台master(可以从registry节点主机做跳板登陆) 执行命令：`kubectl  edit sc ssd-csi-udisk` 添加 ` storageclass.kubernetes.io/is-default-class: "true" `
 
-* 登陆UK8S集群 所有节点，玩成如下配置： 
+### 初始化集群节点配置 
+
+登陆UK8S集群 所有节点，完成如下配置：
+
 1. 添加myhub.com解析记录,执行命令: ` echo  "10.10.184.169 myhub.com" >> /etc/hosts `
 2. 将domain.crt分发到节点,执行命令: ` cat /data/certs/domain.crt  /etc/pki/tls/certs/ca-bundle.crt ` 
 3. 重启docker服务生效执行命令: ` systemctl restart docker`
@@ -157,10 +160,10 @@ fi
 5. cp /root/.docker/config.json /var/lib/kubelet/
 6. systemctl daemon-reload && systemctl restart kubelet"
 
-## 部署host集群
+## 部署管理集群(kubesphere-host)
 
 1. 创建UK8S 集群，给一台 master 节点，绑定eip,设置外网防火墙，允许30880端口访问
-2. 重复`初始化Uk8s节点配置`一节步骤
+2. 确认完成 `初始化集群节点配置` 
 3. 修改 kubesphere-installer.yaml `image: myhub.com/kubespheredev/ks-installer:latest`
 4. 修改 cluster-configuration.yaml
 ```
@@ -170,10 +173,10 @@ fi
 5. 部署kubesphere，执行命令: `kubectl  apply -f  kubesphere-installer.yaml ;  kubectl  apply -f  kubesphere-installer.yaml `
 6. 部署完毕host集群后，执行命令: `kubectl -n kubesphere-system get cm kubesphere-config -o yaml | grep -v "apiVersion" | grep jwtSecret` 记下返回的结果` jwtSecret: "xxxxxxxxxxxxxxxxxxx"` 后面配置member集群需要修改的参数  
 
-## 部署member集群
+## 部署业务集群(kubesphere-member)
 
 1. 创建UK8S 集群
-2. 重复`初始化Uk8s节点配置`一节步骤
+2. 确认完成 `初始化集群节点配置`
 3. 修改 kubesphere-installer.yaml `image: myhub.com/kubespheredev/ks-installer:latest`
 4. 修改 cluster-configuration.yaml
 ```
@@ -190,9 +193,5 @@ fi
 3. 添加其他member集群，重复以上操作
 
 ## 参考文档
-
-* 
-* 多集群管理 https://github.com/kubesphere/community/tree/master/sig-multicluster/how-to-setup-multicluster-on-kubesphere#MemberCluster
-
-2. 平台管理 -> 集群管理 -> 添加集群 (完成自定义设置)-> 下一步 -> 默认-> 添加从member集群 master节点文件 /root/.kube/config 的内容  配置
-2. 平台管理 -> 集群管理 -> 添加集群 (完成自定义设置)-> 下一步 -> 默认-> 添加从member集群 master节点文件 /root/.kube/config 的内容  
+ 
+* 多集群管理 https://github.com/kubesphere/community/tree/master/sig-multicluster/how-to-setup-multicluster-on-kubesphere#MemberCluster 
