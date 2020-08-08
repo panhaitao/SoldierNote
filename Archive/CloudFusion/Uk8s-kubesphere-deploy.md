@@ -82,7 +82,7 @@ registry
 
 启动registry后，registry节点还要完成如下配置
 
-1. 添加myhub.com解析记录,执行命令: ` echo  "10.10.184.169 myhub.com" >> /etc/hosts `
+1. 添加myhub.com解析记录,执行命令: ` echo  "registry_host_ip myhub.com" >> /etc/hosts ` registry_host_ip 需要替换为实际的主机IP
 2. 将domain.crt分发到节点,执行命令: ` cat /data/certs/domain.crt  /etc/pki/tls/certs/ca-bundle.crt ` 
 3. 重启docker服务生效执行命令: ` systemctl restart docker`
 4. 仓库登陆认证，执行命令: ` docker login myhub.com -u user -p "password" ` 
