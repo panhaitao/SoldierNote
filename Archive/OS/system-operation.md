@@ -40,6 +40,47 @@ mount --bind /new-dir/ /old-dir/
 echo "/new-dir/ /old-dir/ none defaults,bind 0 0" >> /etc/fstab
 mount -a
 ```
+find命令（查找系统中的大文件）
+获取某个目录下大于800M的所有文件
+
+find . -type f -size +800M
+
+如上命令所示，我们仅仅能看到超过800M大小的文件的文件名称，但是对文件的信息（例如，文件大小、文件属性）一无所知，那么能否更详细显示一些文件属性或信息呢，当然可以，使用如下命令：
+
+find . -type f -size +800M -print0 | xargs -0 ls -l
+
+使用df du 查询大目录
+df -h; du -h --max-depth=1 /home
+
+xfs 根分区已满，占用空间与实际使用空间不符,使用xfs工具修复
+background：
+某台服务器centos7，通过df查看空间基本被占满
+
+此台机器的分区当时我偷懒，500G的空间就只划了个Boot, 划了个Swap，其他都分了/
+
+解决过程：
+
+使用du查询
+du -sh /* 2>/dev/null | sort -hr | head -3
+发现占用磁盘的文件最大只有几G，怀疑是多个小文件，然而经过查询，发现/只占用了4G的内存
+
+查资料发现网上大多数的都说是进程打开的正在使用的文件被删除，没有释放
+我执行lsof命令发现根本不是这个问题
+
+怀疑是文件系统出了问题，通过 df -aT查看到/挂载点使用的文件系统是xfs
+
+首先安装xfs工具
+yum install xfsdump
+yum install xfsprogs-devel
+yum install xfsprogs
+
+检测/分区的碎片
+xfs_db -c frag -r /dev/sda3
+显示的数据是10%左右，尝试使用修复整理碎片
+
+xfs_fsr /dev/sda3
+再次查看，发现文件系统正常恢复
+
 
 ## 内核配置 
 
