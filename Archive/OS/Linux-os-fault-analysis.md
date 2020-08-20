@@ -67,7 +67,9 @@ echo 3 >/proc/sys/vm/drop_caches  释放 pagecache, dentries and inodes
 
 top 命令 实时查看系统总体负载运行状态 
 
-# vmstat 
+# vmstat
+
+## vmstat 常用命令
 
 * vmstat
 * vmstat -S m
@@ -76,7 +78,16 @@ top 命令 实时查看系统总体负载运行状态
 * vmstat -a
 * vmstat -d
 * vmstat -D
-# vmstat -p /dev/sdb1
+* vmstat -p /dev/sdb1
+
+## 常见参考诊断
+
+1. 如果 r 经常大于cpu核心数 ，且 id 经常小于40，表示处理器的负荷很重,说明CPU不足,需要增加CPU
+2. 如果 b 这个值一般为2-3倍cpu的个数就表明cpu排队比较严要了，常见的情况是由IO引起的
+3. 如果 si，so 长期不等于0，表示物理内存容量太小,需要增加物理内存
+4. 如果 bi, bo 这两个值比较大，说明io的压力也较大，cpu在io的等待可能也会大，
+5. wa的参考值为20%，如果wa超过20%，说明I/O等待严重。
+6. 如果 in cs 两个值比较大说明，说明消耗内核上cpu较多，可能应用在不合理的使用cpu
 
 ## lsof
 
