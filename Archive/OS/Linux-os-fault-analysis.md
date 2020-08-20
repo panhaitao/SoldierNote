@@ -113,7 +113,7 @@ ps aux
 
 ## Linux 工具汇总
 
-![](linux-analysis-and-tools.png)
+![linux-analysis-and-tools](linux-analysis-and-tools.png)
 
 ## 场景
 
