@@ -111,6 +111,10 @@ ps aux
 # journalctl -fu 服务名
 # tail -f /var/log/syslog
 
+## Linux 工具汇总
+
+![](linux-analysis-and-tools.png)
+
 ## 场景
 
 ### 场景1 磁盘写满
