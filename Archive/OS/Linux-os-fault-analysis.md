@@ -136,7 +136,7 @@ ps aux
 
 ## Linux 工具汇总
 
-![linux-analysis-and-tools](linux-analysis-and-tools.png)
+![linux-analysis-and-tools](http://www.brendangregg.com/Perf/linux_observability_tools.png)
 
 ## 场景
 
@@ -208,6 +208,7 @@ vm.dirty_background_ratio:这个参数指定了当文件系统缓存脏页数量
 
 # 参考部分
 
+* http://www.brendangregg.com/linuxperf.html
 * https://ysshao.cn/Linux/Linux_performance/
 * https://blog.csdn.net/wufaliang003/article/details/102382117
 
