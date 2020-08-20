@@ -107,9 +107,9 @@ ps aux
 
 ## 日志
 
-# dmesg  -T
-# journalctl -fu 服务名
-# tail -f /var/log/syslog
+* dmesg  -T
+* journalctl -fu 服务名
+* tail -f /var/log/syslog
 
 ## Linux 工具汇总
 
