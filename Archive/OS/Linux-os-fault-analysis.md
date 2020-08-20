@@ -1,5 +1,3 @@
-
-
 # 系统故障分析
 
 ## CPU 状态
@@ -38,11 +36,13 @@ load average: 0.08, 0.09, 0.05 （系统的平均负载数，表示 1分钟、5�
 ## 内存 I/O 的状态
 
 * total        内存总量    
+* used         已经被使用的内存大小
+* free         显示还有多少可用内存 
+* Available    应用程序可用内存大小
 * page cache   文件系统层级的缓存
 * buffer cache 磁盘等块设备的缓冲
-* free         物理可用内存 
-* Available    应用程序可用内存
-* swpd         使用的虚拟内存量。
+* shared 列显示被共享使用的物理内存大小。
+* swap         使用的虚拟内存量。
 
 * si：从磁盘交换的内存量（换入，从 swap 移到实际内存的内存）
 * so：交换到磁盘的内存量（换出，从实际内存移动到 swap 的内存）
@@ -56,7 +56,19 @@ echo 1 > /proc/sys/vm/drop_caches 释放 pagecache,
 echo 2 > /proc/sys/vm/drop_caches 释放 dentries  inodes, ;
 echo 3 >/proc/sys/vm/drop_caches  释放 pagecache, dentries and inodes 
 
-## netstat
+## TCP的网络状态
+
+* LISTEN：侦听来自远方的TCP端口的连接请求
+* SYN-SENT：再发送连接请求后等待匹配的连接请求（如果有大量这样的状态包，检查是否中招了）
+* SYN-RECEIVED：再收到和发送一个连接请求后等待对方对连接请求的确认（如有大量此状态估计被flood攻击了）
+* ESTABLISHED：代表一个打开的连接
+* FIN-WAIT-1：等待远程TCP连接中断请求，或先前的连接中断请求的确认
+* FIN-WAIT-2：从远程TCP等待连接中断请求
+* CLOSE-WAIT：等待从本地用户发来的连接中断请求
+* CLOSING：等待远程TCP对连接中断的确认
+* LAST-ACK：等待原来的发向远程TCP的连接中断请求的确认（不是什么好东西，此项出现，检查是否被攻击）
+* TIME-WAIT：等待足够的时间以确保远程TCP接收到连接中断请求的确认
+* CLOSED：没有任何连接状态
 
 * 统计当前TCP链接状态 netstat -n | awk '/^tcp/ {++S[$NF]} END {for(a in S) print a, S[a]}' 
 * netstat -nat 
@@ -192,3 +204,10 @@ vm.dirty_background_ratio:这个参数指定了当文件系统缓存脏页数量
 ### 场景7 应用内存泄漏
 
 还有一种，free查看内存可用的不多，top查看找不到内存占用高的，cpu使用率不高，系统负载无异常，重启之后，过段时间还是慢慢发现内存不组，那很可能就是应用程序内存泄漏了，最笨的用排除法找到具体的业务应用
+
+
+# 参考部分
+
+* https://ysshao.cn/Linux/Linux_performance/
+* https://blog.csdn.net/wufaliang003/article/details/102382117
+
