@@ -123,6 +123,10 @@ top 命令 实时查看系统总体负载运行状态
 * pidstat -p $PID -d 1
 * iostat  查看系统总体IO读写
 
+## iftop
+
+iftop -i netdev
+
 ## ps 
 
 ps -ef
