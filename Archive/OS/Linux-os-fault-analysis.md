@@ -1,5 +1,7 @@
 # 系统故障分析
 
+CPU Mem I/O
+
 ## CPU 状态
 
 uptime 开机运行时间
