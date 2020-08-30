@@ -26,7 +26,7 @@
  - 源镜像 k8s.gcr.io/etcd:3.4.3-0                      目标镜像 k8srepo/etcd:3.4.3-0 
  - 源镜像 k8s.gcr.io/coredns:1.6.7                     目标镜像 k8srepo/coredns:1.6.7 
 ```
-加速后的镜像仓库为 uhub.service.ucloud.cn/k8srepo/ ,官方镜像列表地址可以从`kubeadm config images list`这里获得。
+加速后的镜像仓库为 uhub.service.ucloud.cn/k8srepo/ 官方镜像列表地址可以从`kubeadm config images list`这里获得。
 
 ## 创建并配置ULB 
 
