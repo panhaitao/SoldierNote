@@ -13,7 +13,7 @@
 
 ## 配置Uhub
 
-登陆https://console.ucloud.cn/，从全部产品中找到, 容器镜像库-UHub
+登陆 https://console.ucloud.cn/  从全部产品中找到, 容器镜像库-UHub
 
 1. 用户镜像-> 镜像库名称 -> 新建镜像仓库，比如起个名字k8srepo
 2. 在这个k8srepo仓库下配置镜像加速，分别添加如下加速规则
@@ -26,12 +26,19 @@
  - 源镜像 k8s.gcr.io/etcd:3.4.3-0                      目标镜像 k8srepo/etcd:3.4.3-0 
  - 源镜像 k8s.gcr.io/coredns:1.6.7                     目标镜像 k8srepo/coredns:1.6.7 
 ```
-官方镜像列表可以从`kubeadm config images list`这里获得,
+加速后的镜像仓库为 uhub.service.ucloud.cn/k8srepo/ ,官方镜像列表地址可以从`kubeadm config images list`这里获得。
 
+## 创建并配置ULB 
 
-## 配置ULB 
+登陆 https://console.ucloud.cn/  
 
-创建好需要的云主机后,创建k8s apiserver负载均衡 
+1. 从全部产品中找到, 云主机UHost -> 创建主机，具体可以参考ucloud文档
+2. 从全部产品中找到, 负载均衡ULB -> 创建负载均衡
+  - 负载均衡类型: 请求代理型
+  - 网络模式: 内网 
+  - 所属VPC: 选择和新建的云主机一致的VPC
+  - 所属子网: 选择和新建的云主机一致的子网
+  - 其他按照提示操作即可 
 
 ## 初始化所有节点
 
