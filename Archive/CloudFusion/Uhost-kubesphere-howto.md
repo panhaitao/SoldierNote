@@ -1,36 +1,37 @@
-# 用kubeadm部署一个k8s集群
+# kubeshpere 部署在ucloud 云主机上
 
-## 源起
 
-从早期的时候，k8s的部署是比较繁琐，到kubeadm等工具的完善，集群部署变成更加容易，同时也隐藏了很多细节，适当的了解如何使用kubeadm 工具一步步完成完成集群的部署，了解其中的细节，对于容器平台的维护者意义更大。
+如果ucloud的提供的标准Uk8s集群不满足用户的特别需求，但是还是需要希望把kubespere 部署在ucloud云主机上，可以参考如下部署方式，主要分成两部分，首先使用kubeadm在ucloud公有云主机上部署一个k8s集群，然后在这个k8s集群上完成kubeshpere的部署
 
-## 准备工作
+## 部署k8s集群准备工作
 
-1. 准备一个负载均衡，云厂商提供的LB/或者企业私有环境的F5/haproxy均可
-2. 准备三台配置不低于机器2C4G的主机，用于运行k8s master
-3. 准备N台配置不低于4C8G的主机，用于运行k8s node
+1. 使用UHub同步一份kubernetes镜像仓库
+2. 创建一块UFS, 用作K8S集群的存储
+3. 准备三台配置不低于机器2C4G的Uhost云主机，用于运行k8s master
+4. 创建一个负载均衡 ULB, 用作配置k8s apiserver 高可用VIP
+5. 准备N台配置不低于4C8G的Uhost主机，用于运行k8s node
 
-## 配置LB 和启动一个私有docker仓库
+## 配置Uhub
 
-配置 vip 转发到 Master1_IP:6443 ，Master2_IP:6443，Master3_IP:6443, 本文以haproxy为例创建一个简单的负载均衡
+登陆https://console.ucloud.cn/，从全部产品中找到, 容器镜像库-UHub
 
+1. 用户镜像-> 镜像库名称 -> 新建镜像仓库，比如起个名字k8srepo
+2. 在这个k8srepo仓库下配置镜像加速，分别添加如下加速规则
 ```
-yum install haproxy -y
-cat >> /etc/haproxy/haproxy.cfg <<EOF
-listen tcp-6443
-    bind 0.0.0.0:6443
-    mode tcp
-    balance roundrobin
-    server      master1         master1_ip:6443         weight  100
-    #server      master2         master2_ip:6443         weight  100
-    #server      master3         master3_ip:6443         weight  100
-EOF
-systemctl enable haproxy && systemctl restart haproxy
-systemctl stop firewalld.service && systemctl disable firewalld.service
+ - 源镜像 k8s.gcr.io/kube-apiserver:v1.18.8            目标镜像 k8srepo/kube-apiserver:v1.18.8
+ - 源镜像 k8s.gcr.io/kube-controller-manager:v1.18.8   目标镜像 k8srepo/kube-controller-manager:v1.18.8 
+ - 源镜像 k8s.gcr.io/kube-scheduler:v1.18.8            目标镜像 k8srepo/kube-scheduler:v1.18.8/ 
+ - 源镜像 k8s.gcr.io/kube-proxy:v1.18.8                目标镜像 k8srepo/kube-proxy:v1.18.8 
+ - 源镜像 k8s.gcr.io/pause:3.2                         目标镜像 k8srepo/pause:3.2 
+ - 源镜像 k8s.gcr.io/etcd:3.4.3-0                      目标镜像 k8srepo/etcd:3.4.3-0 
+ - 源镜像 k8s.gcr.io/coredns:1.6.7                     目标镜像 k8srepo/coredns:1.6.7 
 ```
+官方镜像列表可以从`kubeadm config images list`这里获得,
 
-初始化配置可以只添加一个master1_ip，等全部集群部署完毕，再去掉注释部分，重启haproxy服务即可。
 
+## 配置ULB 
+
+创建好需要的云主机后,创建k8s apiserver负载均衡 
 
 ## 初始化所有节点
 
@@ -49,19 +50,19 @@ systemctl stop firewalld.service && systemctl disable firewalld.service
 
 ```
 yum install yum-utils -y
-yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+yum-config-manager --add-repo http://mirrors.ustc.edu.cn/docker-ce/linux/centos/docker-ce.repo
 cat > /etc/yum.repos.d/kubernetes.repo<<EOF
 [kubernetes]
 name=Kubernetes
-baseurl=http://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64
+baseurl=http://mirrors.ustc.edu.cn/kubernetes/yum/repos/kubernetes-el7-x86_64
 enabled=1
 gpgcheck=0
 repo_gpgcheck=0
-gpgkey=http://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg
-       http://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg
+gpgkey=http://mirrors.ustc.edu.cn/kubernetes/yum/doc/yum-key.gpg
+       http://mirrors.ustc.edu.cn/kubernetes/yum/doc/rpm-package-key.gpg
 EOF
 yum makecache
-yum install docker-ce ipvsadm kubelet-1.15.6 kubeadm-1.15.6 kubectl-1.15.6 ipset -y
+yum install docker-ce ipvsadm kubelet-1.18.8 kubeadm-1.18.8 kubectl-1.18.8 ipset -y
 swapoff -a  && sed -i 's/.*swap.*/#&/' /etc/fstab
 cat > /etc/sysconfig/modules/ipvs.modules <<EOF
 #!/bin/bash
@@ -114,8 +115,8 @@ systemctl enable kubelet.service
 cat > kubeadm-init.yaml<<EOF
 apiVersion: kubeadm.k8s.io/v1beta2
 kind: ClusterConfiguration
-kubernetesVersion: v1.15.6
-imageRepository: registry.cn-hangzhou.aliyuncs.com/google_containers
+kubernetesVersion: v1.18.8
+imageRepository: uhub.service.ucloud.cn/k8srepo/
 controlPlaneEndpoint: "k8s_apiserver_vip:6443"
 networking:
   dnsDomain: cluster.local
@@ -199,3 +200,21 @@ kubectl get pods --all-namespaces
 * 重置集群:kubeadm reset, 清空目录 /var/lib/etcd/ /var/lib/kubelet/ /etc/kubernetes/
 * master去掉污点，允许调度其他pod: `kubectl taint nodes <master-name> node-role.kubernetes.io/master-`
 * master加污点，禁止调度pod：`kubectl taint nodes <master-name> node-role.kubernetes.io/master=true:NoSchedule`
+* 如果想使用一台独立haproxy实例创建一个简单的负载均衡，可参考如下：
+
+```
+yum install haproxy -y
+cat >> /etc/haproxy/haproxy.cfg <<EOF
+listen tcp-6443
+    bind 0.0.0.0:6443
+    mode tcp
+    balance roundrobin
+    server      master1         master1_ip:6443         weight  100
+    #server      master2         master2_ip:6443         weight  100
+    #server      master3         master3_ip:6443         weight  100
+EOF
+systemctl enable haproxy && systemctl restart haproxy
+systemctl stop firewalld.service && systemctl disable firewalld.service
+```
+
+初始化配置可以只添加一个master1_ip，等全部集群部署完毕，再去掉注释部分，重启haproxy服务即可。
