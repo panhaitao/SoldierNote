@@ -136,9 +136,64 @@ playbook, 运维剧本，一次完成
 3. 分发配置
 4. 重启服务
 
+## Role 
+
+```
+```
+
 ## 其他操作参考：
 
 * 检查yaml文件的语法是否正确 ansible-playbook nginx.yaml --syntax-check
 * 检查yaml文件中的tasks任务: ansible-playbook nginx.yaml --list-task
 * 检查yaml文件中的生效主机:  ansible-playbook nginx.yaml --list-hosts
 * 运行playbook里面特定的某个task,从某个task开始运行: ansible-playbook nginx.yaml --start-at-task='Copy TLS key'
+
+## Ansible 在压测场景中的实践
+
+* 准备好ansible节点，安装ansible git python3 
+* 登陆ansible节点，clone一份playbook `git clone https://github.com/panhaitao/ansible-playbook-store.git ` 
+  - 根据需要配置, 修改云主机创建脚本: scripts/create_uhost.py 
+  - 根据需要数量，修改inventory文件生成脚本: scripts/create_uhost_ansible_hosts.sh
+* 批量创建云主机，并自动生成inventory文件,执行命令: cd ansible-playbook-store && scripts/create_uhost_ansible_hosts.sh 
+
+
+### 批量初始化主机配置
+
+1. 更新主机名
+2. 更新/etc/hosts
+3. 安装软件包 httpd-tools
+4. 拷贝测试数据文件到每个节点 
+5. 更新jmeter三个配置文件
+6. 初始化jmeter agent服务 
+
+使用初始化所有压测节点配置只需要执行如下命令:
+
+```
+cd ansible-playbook-store 
+初始化所有压测节点配: ansible-playbook -i hosts/http_load todo/init_ab_hosts
+启动jemter_work 节点服务: ansible -i hosts/http_load all -m script -a scripts/run_jemter_work.sh
+检查是否有jemter服务启动失败的节点: ansible -i hosts/http_load all -m shell -a "netstat -nat | grep 1099 " | grep rc=1 | awk '{print $1}' | tr '\n' ','
+```
+
+### jemter 压测
+
+1. 在所有jemter_work 节点准备就绪后
+2. 修改当前目下的jmx配置文件
+3. 执行脚本run_jmeter.sh 开始压测
+
+### 操作所有节点进行ab压测
+
+编写ab_bench.sh脚本，例如
+```
+rm -f /tmp/log1
+rm -f /tmp/log2
+ulimit -n 1000000
+nohup ab -p /home/test.json  -T application/json -n 1000000 -c 3000 "https://api1.growingio.com:4433/v3/0a1b4118dd954ec3bcc69da5138bdb96/web/pv?stm=1597991043684" &>> /tmp/log1 &
+nohup ab -p /home/test.json  -T application/json -n 1000000 -c 3000 "https://api5.growingio.com:4433/v3/0a1b4118dd954ec3bcc69da5138bdb96/web/pv?stm=1597991043684" &>> /tmp/log2 &
+
+```
+
+* 操作所有节点进行压测: ansible -i hosts/http_load all -m script -a ab_bench.sh
+* 操作部分节点进行压测: ansible -i hosts/http_load group_a,group_b -m script -a ab_bench.sh
+* 停止所有节点ab进程: ansible -i hosts/http_load all -m shell -a "pkill ab"
+
