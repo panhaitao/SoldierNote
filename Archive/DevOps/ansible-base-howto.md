@@ -55,7 +55,7 @@ Ansible 对基于被管控的设备有两个要求: 支持SSH传输和需要有P
 2. 查找对应的inventory文件，找到要任务中选择的主机或者主机组;
 3. 加载任务中引用的模块文件，如shell,copy,script 等;
 4. 生成对应的临时py文件(python脚本)，并将该文件传输至目标host $HOME/.ansible/tmp/ 目录；
-5. 登陆执行目标host,执行$HOME/.ansible/tmp/XXX/XXX.py文件,执行并返回结果,删除临时py文件, 执行完毕退出；
+5. 登陆目标host,执行$HOME/.ansible/tmp/XXX/XXX.py文件,执行并返回结果,删除临时py文件, 执行完毕退出；
 6. 如果playbook里定义多个任务集，顺次执行, 直到全部执行完毕为止; 遇到失败的任务，会退出，后面的任务不会被执行.
 
 ## inventory 文件
