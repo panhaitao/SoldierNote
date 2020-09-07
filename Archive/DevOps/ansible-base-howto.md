@@ -161,19 +161,19 @@ playbook, 运维剧本，一次完成
 
 1. 更新主机名
 2. 更新/etc/hosts
-3. 安装软件包 httpd-tools
+3. 安装需要的软件包
 4. 拷贝测试数据文件到每个节点 
 5. 更新jmeter三个配置文件
-6. 初始化jmeter agent服务 
+6. 初始化jmeter agent服务
+7. 以及其他你需要的操作
 
-使用初始化所有压测节点配置只需要执行如下命令:
+假如要批量创建40台节点，如果不借助工具，你需要一台台登陆操作，使用ansible，写好playbook role 初始化所有压测节点配置只需要执行一条命令:
 
 ```
-cd ansible-playbook-store 
-初始化所有压测节点配: ansible-playbook -i hosts/http_load todo/init_ab_hosts
-启动jemter_work 节点服务: ansible -i hosts/http_load all -m script -a scripts/run_jemter_work.sh
-检查是否有jemter服务启动失败的节点: ansible -i hosts/http_load all -m shell -a "netstat -nat | grep 1099 " | grep rc=1 | awk '{print $1}' | tr '\n' ','
+ansible-playbook -i hosts/http_load todo/init_ab_hosts
 ```
+
+最后检查是否有jemter服务启动失败的节点: ansible -i hosts/http_load all -m shell -a "netstat -nat | grep 1099 " | grep rc=1 | awk '{print $1}' | tr '\n' ',' 如果所有节点服务运行正常，就可以开始做压测了
 
 ### jemter 压测
 
@@ -196,4 +196,3 @@ nohup ab -p /home/test.json  -T application/json -n 1000000 -c 3000 "https://lb_
 * 操作所有节点进行压测: ansible -i hosts/http_load all -m script -a ab_bench.sh
 * 操作部分节点进行压测: ansible -i hosts/http_load group_a,group_b -m script -a ab_bench.sh
 * 停止所有节点ab进程: ansible -i hosts/http_load all -m shell -a "pkill ab"
-
