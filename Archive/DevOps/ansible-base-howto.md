@@ -1,211 +1,144 @@
-# Ansible 基础使用指南
-　　　
-ansible是新出现的自动化运维工具，基于Python开发，集合了众多运维工具（puppet、cfengine、chef、func、fabric）的优点，实现了批量系统配置、批量程序部署、批量运行命令等功能。目前版本实现的功能如下：
+# Ansible 基础指南
 
-* 连接插件connection plugins：负责和被监控端实现通信；
-* host inventory：指定操作的主机，是一个配置文件里面定义监控的主机；
-* 各种模块核心模块、command模块、自定义模块；
-* 借助于插件完成记录日志邮件等功能；
-* playbook：剧本执行多个任务时，非必需可以让节点一次性运行多个任务。
+ansible是基于Python开发的运维工具，功能类同其他运维工具: puppet、chef、func、fabric、saltstack. 相比其他运维管理工具,Ansible有较强的适应性，最独特的优点,默认使用ssh协议链接被管控主机，不需要在被管控主机上安装任何客户端，就可以完成运维管理工作。
 
-相比其他运维管理工具 Ansible有较强的适应性，和独特的优点： 
-　　　
-* 不需要在被管控主机上安装任何客户端；
-* 无服务器端，使用时直接运行命令即可；
-* 基于模块工作，可使用任意语言开发模块；
-* 使用yaml语言定制剧本playbook；
-* 基于SSH工作；
-* 可实现多级指挥。    
+## 概述
 
-## Ansible 的安装
-    
-登陆管控端系统，创建yum配置文件，执行如下命令： 
+![Ansible架构图](Ansible-Architecture.png)
+
+* 连接插件默认使用ssh协议,支持zeromq协议
+* 基于Python开发,可扩展自定义插件和模块
+* 配置库使用yaml格式,支持使用jinjia模版
+* 核心模块功能丰富，和大量社区编写的模块可以扩展
+
+## 安装与基础配置
+
+### 安装
+
+* rhel/centos  执行命令： yum install ansible -y 完成软件包的安装
+* debian/ubuntu 执行命令：apt install ansible -y 完成软件包的安装
+
+### 默认配置 
+
+* 默认的配置          /etc/ansible/ansible.cfg 以下是优先级由高到低生效
+  - NSIBLE_CONFIG (环境变量)
+  - ansible.cfg (位于当前目录中) 
+  - ansible.cfg (位于家目录中)
+  - /etc/ansible/ansible.cfg
+* 默认的主机清单      /etc/ansible/hosts 执行命令的时候, 可以使用 -i 参数自定义文件路径 
+* 默认存放角色的目录  /etc/ansible/roles 
+
+### 组成部分
+
+1、INVENTORY                      ansible管理主机的清单，默认是/etc/ansible/hosts 可以自定义选择主机列表文件
+2、modules                        ansible执行命令的模块，多数为内置核心模块，支持自定义编写模块
+3、plugins                        模块功能，如连接类型插件，循环插件，变量插件等
+4、API                            供第三方程序调用的应用程序编程接口
+5、ansible                        执行任务的主程序,下面是常用的主程序及功能
+```
+* /usr/bin/ansible           执行命令的程序
+* /usr/bin/ansible-playbook  执行编排任务集的程序，推送模式
+* /usr/bin/ansible-pull      执行编排任务集的程序，拉取模式
+* /usr/bin/ansible-vault     文件加密工具
+* /usr/bin/ansible-doc       查看配置文档，模块功能查看工具
+* /usr/bin/ansible-galaxy    下载/上传优秀代码或roles模块的官网平台
+* /usr/bin/ansible-console   基于console界面与用户交互的执行工具
+```
+
+## 工作原理 
+
+![Ansible原理图](how-ansible-works.png)
+
+Ansible 对基于被管控的设备有两个要求: 支持SSH传输和需要有Python执行引擎, 工作流可分解成如下步骤：
+
+1. 加载配置文件，默认是/etc/ansible/ansible.cfg；
+2. 查找对应的inventory文件，找到要任务中选择的主机或者主机组;
+3. 加载任务中引用的模块文件，如shell,copy,script 等;
+4. 生成对应的临时py文件(python脚本)，并将该文件传输至目标host $HOME/.ansible/tmp/ 目录；
+5. 登陆执行目标host,执行$HOME/.ansible/tmp/XXX/XXX.py文件,执行并返回结果,删除临时py文件, 执行完毕退出；
+6. 如果playbook里定义多个任务集，顺次执行, 直到全部执行完毕为止; 遇到失败的任务，会退出，后面的任务不会被执行.
+
+## inventory 文件
 
 ```
-cat > /etc/yum.repo.d/extras.repo << “EOF”
-[extras]
-Name=deepin extras
-baseurl=http://packages.deepin.com/server/amd64/16/extras/x86_64
-gpgcheck=0
-enable=1
-EOF
-```
-执行命令： yum update && yum install ansible -y 完成软件包的安装
+[web]
+web1  ansible_ssh_host=10.10.33.1  ansible_connection=ssh        ansible_ssh_user=ubuntu ansible_ssh_pass="xxxxxxxxx"
+web2  ansible_ssh_host=10.10.33.2  ansible_connection=ssh        ansible_ssh_user=ubuntu ansible_ssh_pass="xxxxxxxxx"
+web3  ansible_ssh_host=10.10.33.3  ansible_connection=ssh        ansible_ssh_user=ubuntu ansible_ssh_pass="xxxxxxxxx"
+web4  ansible_ssh_host=10.10.33.4  ansible_connection=ssh        ansible_ssh_user=ubuntu ansible_ssh_pass="xxxxxxxxx"
 
-   
-## Ansible 的基础配置
-　　　
-Ansible的一些的设置可以通过配置文件完成.在大多数场景下默认的配置就能满足大多数用户的需求,在一些特殊场景下,用户还是需要自行修改这些配置文件，Ansible 将会按以上顺序逐个查询这些文件,直到找到一个为止,并且使用第一个寻找到个配置文件的配置,这些配置将不会被叠加.他们的被读取的顺序如下:
-
-```
-NSIBLE_CONFIG (一个环境变量)
-ansible.cfg (位于当前目录中)
-ansible.cfg (位于家目录中)
-/etc/ansible/ansible.cfg
+[db]
+db1   ansible_ssh_host=10.10.33.5  ansible_connection=ssh        ansible_ssh_user=root ansible_ssh_pass="xxxxxxxxx"
+db2   ansible_ssh_host=10.10.33.6  ansible_connection=ssh        ansible_ssh_user=root ansible_ssh_pass="xxxxxxxxx"
 ```
 
-## ansible 的工作方式
-
-Ansible 提供了远程批量执行命令和运行playbook的两种方式用来维护目标服务器。
-
-## Ansible 远程批量执行
-
-ansible命令是用来完成远程批量执行操作，通过Ad-Hoc来完成，能够快速执行，而且不需要保存的一次性操作，例如批量分发文件，批量升级软件包...
-　　　
-1. 首先需要完成目标是的ssh key登陆的互信操作，参考命令如下：
-    ssh-keygen && ssh-copy-id root@server_ip
-2. 增加服务器资源修改 /etc/ansible/hosts 添加
-```	
-[web] 
-192.168.1.2 
-```
-3. 执行ansible命令完成ping 测试： 
-    ansible web -m ping -u root
-4. 如果全部主机可以访问，将会返回如下结果： 
-```
-root@deepin-server:~ # ansible web -m ping
-192.168.1.2 | SUCCESS => {
-    "changed": false, 
-    "ping": "pong"
-}
-```
-5. 上述命令各个参数解析，web是选择的ip分组， -m ping 是调用ansible内置的ping模块，-u root 是指明以root身份执行
-
-6. 其他几个常用的操作参考：
-* web分组主机执行w命令(-m command可以省略就表示默认使用命名模块): 
-    ansible web -m command -a 'w' 
-* 将hosts文件分发到目标主机/etc/hosts
-    ansible web -u root -m copy -a "src=hosts dest=/etc/hosts"
-* 在目标主机安装当前仓库最新版本的httpd软件包
-    ansible web -u root -m yum -a "name=httpd state=latest"
-* 在目标主机删除httpd软件包
-    ansible web -u root -m yum -a "name=httpd state=absent"
-* 在目标主机管理httpd服务器，分别完成启动，停止，重启操作
-``` 
-ansible web -u root -m service -a "name=httpd state=started"
-ansible web -u root -m service -a "name=httpd state=stopped"
-ansible web -u root -m service -a "name=httpd state=restarted"
-```
-* 在目标主机完创建一个名为web新用户
-    ansible -u root web -m user -a "name=web password=" 
-* 在目标主机删除名为web的用户
-    ansible web -u root -m user -a "name=web state=absent"
-    
-## Ansible 的 playbook 
-
-playbook是一系统ansible命令的集合，使用yaml格式编写，由ansible-playbook命令读取playbook文件，自上而下的顺序依次执行。同时，playbook开创了很多特性,它可以允许你传输某个命令的状态到后面的指令,如你可以从一台机器的文件中抓取内容并附为变量,然后在另一台机器中使用,使得可以实现一些复杂的部署机制。
-
-## 使用Ansible 部署nginx
-
-1.编写一个nginx 软件源配置nginx.repo，用于分发到服务器:
-```
-[nginx]
-name=nginx repo
-baseurl=http://nginx.org/packages/centos/7/x86_64/
-gpgcheck=0
-enabled=1
-```
-2.生成TLS证书，执行命令：
+* 方括号[]中是group名, 以上 INVENTORY 文件定义了两个group，web 和 db 分贝包含了2个host和4个host，
+* web1,db2 ... 是host名字，每个host有自己的变量: ansible_ssh_host, ansible_connection, ansible_ssh_user,
+* inventory 文件支持组变量，使用 [groupname:vars] 方式定义, 改写后的inventory 文件如下 
 
 ```
-openssl req -x509 -nodes -days 3650 -newkey rsa:2048	 -subj /CN=locahost                              -keyout nginx.key -out nginx.cert 
+[web]
+web1                ansible_ssh_host=10.10.33.1
+web2                ansible_ssh_host=10.10.33.2
+web3                ansible_ssh_host=10.10.33.3
+web4                ansible_ssh_host=10.10.33.4
+[web:vars]
+ansible_connection=ssh
+ansible_ssh_user=root
+ansible_ssh_pass="xxxxxxxxx"
+
+[db]
+db1                 ansible_ssh_host=10.10.33.5
+db2                 ansible_ssh_host=10.10.33.6
+[db:vars]
+ansible_connection=ssh
+ansible_ssh_user=root
+ansible_ssh_pass="xxxxxxxxx"
 ```
-3.创建nginx配置模板，保存为nginx.conf.j2，内容如下：
+
+更多可参考ansible文档: http://ansible.com.cn/docs/intro_inventory.html
+
+## Ansible 使用示例
+
+1. 使用shell模块执行命令, 在目标主机安装软件包: `ansible -i hosts_file web -u root -m shell -a "yum install nginx -y"`
+2. 使用copy模块分发文件,  将nginx.cfg文件分发到web分组: `ansible -i hosts_file web -u root -m copy -a "src=nginx.cfg dest=/etc/nginx/nginx.cfg" `
+3. 使用script模块执行操作, 在db分组目标host执行脚本:  `ansible -i hosts_file db -u root -m script -a "run_db.sh"`
+4. 使用service模块启动服务, 在所有目标host启动ngixn服务: `ansible -i hosts_file web -u root -m service -a "name=nginx state=restarted"`
+
+## playbook 文件格式
 
 ```
- server {
-    listen       80;
-    listen       443 ssl;
-
-    server_name {{ server_name }};
-    ssl_certificate {{ cert_file }};
-    ssl_certificate_key {{ key_file }};
-
-    root   /usr/share/nginx/html;
-    index  index.html index.htm;
-
-    location / {
-        try_files $uri $uri/ =404;
-    }
-}
-```
-4.创建一个用于部署nginx的Playbook，保存为nginx.yaml
-
-```
-- name: Configure https webserver with nginx
-  hosts: web
-  vars:
-    key_file: /etc/nginx/nginx.key
-    cert_file: /etc/nginx/nginx.cert
-    conf_file: /etc/nginx/conf.d/default.conf
-    server_name: localhost
+- hosts: web
+  remote_user: root
   tasks:
-    - name: Enabled nginx repo
-      copy: src=nginx.repo dest=/etc/yum.repos.d/
-    - name: Install Nginx Package
-      yum: name=nginx state=latest update_cache=yes
-
-    - name: Copy TLS key
-      copy: src=nginx.key dest={{ key_file }}
-      notify: restart nginx
-    - name: Copy TLS cert
-      copy: src=nginx.cert dest={{ cert_file }}
-      notify: restart nginx
-    - name: Copy nginx config file
-      template: src=nginx.conf.j2 dest={{ conf_file }}
-      notify: restart nginx
-
-  handlers:
-    - name: restart nginx
-      service: name=nginx state=restarted
+  - name: install packages
+    shell: 'yum install nginx -y'
+  - name: start service
+    shell: 'systemctl restart nginx'
+- hosts: db
+  remote_user: root
+  tasks:
+  - name: install packages
+    shell: 'yum install mysql -y'
 ```
-5. 执行命令：**ansible-playbook nginx.yml**  最后会返回如下信息：
+playbook是yaml格式, 一个基本的playbook包含如下部分
 
-```
-root@deepin-server:~/playbook# ansible-playbook nginx.yaml
+* hosts        定义选择了要操作的目标hosts
+* remote_user  执行任务目标主机的远程用户
+* tasks        
 
-PLAY [Configure https webserver with nginx] ************************************
+## Ansible-playbook 使用示例
 
-TASK [setup] *******************************************************************
-ok: [192.168.1.2]
+playbook, 运维剧本，一次完成
 
-TASK [Enabled nginx repo] ******************************************************
-ok: [192.168.1.2]
+1. 分发文件
+2. 执行命令 
+3. 分发配置
+4. 重启服务
 
-TASK [Install Nginx Package] ***************************************************
-changed: [192.168.1.2]
+## 其他操作参考：
 
-TASK [Copy TLS key] ************************************************************
-changed: [192.168.1.2]
-
-TASK [Copy TLS cert] ***********************************************************
-changed: [192.168.1.2]
-
-TASK [Copy nginx config file] **************************************************
-changed: [192.168.1.2]
-
-RUNNING HANDLER [restart nginx] ************************************************
-changed: [192.168.1.2]
-
-PLAY RECAP *********************************************************************
-192.168.1.2                : ok=7    changed=5    unreachable=0    failed=0
-```
-
-6.操作完成后，可以在本机使用firefox访问https://localhost 验证服务是否配置正确。
-
-
-其他操作参考：
-
-* 检查yaml文件的语法是否正确
-
-    ansible-playbook nginx.yaml --syntax-check
-* 检查yaml文件中的tasks任务
-
-    ansible-playbook nginx.yaml --list-task
-* 检查yaml文件中的生效主机
-    
-    ansible-playbook nginx.yaml --list-hosts
-* 运行playbook里面特定的某个task,从某个task开始运行
-
-    ansible-playbook nginx.yaml --start-at-task='Copy TLS key'
-
+* 检查yaml文件的语法是否正确 ansible-playbook nginx.yaml --syntax-check
+* 检查yaml文件中的tasks任务: ansible-playbook nginx.yaml --list-task
+* 检查yaml文件中的生效主机:  ansible-playbook nginx.yaml --list-hosts
+* 运行playbook里面特定的某个task,从某个task开始运行: ansible-playbook nginx.yaml --start-at-task='Copy TLS key'
