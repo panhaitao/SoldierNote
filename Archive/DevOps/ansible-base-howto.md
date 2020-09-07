@@ -1,6 +1,6 @@
 # Ansible 基础指南
 
-ansible是基于Python开发的运维工具，功能类同其他运维工具: puppet、chef、func、fabric、saltstack. 相比其他运维管理工具,Ansible有较强的适应性，最独特的优点,默认使用ssh协议链接被管控主机，不需要在被管控主机上安装任何客户端，就可以完成运维管理工作。
+ansible是基于Python开发的运维工具，功能类同其他运维工具: puppet、chef、func、fabric、saltstack. 相比其他运维管理工具,Ansible有较强的适应性，最独特的优点,默认使用ssh协议连接目标host，不需要在目标host安装任何客户端，就可以完成运维管理工作。
 
 ## 概述
 
