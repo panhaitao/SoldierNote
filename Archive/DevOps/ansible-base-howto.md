@@ -4,7 +4,7 @@ ansible是基于Python开发的运维工具，功能类同其他运维工具: pu
 
 ## 概述
 
-![Ansible架构图](Ansible-Architecture.png)
+![Ansible架构图](https://github.com/panhaitao/SoldierNote/edit/master/Archive/DevOps/Ansible-Architecture.png)
 
 * 连接插件默认使用ssh协议,支持zeromq协议
 * 基于Python开发,可扩展自定义插件和模块
@@ -30,11 +30,11 @@ ansible是基于Python开发的运维工具，功能类同其他运维工具: pu
 
 ### 组成部分
 
-1、INVENTORY                      ansible管理主机的清单，默认是/etc/ansible/hosts 可以自定义选择主机列表文件
-2、modules                        ansible执行命令的模块，多数为内置核心模块，支持自定义编写模块
-3、plugins                        模块功能，如连接类型插件，循环插件，变量插件等
-4、API                            供第三方程序调用的应用程序编程接口
-5、ansible                        执行任务的主程序,下面是常用的主程序及功能
+1. INVENTORY                      ansible管理主机的清单，默认是/etc/ansible/hosts 可以自定义选择主机列表文件
+2. modules                        ansible执行命令的模块，多数为内置核心模块，支持自定义编写模块
+3. plugins                        模块功能，如连接类型插件，循环插件，变量插件等
+4. API                            供第三方程序调用的应用程序编程接口
+5. ansible                        执行任务的主程序,下面是常用的主程序及功能
 ```
 * /usr/bin/ansible           执行命令的程序
 * /usr/bin/ansible-playbook  执行编排任务集的程序，推送模式
@@ -47,7 +47,7 @@ ansible是基于Python开发的运维工具，功能类同其他运维工具: pu
 
 ## 工作原理 
 
-![Ansible原理图](how-ansible-works.png)
+![Ansible原理图](https://github.com/panhaitao/SoldierNote/edit/master/Archive/DevOps/how-ansible-works.png)
 
 Ansible 对基于被管控的设备有两个要求: 支持SSH传输和需要有Python执行引擎, 工作流可分解成如下步骤：
 
