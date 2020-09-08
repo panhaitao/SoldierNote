@@ -15,8 +15,8 @@ ansible是基于Python开发的运维工具，功能类同其他运维工具: pu
 
 ### 安装
 
-* rhel/centos  执行命令： yum install ansible -y 完成软件包的安装
-* debian/ubuntu 执行命令：apt install ansible -y 完成软件包的安装
+* rhel/centos  执行命令： yum install ansible sshpass -y 完成软件包的安装
+* debian/ubuntu 执行命令：apt install ansible sshpass -y 完成软件包的安装
 
 ### 默认配置 
 
