@@ -83,17 +83,17 @@ web2                ansible_ssh_host=10.10.33.2
 web3                ansible_ssh_host=10.10.33.3
 web4                ansible_ssh_host=10.10.33.4
 [web:vars]
-ansible_connection=ssh
-ansible_ssh_user=root
 ansible_ssh_pass="xxxxxxxxx"
 
 [db]
 db1                 ansible_ssh_host=10.10.33.5
 db2                 ansible_ssh_host=10.10.33.6
 [db:vars]
+ansible_ssh_pass="xxxxxxxxx"
+
+[all:vars]
 ansible_connection=ssh
 ansible_ssh_user=root
-ansible_ssh_pass="xxxxxxxxx"
 ```
 
 更多可参考ansible文档: http://ansible.com.cn/docs/intro_inventory.html
@@ -125,28 +125,117 @@ playbook是yaml格式, 一个基本的playbook包含如下部分
 
 * hosts        定义选择了要操作的目标hosts
 * remote_user  执行任务目标主机的远程用户
-* tasks        
+* tasks        对于一个操作目标, 可以定义多个任务     
 
 ## Ansible-playbook 使用示例
 
-playbook, 运维剧本，一次完成
+1. 分发文件(使用copy模块)
+cp_file.yml
+```
+- hosts: web
+  remote_user: root
+  tasks:
+  - name: cp file to all remote hosts
+    copy: src=files/test.json dest=/home/test.json owner=root mode=0755
+```
+执行命令对web分组host应用cp_file.yml: `ansible-playbook -i hosts_file cp_file.yml`
 
-1. 分发文件
-2. 执行命令 
-3. 分发配置
-4. 重启服务
+2. 执行命令(使用shell模块) 
+
+get_cpu_core_num.yml
+```
+- hosts: web
+  remote_user: root
+  tasks:
+  - name: get cpu core numbers
+    shell: 'nproc'
+```
+执行命令对web分组host应用get_cpu_core_num.yml : `ansible-playbook -i hosts_file get_cpu_core_num.yml`
+
+3. 分发配置(使用templates模块)
+
+在templates目录创建jinjia模版文件hosts-temp
+```
+127.0.0.1   localhost localhost4
+::1         localhost localhost6
+
+{% for item in groups['all'] %}
+{{ hostvars[item].ansible_default_ipv4.address }} {{ item }}
+{% endfor %}
+```
+update_etc_hosts.yml
+```
+- hosts: all
+  remote_user: root
+  tasks:
+  - name: update /etc/hosts
+    template: src=templates/hosts-temp dest=/etc/hosts owner=root group=root mode=0644
+```
+执行命令对web分组host应用update_etc_hosts.yml : `ansible-playbook -i hosts_file update_etc_hosts.yml`
+
+4. 执行脚本
+
+init_jmeter_worker.yml
+```
+- hosts: jmeter
+  remote_user: root
+  tasks:
+  - name: run jmeter worker agent
+    script: files/run_jemter_work.sh
+```
+执行命令对jmeter分组host应用init_jmeter_worker.yml : `ansible-playbook -i hosts_file init_jmeter_worker.yml`
+
 
 ## Role 
 
+Roles 是将一些列关联的tasks template hosts 动作的重新组织，提取成一个简洁、可重用的抽象
+* 比如部署应用，都要安装，更新配置，启动服务，可以抽取成一个节点操作的role
+* 或者初始化一个集群，LB集群, K8S集群，存储集群，可以抽取成一个集群初始化的role 
+* 或者某一个可能反复操作的动作，比如集群组件的升级，可以抽取成一个升级操作的role
+
+将Ansible-playbook 示例4个yaml 重新组织成role, 目录结构如下:
+
+* roles/bench_cluster    
+* files     目录一半用于存放脚本或者文件
+* templates 一般用于存放jinjia模版文件 
+* tasks     目录用于存放tasks部分内容, 下面的例子是使用main.yml 引用其他yml文件
+
 ```
+roles/bench_cluster/
+       ├── files
+       │   ├── test.json
+       │   ├── run_jemter_work.sh
+       ├── tasks
+       │   ├── main.yml
+       │   ├── update_etc_hosts.yml
+       │   ├── get_cpu_core_num.yml
+       │   ├── cp_file.yml
+       │   ├── init_jmeter_worker.yml
+       └── templates
+           ├── hosts-temp
 ```
+
+role的使用，编写 init_web_bench_cluster.yml 内容如下:
+```
+- name: init web bench node
+  hosts: all
+  user: root
+  tasks:
+    - include_role:
+        name: bench_cluster
+```
+
+执行命令`ansible-playbook -i hosts_file init_web_bench_cluster.yml` 就可以引用 bench_cluster role定义的任务集对hosts_file内所有host完成变更。
+
 
 ## 其他操作参考：
 
-* 检查yaml文件的语法是否正确 ansible-playbook nginx.yaml --syntax-check
-* 检查yaml文件中的tasks任务: ansible-playbook nginx.yaml --list-task
-* 检查yaml文件中的生效主机:  ansible-playbook nginx.yaml --list-hosts
-* 运行playbook里面特定的某个task,从某个task开始运行: ansible-playbook nginx.yaml --start-at-task='Copy TLS key'
+* 检查语法是否正确 ansible-playbook task.yml --syntax-check
+* 测试执行，确认是否预期的任务: ansible-playbook task.yml -C
+* 执行过程将结果以diff方式输出: ansible-playbook task.yml -D
+* 检查yaml文件中的tasks任务: ansible-playbook task.yml --list-task
+* 检查yaml文件中的生效主机: ansible-playbook task.yml --list-hosts
+* 运行playbook里面特定的某个task,从某个task开始运行: ansible-playbook task.yaml --start-at-task='Copy TLS key'
 
 ## Ansible 在压测场景中的实践
 
