@@ -140,9 +140,7 @@ cp_file.yml
 ```
 执行命令对web分组host应用cp_file.yml: `ansible-playbook -i hosts_file cp_file.yml`
 
-2. 执行命令(使用shell模块) 
-
-get_cpu_core_num.yml
+2. 执行命令(使用shell模块) get_cpu_core_num.yml
 ```
 - hosts: web
   remote_user: root
@@ -173,9 +171,7 @@ update_etc_hosts.yml
 ```
 执行命令对web分组host应用update_etc_hosts.yml : `ansible-playbook -i hosts_file update_etc_hosts.yml`
 
-4. 执行脚本
-
-init_jmeter_worker.yml
+4. 执行脚本(使用script模块) init_jmeter_worker.yml
 ```
 - hosts: jmeter
   remote_user: root
@@ -183,22 +179,26 @@ init_jmeter_worker.yml
   - name: run jmeter worker agent
     script: files/run_jemter_work.sh
 ```
+
 执行命令对jmeter分组host应用init_jmeter_worker.yml : `ansible-playbook -i hosts_file init_jmeter_worker.yml`
 
-
-## Role 
+## Role的定义和使用 
 
 Roles 是将一些列关联的tasks template hosts 动作的重新组织，提取成一个简洁、可重用的抽象
 * 比如部署应用，都要安装，更新配置，启动服务，可以抽取成一个节点操作的role
 * 或者初始化一个集群，LB集群, K8S集群，存储集群，可以抽取成一个集群初始化的role 
 * 或者某一个可能反复操作的动作，比如集群组件的升级，可以抽取成一个升级操作的role
 
-将Ansible-playbook 示例4个yaml 重新组织成role, 目录结构如下:
+不考虑逻辑关联性，存粹做演示用途，将 Ansible-playbook 示例4个yaml 组织成role, 目录结构如下:
 
-* roles/bench_cluster    
+```
+* roles/bench_cluster bench_cluster是角色名   
 * files     目录一半用于存放脚本或者文件
 * templates 一般用于存放jinjia模版文件 
 * tasks     目录用于存放tasks部分内容, 下面的例子是使用main.yml 引用其他yml文件
+```
+
+一个实际的role还有其他目录，这里使用到 files，templates，tasks 满足对role概念的基本理解
 
 ```
 roles/bench_cluster/
