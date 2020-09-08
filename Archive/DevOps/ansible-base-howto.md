@@ -157,10 +157,26 @@ playbook, 运维剧本，一次完成
   * 修改 Password 改为自己需要设置的密码
   * 修改 创建的主机的配置
   - 根据需要数量，修改inventory文件生成脚本: scripts/create_uhost_ansible_hosts.sh
-  * for N in `seq 1 40`  一行定义的一共创建40台主机，编号1-40
+  * for N in `seq 1 40`  一行定义的一共创建40台主机，编号1-40 根据需要修改
   * 将 ansible_ssh_pass 的值 设置为和 scripts/create_uhost.py 中 Password 定义的一致 
 * 批量创建云主机，并自动生成inventory文件,执行命令: cd ansible-playbook-store && scripts/create_uhost_ansible_hosts.sh 
 
+以创建5台云主机为例，执行完毕会生成如下文件 hosts/http_load (这个文件就可以作为ansible后续操作需要的inventory文件)
+
+```
+[all]
+ab-1                    ansible_ssh_host=10.10.177.95
+ab-2                    ansible_ssh_host=10.10.71.215
+ab-3                    ansible_ssh_host=10.10.132.202
+ab-4                    ansible_ssh_host=10.10.114.52
+ab-5                    ansible_ssh_host=10.10.165.159
+ops                     ansible_ssh_host=127.0.0.1
+
+[all:vars]
+ansible_connection=ssh
+ansible_ssh_user=root
+ansible_ssh_pass="xxxxxxx"
+```
 
 ### 批量初始化主机配置
 
