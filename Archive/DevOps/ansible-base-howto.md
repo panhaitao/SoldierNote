@@ -152,9 +152,8 @@ playbook, 运维剧本，一次完成
 
 * 准备好ansible节点，安装ansible git python3 
 * 登陆ansible节点，clone一份playbook `git clone https://github.com/panhaitao/ansible-playbook-store.git ` 
-  - 根据需要配置, 补全云主机创建脚本: scripts/create_uhost.py 
-  * 填写 public_key
-  * 填写 private_key 
+  - 上传的GitHub的代码去掉去掉敏感信息，需要补全云主机创建脚本: scripts/create_uhost.py 
+  * 填写 public_key private_key 可以登陆 console.ucloud.cn -> 全部产品-> API 产品 查看自己的 API密钥 
   * 修改 Password 改为自己需要设置的密码
   * 修改 创建的主机的配置
   - 根据需要数量，修改inventory文件生成脚本: scripts/create_uhost_ansible_hosts.sh
