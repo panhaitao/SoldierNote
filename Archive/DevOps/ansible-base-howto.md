@@ -45,7 +45,7 @@ ansible是基于Python开发的运维工具，功能类同其他运维工具: pu
 * /usr/bin/ansible-console   基于console界面与用户交互的执行工具
 ```
 
-## 工作原理 
+## 工作原理与基本使用 
 
 ![Ansible原理图](https://github.com/panhaitao/SoldierNote/edit/master/Archive/DevOps/how-ansible-works.png)
 
@@ -59,6 +59,8 @@ Ansible 对基于被管控的设备有两个要求: 支持SSH传输和需要有P
 6. 如果playbook里定义多个任务集，顺次执行, 直到全部执行完毕为止; 遇到失败的任务，会退出，后面的任务不会被执行.
 
 ## inventory 文件
+
+Ansible 可同时操作属于一个组的多台主机,组和主机之间的关系通过 inventory 文件配置. 默认的文件路径为 /etc/ansible/hosts 一个典型的inventory 文件如下:
 
 ```
 [web]
@@ -98,14 +100,16 @@ ansible_ssh_user=root
 
 更多可参考ansible文档: http://ansible.com.cn/docs/intro_inventory.html
 
-## Ansible 使用示例
+### Ansible 使用示例
 
 1. 使用shell模块执行命令, 在目标主机安装软件包: `ansible -i hosts_file web -u root -m shell -a "yum install nginx -y"`
 2. 使用copy模块分发文件,  将nginx.cfg文件分发到web分组: `ansible -i hosts_file web -u root -m copy -a "src=nginx.cfg dest=/etc/nginx/nginx.cfg" `
 3. 使用script模块执行操作, 在db分组目标host执行脚本:  `ansible -i hosts_file db -u root -m script -a "run_db.sh"`
 4. 使用service模块启动服务, 在所有目标host启动ngixn服务: `ansible -i hosts_file web -u root -m service -a "name=nginx state=restarted"`
 
-## playbook 文件格式
+### playbook 文件格式
+
+Playbooks 是 Ansible的配置,部署,编排语言.他们可以被描述为一个需要希望远程主机执行命令的方案,或者一组IT程序运行的命令集合.
 
 ```
 - hosts: web
@@ -121,13 +125,14 @@ ansible_ssh_user=root
   - name: install packages
     shell: 'yum install mysql -y'
 ```
-playbook是yaml格式, 一个基本的playbook包含如下部分
+
+playbook是yaml格式, 一个基本的playbook包含主要部分如下:
 
 * hosts        定义选择了要操作的目标hosts
 * remote_user  执行任务目标主机的远程用户
 * tasks        对于一个操作目标, 可以定义多个任务     
 
-## Ansible-playbook 使用示例
+### Ansible-playbook 使用示例
 
 1. 分发文件(使用copy模块)
 cp_file.yml
