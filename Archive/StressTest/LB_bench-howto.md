@@ -2,55 +2,6 @@
 
 启动一个 nginx apahce
 
-# 测试post请求
-
-* 使用nginx uwsgi 构建一个post接口
-
-yum install python2-pip
-pip install flask uwsgi
-
-/usr/share/nginx/api
-
-uwsgiconfig.ini
-```
-[uwsgi]
- 
-socket = 0.0.0.0:12345
-chdir = /usr/share/nginx/api/
-wsgi-file = restfulapi.py  
-callable = app
-processes = 8
-threads = 20
-stats = 127.0.0.1:9191
-pidfile = restfulapi.pid
-daemonize = /var/log/restfulapi.log
-```
-
-restfulapi.py
-```
-#!/bin/env python
-# -*- coding:utf-8 -*-
-from flask import Flask, abort, request, jsonify
-
-app = Flask(__name__)
-
-
-# 创建任务接口函数
-@app.route('/add_task/', methods=['POST'])
-def add_task():
-    abc = request.json['Taskid'].encode("utf-8")
-    #postdata = eval(str(request.json['Postdata']).encode("utf-8"))
-    return abc
-```
-
-```
-location / {
-            include uwsgi_params;
-            uwsgi_pass 127.0.0.1:12345;
-```
-
-uwsgi --ini uwsgiconfig.ini
-
 
 test.json
 ```
