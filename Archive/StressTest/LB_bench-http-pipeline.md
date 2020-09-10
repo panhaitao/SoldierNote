@@ -59,6 +59,7 @@ if __name__ == '__main__':
 ```
 
 /usr/share/nginx/api/uwsgiconfig.ini
+
 ```
 [uwsgi]
 socket = 127.0.0.1:8080
@@ -118,13 +119,15 @@ end
 
 request = function()
    return req
-end ```
+end
+```
 
 2. wrk -t1 -c1 -d1s -R1 -L -s post.lua http://nginx_server_ip
 
 ## 检查确认
 
 1. wrk 每次压测,nginx日志可见服务端依次处理了 /login /name /pw 三个请求
+
 ```
 10.10.74.50 - - [09/Sep/2020:16:41:22 +0800] "POST /login HTTP/1.1" 200 51 "-" "-" "-"
 10.10.74.50 - - [09/Sep/2020:16:41:22 +0800] "POST /name HTTP/1.1" 200 30 "-" "-" "-"
@@ -146,7 +149,7 @@ HTTP: POST /login HTTP/1.1
 ```
 
 ## 确认达到压测效果后，可以调大参数做性能压测了
+
 ```
 wrk -t100 -c1000 -d60s -R10000000 -L -s post.lua http://nginx_server_ip
 ```
-
