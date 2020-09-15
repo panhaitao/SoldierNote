@@ -11,6 +11,7 @@
   - https://github.com/prometheus/prometheus/blob/master/documentation/examples/remote_storage/remote_storage_adapter/README.md
   - https://prometheus.io/docs/prometheus/latest/configuration/configuration
 3. Grafana
+  - http://docs.grafana.org/installation/configuration/#provisioning
 
 ## 工作流
 
@@ -20,8 +21,9 @@ JMeter > Prometheus > Grafana
 
 GitHub上下载最新版jmeter-prometheus-plugin-0.6.0.jar文件，并将其放在 \lib\ext中，重启Jmeter即可。
 
-## docker-compose -f docker-compose.yml up -d
+## 启动  
 
+docker-compose -f docker-compose.yml up -d
 
 ## 其他参考
 
