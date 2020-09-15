@@ -104,7 +104,8 @@ cd wrk2 && make
 ```
 
 1. 编写 post.lua 构造单链接3请求的模拟
-``` wrk.method = "POST"
+```
+wrk.method = "POST"
 wrk.headers["Content-Type"] = "application/json"
 wrk.body = '{"name": "xiaoming","pw": "xxx"}'
 
