@@ -6,6 +6,7 @@
 
 1. Jmeter 
   - https://github.com/johrstrom/jmeter-prometheus-plugin
+  - https://github.com/johrstrom/jmeter-prometheus-plugin/blob/master/docs/examples/simple_prometheus_example.jmx
 2. Prometheus
   - https://github.com/prometheus/prometheus/blob/master/documentation/examples/prometheus.yml
   - https://github.com/prometheus/prometheus/blob/master/documentation/examples/remote_storage/remote_storage_adapter/README.md
