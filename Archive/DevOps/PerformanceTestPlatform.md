@@ -46,7 +46,7 @@ systemctl restart docker
 ```
 docker pull prom/prometheus
 cat > prometheus.yml <<EOF
-bal:
+global:
   scrape_interval:     1s
   evaluation_interval: 1s
 
