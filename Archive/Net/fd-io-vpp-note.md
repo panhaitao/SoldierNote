@@ -59,8 +59,10 @@ plugins {
 ```
 vpp# show interface addr   
 vpp# set interface state GigabitEthernet0/7/0 up
-vpp# set interface ip address GigabitEthernet0/7/0 10.10.2.120/24  
+vpp# set interface ip address GigabitEthernet0/7/0 10.10.2.75/24  
 ```
+
+重新绑定后的 10.10.2.75/24 要和原有共有云虚拟网卡的内网IP一致，不然是ping不通的 
 
 ### tap 
 
