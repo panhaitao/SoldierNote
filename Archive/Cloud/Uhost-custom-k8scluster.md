@@ -24,12 +24,19 @@
 更多细节参考：https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#check-required-ports
 
 ```
-yum install yum-utils -y
-yum-config-manager --add-repo http://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/centos/docker-ce.repo
+
+cat > /etc/yum.repos.d/docker-ce.repo <<EOF
+[docker]
+name=docker-ce
+baseurl=https://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/centos/7/x86_64/stable/
+enabled=1
+gpgcheck=0
+repo_gpgcheck=0
+EOF
 yum makecache
 yum install docker-ce -y
 
-cat > /etc/yum.repos.d/kubernetes.repo<<EOF
+cat > /etc/yum.repos.d/kubernetes.repo <<EOF
 [kubernetes]
 name=Kubernetes
 baseurl=https://mirrors.tuna.tsinghua.edu.cn/kubernetes/yum/repos/kubernetes-el7-x86_64/
@@ -39,6 +46,7 @@ repo_gpgcheck=0
 EOF
 yum makecache
 yum install ipvsadm kubelet-1.18.8 kubeadm-1.18.8 kubectl-1.18.8 ipset -y
+
 swapoff -a  && sed -i 's/.*swap.*/#&/' /etc/fstab
 cat > /etc/sysconfig/modules/ipvs.modules <<EOF
 #!/bin/bash
