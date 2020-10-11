@@ -138,14 +138,40 @@ if [[ "$pri_repo" != "" ]];then
 fi
 ```
 
+## 其他客户端主机需要的操作 
 
-### K8S集群节点的配置 
-
-所有使用私有仓库的节点，需要完成如下配置：
+docker版本 (1.13.1 18.09 19.03 )验证通过:
 
 1. 添加myhub.com解析记录,执行命令: ` echo  "10.10.184.169 myhub.com" >> /etc/hosts `
-2. 将domain.crt分发到节点,并执行命令: ` cat domain.crt >> /etc/pki/tls/certs/ca-bundle.crt ` 
+2. 将domain.crt分发到节点,执行命令: ``cat /data/certs/domain.crt  /etc/pki/tls/certs/ca-bundle.crt ` 
 3. 重启docker服务生效执行命令: ` systemctl restart docker`
 4. 仓库登陆认证，执行命令: ` docker login myhub.com -u user -p "password" ` 执行成功后认证信息会记录在 ~/.docker/config.json
-5. cp /root/.docker/config.json /var/lib/kubelet/
-6. systemctl daemon-reload && systemctl restart kubelet"
+
+如果是k8s节点还需要完成如下操作:
+
+```
+cp /root/.docker/config.json /var/lib/kubelet/
+systemctl daemon-reload
+systemctl restart kubelet"
+```
+
+## FAQ
+
+Error response from daemon: Get https://myhub.com/v2/: x509: certificate signed by unknown authority
+
+```
+cat domain.crt  >> /etc/pki/tls/certs/ca-bundle.crt 
+systemctl restart docker
+```
+
+或者在/etc/docker/daemon.json 写入配置
+```
+{
+  "insecure-registries" : ["myregistrydomain.com:5000"]
+}
+```
+systemctl restart docker 重启服务生效
+
+## 参考
+
+* https://medium.com/better-programming/deploy-a-docker-registry-using-tls-and-htpasswd-56dd57a1215a
