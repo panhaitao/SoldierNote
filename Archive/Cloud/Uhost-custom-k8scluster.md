@@ -25,7 +25,7 @@
 
 ```
 yum install yum-utils -y
-yum-config-manager --add-repo https://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/centos/docker-ce.repo
+yum-config-manager --add-repo http://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/centos/docker-ce.repo
 yum makecache
 yum install docker-ce -y
 
