@@ -144,6 +144,18 @@ kubeadm init --config=kubeadm-init.yaml --upload-certs
 ```
 执行完毕后记录下 kubeadm 返回的信息，后续添加节点需要使用 
 
+其中包含--control-plane 这段是用于添加master节点，示例如下： 
+```
+  kubeadm join 10.10.153.192:6443 --token yiqa9m.fv50gop0huu32fie \
+    --discovery-token-ca-cert-hash sha256:c722e3d0a77e1995bb43d478a9dc40037705ae3814ffa175b558a90e9242b427 \
+    --control-plane --certificate-key 7f512b9e7eca96dbda27c3769c948e9118097e5f29e6fe7c02492442371357cb
+```
+
+不包含--control-plane 这条命令是用于添加node节点，示例如下： 
+```
+kubeadm join 10.10.153.192:6443 --token yiqa9m.fv50gop0huu32fie \
+    --discovery-token-ca-cert-hash sha256:c722e3d0a77e1995bb43d478a9dc40037705ae3814ffa175b558a90e9242b427
+```
 2. kubeadm-init.yaml 配置中的关键配置做简要说明:
   * kubernetesVersion    此处定义的版本和上一步安装的kubeadm，kubelet版本一致
   * imageRepository      此处定义了k8s组件的镜像仓库，私有环境部署可以指定自己的镜像仓库
