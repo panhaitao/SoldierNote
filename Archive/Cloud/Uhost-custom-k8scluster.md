@@ -233,9 +233,7 @@ kubeadm join 10.10.153.192:6443 --token yiqa9m.fv50gop0huu32fie \
 
 ## 回到master节点为node节点打标签
 
-* 更新k8s集群节点的node_name
-
-登陆任意一个masterk8s集群节点的node_name,执行命令:
+登陆任意一个master 更新其他集群节点的node_name,执行命令:
 
 ```
 kubectl label node --overwrite <node_name> node-role.kubernetes.io/node=
