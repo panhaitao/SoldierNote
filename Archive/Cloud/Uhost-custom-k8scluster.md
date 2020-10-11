@@ -24,7 +24,6 @@
 更多细节参考：https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#check-required-ports
 
 ```
-
 cat > /etc/yum.repos.d/docker-ce.repo <<EOF
 [docker]
 name=docker-ce
@@ -86,7 +85,7 @@ systemctl enable kubelet.service
  - 源镜像 k8s.gcr.io/coredns:1.6.7                     目标镜像 k8srepo/coredns:1.6.7 
 ```
 
-加速后的镜像仓库为 uhub.service.ucloud.cn/k8srepo/ 官方镜像列表地址可以从`kubeadm config images list`这里获得, 所有使用加速镜像仓库需要完成认证,登陆所有K8S节点
+加速后的镜像仓库为 uhub.service.ucloud.cn/k8srepo 官方镜像列表地址可以从`kubeadm config images list`这里获得, 所有使用加速镜像仓库需要完成认证,登陆所有K8S节点
 ```
 docker login -u <ucloud用户> -p "ucloud密码"  uhub.service.ucloud.cn/k8srepo
 ```
@@ -117,33 +116,13 @@ VServer名称: 自定义
 
 初始化k8s集群第一个master节点需要完成如下步骤：
 
-1. 生成kubeadm-init.yaml 这里是一个关键步骤，我会对配置中的关键配置做简要说明:
-  * kubernetesVersion    此处定义的版本和上一步安装的kubeadm，kubelet版本一致
-  * imageRepository      此处定义了k8s组件的镜像仓库，私有环境部署可以指定自己的镜像仓库
-  * controlPlaneEndpoint 此处定义了k8s_apiserver_vip, 部署一个高可用集群依赖这个配置
-  * networking           此处定义了集群内部的dns域名，service子网，pod子网，注意合理划分，互相不要冲突也不要和主机网络冲突
-  * apiServer.certSANs   此处是master和apiserver交互认证的配置,一定要和master主机名，master_ip一致 
-2. 执行 kubeadm init 初始化第一个master节点，--upload-certs 不能遗漏，不然后续添加master只能手动拷贝master1的证书文件了
-3. 配置本机的默认kubeconfig，确保kubectl命令能够和apisever认证交互  
-4. 部署cni网络插件，这里以flannel为例，注意kube-flannel.yml内的子网定义要和kubeadm-init.yaml里定义的一致
-```
-  net-conf.json: |
-    {
-      "Network": "10.10.0.0/16",  #此处需要和kubeadm-init.yaml里定义的一致
-      "Backend": {
-        "Type": "vxlan"
-      }
-    }
-```
-
-更多参考 https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/high-availability/，下面是一键部署脚本：
-
+1. 创建 kubeadm-init.yaml 文件, 用于初始化k8s集群 
 ```
 cat > kubeadm-init.yaml<<EOF
 apiVersion: kubeadm.k8s.io/v1beta2
 kind: ClusterConfiguration
 kubernetesVersion: v1.18.8
-imageRepository: uhub.service.ucloud.cn/k8srepo/
+imageRepository: uhub.service.ucloud.cn/k8srepo
 controlPlaneEndpoint: "k8s_apiserver_vip:6443"
 networking:
   dnsDomain: cluster.local
@@ -161,16 +140,38 @@ apiServer:
   - 127.0.0.1
   - localhost
 EOF
-kubeadm init --config=kubeadm-init.yaml --upload-certs  #参考 https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/high-availability/
+kubeadm init --config=kubeadm-init.yaml --upload-certs
+```
+执行完毕后记录下 kubeadm 返回的信息，后续添加节点需要使用 
+
+2. kubeadm-init.yaml 配置中的关键配置做简要说明:
+  * kubernetesVersion    此处定义的版本和上一步安装的kubeadm，kubelet版本一致
+  * imageRepository      此处定义了k8s组件的镜像仓库，私有环境部署可以指定自己的镜像仓库
+  * controlPlaneEndpoint 此处定义了k8s_apiserver_vip, 部署一个高可用集群依赖这个配置
+  * networking           此处定义了集群内部的dns域名，service子网，pod子网，注意合理划分，互相不要冲突也不要和主机网络冲突
+  * apiServer.certSANs   此处是master和apiserver交互认证的配置,一定要和master主机名，master_ip一致 
+3. 执行 kubeadm init 初始化第一个master节点，--upload-certs 不能遗漏，不然后续添加master只能手动拷贝master1的证书文件了
+4. 配置本机的默认kubeconfig，确保kubectl命令能够和apisever认证交互  
+```
 mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
-wget https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 ```
+5. 部署flanne cni网络插件
+  * wget https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+  * 修改kube-flannel.yml内的子网定义要和kubeadm-init.yaml里定义的一致
+```
+  net-conf.json: |
+    {
+      "Network": "172.16.128.0/17",  #此处需要和kubeadm-init.yaml里定义的一致
+      "Backend": {
+        "Type": "vxlan"
+      }
+    }
+```
+6. 修改文件中Network配置后，执行kubectl apply -f kube-flannel.yml
 
-修改文件中Network配置后，执行kubectl apply -f kube-flannel.yml
-
-执行完毕后记录下 kubeadm 返回的信息，后续添加节点需要使用 
+更多参考 https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/high-availability/
 
 ## 添加其他master节点
 
