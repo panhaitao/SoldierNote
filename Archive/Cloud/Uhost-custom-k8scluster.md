@@ -143,8 +143,8 @@ imageRepository: uhub.service.ucloud.cn/k8srepo/
 controlPlaneEndpoint: "k8s_apiserver_vip:6443"
 networking:
   dnsDomain: cluster.local
-  serviceSubnet: 10.96.0.0/16
-  podSubnet: 10.10.0.0/16
+  serviceSubnet: 172.16.0.0/17
+  podSubnet: 172.16.128.0/17
 apiServer:
   timeoutForControlPlane: 4m0s
   certSANs:
