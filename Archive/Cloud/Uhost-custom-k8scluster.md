@@ -26,6 +26,9 @@
 ```
 yum install yum-utils -y
 yum-config-manager --add-repo http://mirrors.ustc.edu.cn/docker-ce/linux/centos/docker-ce.repo
+yum makecache
+yum install docker-ce -y
+
 cat > /etc/yum.repos.d/kubernetes.repo<<EOF
 [kubernetes]
 name=Kubernetes
@@ -37,7 +40,7 @@ gpgkey=http://mirrors.ustc.edu.cn/kubernetes/yum/doc/yum-key.gpg
        http://mirrors.ustc.edu.cn/kubernetes/yum/doc/rpm-package-key.gpg
 EOF
 yum makecache
-yum install docker-ce ipvsadm kubelet-1.18.8 kubeadm-1.18.8 kubectl-1.18.8 ipset -y
+yum install ipvsadm kubelet-1.18.8 kubeadm-1.18.8 kubectl-1.18.8 ipset -y
 swapoff -a  && sed -i 's/.*swap.*/#&/' /etc/fstab
 cat > /etc/sysconfig/modules/ipvs.modules <<EOF
 #!/bin/bash
