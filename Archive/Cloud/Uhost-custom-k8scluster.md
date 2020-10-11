@@ -1,49 +1,16 @@
-# kubeshpere 部署在ucloud 云主机上
+# 在ucloud 云主机上自建k8s集群
 
+如果用户希望在在ucloud 云主机上自建k8s集群，需要完成如下操作步骤:
 
-如果ucloud的提供的标准Uk8s集群不满足用户的特别需求，但是还是需要希望把kubespere 部署在ucloud云主机上，可以参考如下部署方式，主要分成两部分，首先使用kubeadm在ucloud公有云主机上部署一个k8s集群，然后在这个k8s集群上完成kubeshpere的部署
-
-## 部署k8s集群准备工作
-
-1. 使用UHub同步一份kubernetes镜像仓库
-2. 创建一块UFS, 用作K8S集群的存储
-3. 准备三台配置不低于机器2C4G的Uhost云主机，用于运行k8s master
+1. 准备三台配置不低于机器2C4G的Ucloud云主机，用于运行k8s master
+2. 准备N台配置不低于4C8G的Ucloud主机，用于运行k8s node
+3. 使用UHub同步一份kubernetes镜像仓库
 4. 创建一个负载均衡 ULB, 用作配置k8s apiserver 高可用VIP
-5. 准备N台配置不低于4C8G的Uhost主机，用于运行k8s node
+5. 使用kubeadm工具完成k8s集群的部署
 
-## 配置Uhub
+## 申请Ucloud云主机并完成初始化
 
-登陆 https://console.ucloud.cn/  从全部产品中找到, 容器镜像库-UHub
-
-1. 用户镜像-> 镜像库名称 -> 新建镜像仓库，比如起个名字k8srepo
-2. 在这个k8srepo仓库下配置镜像加速，分别添加如下加速规则
-```
- - 源镜像 k8s.gcr.io/kube-apiserver:v1.18.8            目标镜像 k8srepo/kube-apiserver:v1.18.8
- - 源镜像 k8s.gcr.io/kube-controller-manager:v1.18.8   目标镜像 k8srepo/kube-controller-manager:v1.18.8 
- - 源镜像 k8s.gcr.io/kube-scheduler:v1.18.8            目标镜像 k8srepo/kube-scheduler:v1.18.8/ 
- - 源镜像 k8s.gcr.io/kube-proxy:v1.18.8                目标镜像 k8srepo/kube-proxy:v1.18.8 
- - 源镜像 k8s.gcr.io/pause:3.2                         目标镜像 k8srepo/pause:3.2 
- - 源镜像 k8s.gcr.io/etcd:3.4.3-0                      目标镜像 k8srepo/etcd:3.4.3-0 
- - 源镜像 k8s.gcr.io/coredns:1.6.7                     目标镜像 k8srepo/coredns:1.6.7 
-```
-加速后的镜像仓库为 uhub.service.ucloud.cn/k8srepo/ 官方镜像列表地址可以从`kubeadm config images list`这里获得。
-
-## 创建并配置ULB 
-
-登陆 https://console.ucloud.cn/  
-
-1. 从全部产品中找到, 云主机UHost -> 创建主机，具体可以参考ucloud文档
-2. 从全部产品中找到, 负载均衡ULB -> 创建负载均衡
-```
-负载均衡类型: 请求代理型
-网络模式: 内网 
-所属VPC: 选择和新建的云主机一致的VPC
-所属子网: 选择和新建的云主机一致的子网
-其他按照提示操作即可 
-```
-## 初始化所有节点
-
-设置主机名，更新/etc/hosts，具体操作略，初始化所有节点包含如下步骤：
+申请云主机步骤略，设置主机名，更新/etc/hosts，具体操作略，初始化所有节点包含如下步骤：
 
 1. 配置docker kubernetes 仓库
 2. 安装docker，kubelet,kubeadm等软件包
@@ -92,6 +59,37 @@ systemctl restart docker && systemctl enable docker
 systemctl stop firewalld.service && systemctl  disable firewalld.service
 setenforce 0 && sed -i 's/SELINUX=enforcing/SELINUX=disabled/' /etc/selinux/config 
 systemctl enable kubelet.service
+```
+
+## 配置Uhub
+
+登陆 https://console.ucloud.cn/  从全部产品中找到, 容器镜像库-UHub
+
+1. 用户镜像-> 镜像库名称 -> 新建镜像仓库，比如起个名字k8srepo
+2. 在这个k8srepo仓库下配置镜像加速，分别添加如下加速规则
+```
+ - 源镜像 k8s.gcr.io/kube-apiserver:v1.18.8            目标镜像 k8srepo/kube-apiserver:v1.18.8
+ - 源镜像 k8s.gcr.io/kube-controller-manager:v1.18.8   目标镜像 k8srepo/kube-controller-manager:v1.18.8 
+ - 源镜像 k8s.gcr.io/kube-scheduler:v1.18.8            目标镜像 k8srepo/kube-scheduler:v1.18.8/ 
+ - 源镜像 k8s.gcr.io/kube-proxy:v1.18.8                目标镜像 k8srepo/kube-proxy:v1.18.8 
+ - 源镜像 k8s.gcr.io/pause:3.2                         目标镜像 k8srepo/pause:3.2 
+ - 源镜像 k8s.gcr.io/etcd:3.4.3-0                      目标镜像 k8srepo/etcd:3.4.3-0 
+ - 源镜像 k8s.gcr.io/coredns:1.6.7                     目标镜像 k8srepo/coredns:1.6.7 
+```
+加速后的镜像仓库为 uhub.service.ucloud.cn/k8srepo/ 官方镜像列表地址可以从`kubeadm config images list`这里获得。
+
+## 创建并配置ULB 
+
+登陆 https://console.ucloud.cn/  
+
+1. 从全部产品中找到, 云主机UHost -> 创建主机，具体可以参考ucloud文档
+2. 从全部产品中找到, 负载均衡ULB -> 创建负载均衡
+```
+负载均衡类型: 请求代理型
+网络模式: 内网 
+所属VPC: 选择和新建的云主机一致的VPC
+所属子网: 选择和新建的云主机一致的子网
+其他按照提示操作即可 
 ```
 
 ## 初始化master1
@@ -157,8 +155,7 @@ wget https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-
 
 对master节点进行扩需要完成如下操作：
 
-1. 初始化系统配置，禁用交换分区，重复执行 初始化所有节点一节 的步骤
-2. 执行初始化master1一节最后记录的kubeadm join ... --control-plane 一行，如果遗忘，可以回到master1节点执行`kubeadm token create --print-join-command`返回的结果,加上`--control-plane`即可
+1. 执行初始化master1一节最后记录的kubeadm join ... --control-plane 一行，如果遗忘，可以回到master1节点执行`kubeadm token create --print-join-command`返回的结果,加上`--control-plane`即可
 3. 配置本机的默认kubeconfig，确保kubectl命令能够和apisever认证交互 
 
 最后实际执行的结果类同如下(请根据实际结果)
@@ -209,7 +206,6 @@ kubectl get pods --all-namespaces
 * master去掉污点，允许调度其他pod: `kubectl taint nodes <master-name> node-role.kubernetes.io/master-`
 * master加污点，禁止调度pod：`kubectl taint nodes <master-name> node-role.kubernetes.io/master=true:NoSchedule`
 * 如果想使用一台独立haproxy实例创建一个简单的负载均衡，可参考如下：
-
 ```
 yum install haproxy -y
 cat >> /etc/haproxy/haproxy.cfg <<EOF
@@ -224,5 +220,4 @@ EOF
 systemctl enable haproxy && systemctl restart haproxy
 systemctl stop firewalld.service && systemctl disable firewalld.service
 ```
-
 初始化配置可以只添加一个master1_ip，等全部集群部署完毕，再去掉注释部分，重启haproxy服务即可。
