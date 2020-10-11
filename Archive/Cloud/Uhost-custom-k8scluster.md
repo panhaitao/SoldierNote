@@ -1,6 +1,14 @@
-# 在ucloud 云主机上自建k8s集群
+# Ucloud 云主机上自建k8s集群
 
-如果用户希望在在ucloud 云主机上自建k8s集群，需要完成如下操作步骤:
+如果用户希望在在ucloud 云主机上自建k8s集群, 本文以如下组合为例:
+
+* Ucloud快杰云主机: CentOS7.6
+* Kernel:4.19.0-6
+* k8s:v1.18.8
+* docker:19.03.9
+* flannel:v0.13.0-rc2
+
+部署一个高可用集群，需要如下操作步骤:
 
 1. 准备三台配置不低于机器2C4G的Ucloud云主机，用于运行k8s master
 2. 准备N台配置不低于4C8G的Ucloud主机，用于运行k8s node
@@ -73,7 +81,7 @@ systemctl enable kubelet.service
 
 登陆 https://console.ucloud.cn/  从全部产品中找到, 容器镜像库-UHub
 
-1. 用户镜像-> 镜像库名称 -> 新建镜像仓库，比如起个名字k8srepo
+1. 用户镜像-> 镜像库名称 -> 新建镜像仓库，比如起个名字k8srepo(Ucloud这个名字我已经占用了)
 2. 在这个k8srepo仓库下配置镜像加速，分别添加如下加速规则
 ```
  - 源镜像 k8s.gcr.io/kube-apiserver:v1.18.8            目标镜像 k8srepo/kube-apiserver:v1.18.8
@@ -83,11 +91,15 @@ systemctl enable kubelet.service
  - 源镜像 k8s.gcr.io/pause:3.2                         目标镜像 k8srepo/pause:3.2 
  - 源镜像 k8s.gcr.io/etcd:3.4.3-0                      目标镜像 k8srepo/etcd:3.4.3-0 
  - 源镜像 k8s.gcr.io/coredns:1.6.7                     目标镜像 k8srepo/coredns:1.6.7 
+ - 源镜像 quay.io/coreos/flannel:v0.13.0-rc2           目标镜像 k8srepo/flannel:v0.13.0-rc2
 ```
 
 加速后的镜像仓库为 uhub.service.ucloud.cn/k8srepo 官方镜像列表地址可以从`kubeadm config images list`这里获得, 所有使用加速镜像仓库需要完成认证,登陆所有K8S节点
 ```
 docker login -u <ucloud用户> -p "ucloud密码"  uhub.service.ucloud.cn/k8srepo
+cp /root/.docker/config.json /var/lib/kubelet/
+systemctl daemon-reload
+systemctl restart kubelet
 ```
 
 ## 创建并配置ULB 
@@ -170,7 +182,7 @@ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 ```
 5. 部署flanne cni网络插件
-  * wget https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+  * wget https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml 
   * 修改kube-flannel.yml内的子网定义要和kubeadm-init.yaml里定义的一致
 ```
   net-conf.json: |
@@ -181,9 +193,11 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
       }
     }
 ```
-6. 修改文件中Network配置后，执行kubectl apply -f kube-flannel.yml
+  * 修改 image: quay.io/coreos/flannel:v0.13.0-rc2 为 image: uhub.service.ucloud.cn/k8srepo/flannel:v0.13.0-rc2 
+6. 修改文件保存后，执行kubectl apply -f kube-flannel.yml
 
-更多参考 https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/high-availability/
+* 集群配置更多参考 https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/high-availability/
+* 其他网络插件参考 https://kubernetes.io/docs/concepts/cluster-administration/addons/
 
 ## 添加其他master节点
 
