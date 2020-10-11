@@ -144,7 +144,7 @@ kubeadm init --config=kubeadm-init.yaml --upload-certs
 ```
 执行完毕后记录下 kubeadm 返回的信息，后续添加节点需要使用 
 
-其中包含--control-plane 这段是用于添加master节点，示例如下： 
+其中包含--control-plane 这段是用于`添加master节点，示例如下： 
 ```
   kubeadm join 10.10.153.192:6443 --token yiqa9m.fv50gop0huu32fie \
     --discovery-token-ca-cert-hash sha256:c722e3d0a77e1995bb43d478a9dc40037705ae3814ffa175b558a90e9242b427 \
@@ -187,15 +187,16 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 ## 添加其他master节点
 
-对master节点进行扩需要完成如下操作：
+登陆其他master节点进行扩需要完成如下操作：
 
-1. 执行初始化master1一节最后记录的kubeadm join ... --control-plane 一行，如果遗忘，可以回到master1节点执行`kubeadm token create --print-join-command`返回的结果,加上`--control-plane`即可
-3. 配置本机的默认kubeconfig，确保kubectl命令能够和apisever认证交互 
-
-最后实际执行的结果类同如下(请根据实际结果)
-
+1. 执行初始化master1 kubeadm init 命令返回的添加master的命令，示例如下： 
 ```
-kubeadm join 172.16.0.2:6443 --token nlaa8f.6oryd1alvspf6r7i --discovery-token-ca-cert-hash sha256:40bdab940b643a1e6958c39d44949dfb9cc6e610d26ea5172307112ecb64afdc --control-plane
+  kubeadm join 10.10.153.192:6443 --token yiqa9m.fv50gop0huu32fie \
+    --discovery-token-ca-cert-hash sha256:c722e3d0a77e1995bb43d478a9dc40037705ae3814ffa175b558a90e9242b427 \
+    --control-plane --certificate-key 7f512b9e7eca96dbda27c3769c948e9118097e5f29e6fe7c02492442371357cb
+```
+2. 配置本机的默认kubeconfig，确保kubectl命令能够和apisever认证交互 
+```
 mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
@@ -203,20 +204,24 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 ## 添加 其他node节点
 
-对master节点进行扩需要完成如下操作：
+登陆其他node节点进行扩需要完成如下操作：
 
-1. 初始化系统配置，禁用交换分区，重复执行 初始化所有节点一节 的步骤
-2. 执行初始化master1一节最后记录的kubeadm join ... a5172307112ecb64afdc 一行，如果遗忘，可以回到master1节点执行`kubeadm token create --print-join-command`返回的结果
-
-最后实际执行的结果类同如下(请根据实际结果)
-
+1. 执行初始化master1 kubeadm init 命令返回的添加node的命令，示例如下： 
 ```
-kubeadm join 172.16.0.2:6443 --token nlaa8f.6oryd1alvspf6r7i --discovery-token-ca-cert-hash sha256:40bdab940b643a1e6958c39d44949dfb9cc6e610d26ea5172307112ecb64afdc --control-plane
+kubeadm join 10.10.153.192:6443 --token yiqa9m.fv50gop0huu32fie \
+    --discovery-token-ca-cert-hash sha256:c722e3d0a77e1995bb43d478a9dc40037705ae3814ffa175b558a90e9242b427
 ```
+
+## 添加节点过程如果遗忘添加命令
+
+* 可以回到master1节点执行`kubeadm token create --print-join-command`返回的结果
+* 如果遗忘certificate-key 可以回到master-1节点执行命令 kubeadm init phase upload-certs --upload-certs 重置
 
 ## 回到master节点为node节点打标签
 
-* 替换实际的node_name
+* 更新k8s集群节点的node_name
+
+登陆任意一个masterk8s集群节点的node_name,执行命令:
 
 ```
 kubectl label node --overwrite <node_name> node-role.kubernetes.io/node=
@@ -237,7 +242,7 @@ kubectl get pods --all-namespaces
 * 查看docker运行日志: journalctl -fu docker
 * 查看kubelet运行日志: journalctl -fu kubelet
 * 重置集群:kubeadm reset, 清空目录 /var/lib/etcd/ /var/lib/kubelet/ /etc/kubernetes/
-* master去掉污点，允许调度其他pod: `kubectl taint nodes <master-name> node-role.kubernetes.io/master-`
+* master去掉污点，允许调度pod: `kubectl taint nodes <master-name> node-role.kubernetes.io/master-`
 * master加污点，禁止调度pod：`kubectl taint nodes <master-name> node-role.kubernetes.io/master=true:NoSchedule`
 * 如果想使用一台独立haproxy实例创建一个简单的负载均衡，可参考如下：
 ```
