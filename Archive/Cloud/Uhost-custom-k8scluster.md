@@ -92,6 +92,14 @@ systemctl enable kubelet.service
 所属子网: 选择和新建的云主机一致的子网
 其他按照提示操作即可 
 ```
+3. 选择刚刚创建的负载均衡，配置vserver
+```
+vserver管理->添加vserver
+VServer名称: 自定义
+协议和端口 : TCP 6443
+其他默认，点击确定
+选择刚刚创建的VServer，服务节点->添加节点, 选择 master 1-3 对应的主机即可
+```
 
 ## 初始化master1
 
