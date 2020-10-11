@@ -32,12 +32,10 @@ yum install docker-ce -y
 cat > /etc/yum.repos.d/kubernetes.repo<<EOF
 [kubernetes]
 name=Kubernetes
-baseurl=http://mirrors.ustc.edu.cn/kubernetes/yum/repos/kubernetes-el7-x86_64
+baseurl=https://mirrors.tuna.tsinghua.edu.cn/kubernetes/yum/repos/kubernetes-el7-x86_64/
 enabled=1
 gpgcheck=0
 repo_gpgcheck=0
-gpgkey=http://mirrors.ustc.edu.cn/kubernetes/yum/doc/yum-key.gpg
-       http://mirrors.ustc.edu.cn/kubernetes/yum/doc/rpm-package-key.gpg
 EOF
 yum makecache
 yum install ipvsadm kubelet-1.18.8 kubeadm-1.18.8 kubectl-1.18.8 ipset -y
