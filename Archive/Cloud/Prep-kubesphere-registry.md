@@ -91,12 +91,17 @@ registry
 登陆registry节点，将如下文件保存为images.list
 
 ```
+jimmidyson/configmap-reload:v0.3.0
+kubesphere/ks-apiserver:v3.0.0
+kubesphere/ks-console:v3.0.0
+kubesphere/ks-controller-manager:v3.0.0
+kubesphere/tower:v0.1.0
 library/haproxy:2.0.4
 library/redis:5.0.5-alpine
 osixia/openldap:1.3.0
-jimmidyson/configmap-reload:v0.3.0
 csiplugin/snapshot-controller:v2.0.1
 mirrorgooglecontainers/defaultbackend-amd64:1.4
+prom/alertmanager:v0.21.0
 kubesphere/alertmanager:v0.21.0
 kubesphere/kube-rbac-proxy:v0.4.1
 kubesphere/kube-state-metrics:v1.9.6
