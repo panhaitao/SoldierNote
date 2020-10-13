@@ -1,4 +1,4 @@
-# Uk8s kubesphere 部署篇
+# Uk8s集群部署kubesphere
 
 由于目前Uhub提供的镜像加速功能不够灵活，原本搭建一个简单http的registry，但是个人觉得添加docker配置项insecure-registries的方式不够优雅，长时间运行不够安全，还是花时间验证如何搭建https的registry 用于完成内网环境下kubespshre部署在Uk8s集群上，虽然这样最开始麻烦了些，但是好处以后申请 Uk8s 集群的时候就不用每个节点都需要绑定EIP了，如果是生产环境可以较少一定开支，也便于维护.
 
