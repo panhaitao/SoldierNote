@@ -118,6 +118,7 @@ library/redis:5.0.5-alpine
 mirrorgooglecontainers/defaultbackend-amd64:1.4
 osixia/openldap:1.3.0
 prom/alertmanager:v0.21.0
+prom/prometheus:v2.20.1
 ```
 
 然后使用下面的脚本上传镜像
