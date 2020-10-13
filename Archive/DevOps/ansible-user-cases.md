@@ -1,6 +1,5 @@
 # ansible应用场景汇总(编写中)
 
-
 ## 概述
 
 阅读本篇需要对ansible有一定的了解，不熟悉ansible的同学请先阅读 [ansible 基础指南]<https://github.com/panhaitao/SoldierNote/blob/master/Archive/DevOps/ansible-base-howto.md>以下是结合ansible的应用场景
@@ -13,6 +12,7 @@
   * 初始化ab压测节点
 3. 批量配置docker主机
 4. 批量初始化USMC agent
+5. 
 
 ## 应用场景
 
@@ -65,7 +65,58 @@
 * 执行命令 ansible-playbook -i hosts/k8s todo/init_uwsgi_hosts -D 完成USMC agent的部署，
 * 继续进行迁移计划的其他操作
 
-## 参考说明
+
+#### 场景五: 使用ansible手动巡检
+
+在某些私有云客户场景，客户的监控做的非常不完善，有时候主机节点巡检，可以使用ansible或者pdsh等工具快速对集群内所有主机列表进行查询，结合日常工作，常用检查项如下:   
+
+1. 使用ansible shell 模块做批量检查：
+
+* 查看所有主机运行状态: `ansible -i hosts all -m shell -a "uptime;mpstat;free" -o | sort`
+* 查看所有主机内核版本：`ansible -i hosts all -m shell -a "hostname -i;uname -r" -o | sort`
+* 查看所有主机docker版本：`ansible -i hosts all -m shell -a "docker version | grep version" -o | sort`
+* 查看K8S集群节点版本：`ansible -i hosts k8s-m01 -m shell -a "kubectl get nodes"`
+* 查看K8S集群pod运行状态：`ansible -i hosts k8s-m01 -m shell -a "kubectl get pods --all-namespaces | grep -v Running"`
+
+2. 使用ansible script 模块做批量检查等操作：
+
+* 批量更改主机密码: `ansible all -m script -a "change_password.sh"`
+
+change_password.sh 脚本参考
+```
+echo "user:user_new_password" | chpasswd
+```
+
+* 找出分区占用过大的的主机: `ansible all -m script -a "check_disk_use.sh" `
+
+check_disk_use.sh 脚本参考
+```
+df -h  |  awk 'NR>1 { print $5" "$6 }' | while read line
+do
+        part_use=`echo $line | awk '{print $1}' | awk -F% '{print $1}'`
+	part_mount=`echo $line | awk '{print $2}'`
+	    
+	if [[ ${part_use} -ge 70 ]];then
+	    	echo "       Local Dir $part_mount Usage is over $part_use %  "
+	fi
+done
+```
+
+* 列出集群使用的nas存储卷信息: `ansible all -m script -a "check_cluster_nfs_pv.sh" `
+
+check_cluster_nfs_pv.sh 脚本参考
+```
+df -h  |  awk '{ print $2"" $5" "$6 }' | while read line
+do
+        part_size=`echo $line | awk '{print $1}' | awk -F% '{print $1}'`
+        part_use=`echo $line | awk '{print $2}'  | awk -F% '{print $1}'`
+	part_mount=`echo $line | awk '{print $3}'| awk -F "nfs/" '{print $2}'`
+        		
+        echo -e "$part_mount $part_size $part_use%"
+done
+```
+
+## Playbook配置库参考说明
 
 1. ansible镜像的Dockerfile:  https://github.com/panhaitao/alpine-ansible.git
 2. Playbook配置库: https://github.com/panhaitao/Playbook-Performance-Test.git
