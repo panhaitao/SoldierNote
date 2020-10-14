@@ -1,4 +1,4 @@
-# Tutorial: Ucloud 云主机上自建k8s集群
+# Ucloud 云主机上自建k8s集群
 
 如果用户希望在在ucloud 云主机上自建k8s集群, 本文以如下组合为例:
 
