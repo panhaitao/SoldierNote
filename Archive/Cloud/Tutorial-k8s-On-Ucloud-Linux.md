@@ -42,6 +42,7 @@ repo_gpgcheck=0
 EOF
 yum makecache
 yum install docker-ce -y
+systemctl restart docker && systemctl enable docker
 
 cat > /etc/yum.repos.d/kubernetes.repo <<EOF
 [kubernetes]
@@ -71,7 +72,6 @@ net.bridge.bridge-nf-call-iptables = 1
 net.bridge.bridge-nf-call-ip6tables = 1
 EOF
 sysctl --system
-systemctl restart docker && systemctl enable docker
 systemctl stop firewalld.service && systemctl  disable firewalld.service
 setenforce 0 && sed -i 's/SELINUX=enforcing/SELINUX=disabled/' /etc/selinux/config 
 systemctl enable kubelet.service
@@ -97,9 +97,6 @@ systemctl enable kubelet.service
 加速后的镜像仓库为 uhub.service.ucloud.cn/k8srepo 官方镜像列表地址可以从`kubeadm config images list`这里获得, 所有使用加速镜像仓库需要完成认证,登陆所有K8S节点
 ```
 docker login -u <ucloud用户> -p "ucloud密码"  uhub.service.ucloud.cn/k8srepo
-cp /root/.docker/config.json /var/lib/kubelet/
-systemctl daemon-reload
-systemctl restart kubelet
 ```
 
 ## 创建并配置ULB 
@@ -109,7 +106,7 @@ systemctl restart kubelet
 1. 从全部产品中找到, 云主机UHost -> 创建主机，具体可以参考ucloud文档
 2. 从全部产品中找到, 负载均衡ULB -> 创建负载均衡
 ```
-负载均衡类型: 请求代理型
+负载均衡类型: 请求代理模式
 网络模式: 内网 
 所属VPC: 选择和新建的云主机一致的VPC
 所属子网: 选择和新建的云主机一致的子网
