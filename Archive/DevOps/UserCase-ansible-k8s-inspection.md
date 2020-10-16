@@ -24,13 +24,14 @@
   * 镜像密钥→ 填入你登陆ucloud平台的用户名和密码
   * 自定义网络→ 选择绑定外网IP，选择需要的付费方式，完成cube实例的创建 
 3. 等cube实例启动完毕后，可以使用步骤1.c中定义的root密码ssh登陆容器
-4. 补全参考配置文件 (example/uhost_type_o.yml 是快杰云主机， example/uhost_type_n.yml 是普通云主机)
+4. 第一次使用同步下最新repo,进入 /data/playbook工作目录, 执行命令: git pull
+5. 补全参考配置文件 (example/uhost_type_o.yml 是快杰云主机， example/uhost_type_n.yml 是普通云主机)
   * 修改 auth.public_key auth.private_key 可以登陆 console.ucloud.cn -> 全部产品-> API 产品 查看自己的 API密钥
   * 修改 os.password 定义新创建的主机登陆密码
   * 修改 os.maxhosts 定义创建主机数量
   * 其他根据需要修改
-5. 以创建快杰云主机为例，进入 /data/playbook工作目录，执行命令` sh scripts/create_inventory_file.sh  /data/playbook/example/uhost_type_o.yml `后，会在 hosts目录下生成ansible需要的inventory文件
-6. 测试新创建的主机是否就绪: 进入 /data/playbook工作目录,执行命令` ansible -i hosts/<file_name>  all -m shell -a 'pwd' -o ` 如果都能正确返回，说明主机已经就绪
+6. 以创建快杰云主机为例，进入 /data/playbook工作目录，执行命令` sh scripts/create_inventory_file.sh  /data/playbook/example/uhost_type_o.yml `后，会在 hosts目录下生成ansible需要的inventory文件
+7. 测试新创建的主机是否就绪: 进入 /data/playbook工作目录,执行命令` ansible -i hosts/<file_name>  all -m shell -a 'pwd' -o ` 如果都能正确返回，说明主机已经就绪
 
 ### 场景二: 初始化压测主机
 
