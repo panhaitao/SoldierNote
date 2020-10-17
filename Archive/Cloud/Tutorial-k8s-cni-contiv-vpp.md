@@ -1,4 +1,4 @@
-# Ucloud 云主机上自建k8s集群-设置contiv/vpp网络插件
+# Ucloud 云主机上自建k8s集群-设置contiv/vpp网络插件(细节待补充)
 
 ## 概述
 
