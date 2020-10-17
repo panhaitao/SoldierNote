@@ -3,6 +3,35 @@
 ## 安装
 
 ```
+CentOS7 安装vpp 
+
+cat > /etc/yum.repos.d/epel.repo << EOF
+[epel]
+name=Extra Packages for Enterprise Linux 7 - $basearch
+baseurl=https://mirrors.tuna.tsinghua.edu.cn/epel/7/x86_64/
+enabled=1
+gpgcheck=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+
+[fdio_release]
+name=fdio_release
+baseurl=https://packagecloud.io/fdio/release/el/7/$basearch
+repo_gpgcheck=1
+gpgcheck=0
+enabled=1
+gpgkey=https://packagecloud.io/fdio/release/gpgkey
+sslverify=0
+sslcacert=/etc/pki/tls/certs/ca-bundle.crt
+metadata_expire=300
+EOF
+
+systemctl restart kubelet
+#yum install lshw vppl vpp-plugins
+
+```
+Ubuntu 20.04 安装vpp
+
+```
 cat > /etc/apt/sources.list.d/99fd.io.list <<EOF
 deb [trusted=yes] https://packagecloud.io/fdio/release/ubuntu bionic main
 EOF
