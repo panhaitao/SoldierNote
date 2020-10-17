@@ -22,16 +22,18 @@ service kubelet restart
 
 ### 初始化节点网卡
 
-yum install lshw -y
-wget -k https://raw.githubusercontent.com/contiv/vpp/master/k8s/setup-node.sh
+所有节点都要完成如下操作
+
+1. 安装lshw，setup-node.sh 脚本需要使用 `yum install lshw -y`
+2. wget -k https://raw.githubusercontent.com/contiv/vpp/master/k8s/setup-node.sh
 
 ### 部署contiv/vpp
 
 安装Contiv-VPP 参考如下操作
-wget https://raw.githubusercontent.com/contiv/vpp/master/k8s/contiv-vpp.yaml
 
-根据部署集群的配置修改contiv-vpp.yam 详细配置参考: https://fdio-vpp.readthedocs.io/en/latest/usecases/contiv/NETWORKING.html
-kubectl apply -f contiv-vpp.yaml
+1. 获取contiv-vpp.yaml, 执行命令: wget https://raw.githubusercontent.com/contiv/vpp/master/k8s/contiv-vpp.yaml
+2. 根据部署集群的配置修改contiv-vpp.yam 详细配置参考: https://fdio-vpp.readthedocs.io/en/latest/usecases/contiv/NETWORKING.html
+3. 部署contiv/vpp 执行命令: `kubectl apply -f contiv-vpp.yaml`
 
 ### 配置节点vpp-node
 
@@ -91,7 +93,6 @@ k8s-3   Ready    master   83m   v1.18.8
 * https://github.com/contiv/vpp/blob/master/docs/setup/MANUAL_INSTALL.md
 * https://github.com/contiv/vpp/blob/master/docs/setup/MULTI_NIC_SETUP.md
 * https://fd.io/docs/vpp/master/gettingstarted/installing/centos.html#vpp-latest-release
-
 
 ## 故障分析
 
