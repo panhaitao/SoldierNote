@@ -1,6 +1,15 @@
 # LINUX 时间设置
 
-## Unix时间戳
+## 概念
+
+* 系统时间和硬件时间
+
+同步系统时间和硬件时间，可以使用hwclock命令。
+
+* 以系统时间为基准，修改硬件时间, hwclock --systoh
+* 以硬件时间为基准，修改系统时间, hwclock --hctosys
+
+* Unix时间戳
 
 Unix时间戳(Unix timestamp)，或称Unix时间(Unix time)、POSIX时间(POSIX time)，是一种时间表示方式，定义为从格林威治时间1970年01月01日00时00分00秒起至现在的总秒数. 在 Unix/Linux中,获取现在的Unix时间戳 date +%s, 通过Unix时间戳换算普通时间date -d @Unix timestamp 其他常用和系统时间相关的命令
 
@@ -10,7 +19,12 @@ Unix时间戳(Unix timestamp)，或称Unix时间(Unix time)、POSIX时间(POSIX 
 
 ## 时间同步
 
-### NTP
+### NTP 协议
+
+chrony是一个较新ntp协议的实现程序,替代传统的ntpd
+
+* ntpdate -d -u 172.17.30.100
+* 查看同步情况 ntpq -p
 
 ### PTP
 
