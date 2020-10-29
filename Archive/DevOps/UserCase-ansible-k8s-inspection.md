@@ -12,6 +12,7 @@
   * 初始化ab压测节点
 3. 批量配置docker主机
 4. 批量初始化USMC agent
+5. 批量操作Windows云主机做游戏压测
 
 ## 应用场景
 
@@ -64,6 +65,10 @@
 * 服务器迁移中心 USMC → 创建迁移计划，将生成的计划ID usmc-xxxxx 设置为 todo/init_usmc_agent 的usmc_id 值
 * 执行命令 ansible-playbook -i hosts/k8s todo/init_uwsgi_hosts -D 完成USMC agent的部署，
 * 继续进行迁移计划的其他操作
+
+### 场景五: 使用windows云主机做游戏压测
+
+客户方需要做游戏业务压测，压测工具是运行windows上的GUI程序，需要100+数量级别的windows云主机做并发压测，已经
 
 ## Playbook配置库参考说明
 
