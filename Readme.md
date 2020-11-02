@@ -7,4 +7,9 @@
 * Topic/UserCases 某个功能点或实际案例汇总
 * Reference       参考指南汇总
 * Troubleshooting 排障分析归档
+* Essay           个人随笔
 ```
+
+* 构建文档
+npm -g install markdown-include
+make

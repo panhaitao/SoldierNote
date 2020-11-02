@@ -1,11 +1,11 @@
-# K8S Collect  Event
+# K8S Collect Event
 
 ```
+yum install -y nfs-utils -y
 docker login -u user -p "password" uhub.service.ucloud.cn
 cp /root/.docker/config.json /var/lib/kubelet/ -f
 systemctl daemon-reload && systemctl restart kubelet
 ```
-
 
 * https://github.com/opsgenie/kubernetes-event-exporter
 
@@ -28,21 +28,27 @@ systemctl daemon-reload && systemctl restart kubelet
           useEventID: true
 ```
 
-cd deploy 
-kubectl apply -f 00-roles.yaml
-kubectl apply -f 01-config.yaml
-kubectl apply -f 02-deployment.yaml
 
+* cd deploy 
+* kubectl apply -f 00-roles.yaml
+* kubectl apply -f 01-config.yaml
+* kubectl apply -f 02-deployment.yaml
 
 ## promethus
 
-https://github.com/panhaitao/nfs-client-provisioner-deploy.git
+https://github.com/panhaitao/k8s-app-deploy.git
 
 ## Pod Lifecycle Metrics
 
 
-prometheus.io/scrape: 'true'
-clusterIP: None
+## Deploy kube-state-metrics
+
+```
+annotations:
+  prometheus.io/scrape: 'true'
+```
+
+* clusterIP: None
 
 初步判断可以修改kube-state-metrics 来添加
 https://github.com/kubernetes/kube-state-metrics/blob/master/internal/store/pod.go
