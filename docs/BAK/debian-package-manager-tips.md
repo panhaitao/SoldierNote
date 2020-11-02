@@ -1,4 +1,4 @@
-# Debian GNU/Linux 包管理妙计串烧
+# Debian GNU/Linux 包管理妙计串烧(Archived)
 
 作为一个资深的 Debian GNU/Linux（后文简称“Debian”）粉，笔者可是私藏了不少既实用又鲜为人知的锦囊妙计哦。独乐乐不如众乐乐，现从中撷取几条分享给大家，希望对各位有所帮助。
 

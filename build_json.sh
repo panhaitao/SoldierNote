@@ -1,6 +1,6 @@
 #!/bin/sh
 
-for md_file in `find docs  -type f | grep -v Case | grep -v BAK`
+for md_file in `find docs  -type f | grep -v Case `
 do
 
 name=`echo ${md_file##*/} | awk -F. '{print $1}'`
