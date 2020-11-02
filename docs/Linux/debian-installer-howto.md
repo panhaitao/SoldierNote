@@ -1,4 +1,4 @@
-# Debian发行版基础系列三:debian-installer 原理分析(Archived)
+# Debian发行版基础系列三:debian-installer 原理分析(尘封归档篇)
 
 ## 安装器的组成
 
