@@ -1,4 +1,4 @@
-# Debian发行版基础系列一:DEB包与APT仓库基础
+# Debian发行版基础系列一:DEB包与APT仓库基础(Archived)
 
 ## 准备开发环境
 
