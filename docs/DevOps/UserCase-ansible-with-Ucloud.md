@@ -74,19 +74,18 @@ ansible_ssh_pass="xxxxxxxxx"
 
 </center>
 
-<img src="https://github.com/panhaitao/SoldierNote/blob/master/static/uhost_with_mem_monitor.png" align="right"  width="30%"  border="2" hspace="20" >
 
 具备了以上条件，这里再使用一个比较实用的场景: 所有主机安装UCloud辅助agent程序，以便可以获取更丰富监控指标（如内存、磁盘空间、进程等）
 
-完成web,db,k8s 三个组所有主机agent程序，执行命令如下：
+<img src="https://github.com/panhaitao/SoldierNote/blob/master/static/uhost_with_mem_monitor.png" align="right"  width="30%"  border="2" hspace="20" >
+
+在这里，使用ansible 完成对 web,db,k8s 三个组所有主机agent程序，执行命令如下:
 
 * ansible web,db,k8s -m shell -a 'wget http://umon.api.service.ucloud.cn/static/umatest/uma-1.1.5-1.x86_64.rpm'
 * ansible web,db,k8s -m shell -a 'yum localinstall uma-1.1.5-1.x86_64.rpm -y'
 * ansible web,db,k8s -m shell -a 'service uma start'
 
-如果后续新增主机也需要安装agent程序，几十台，甚至几百台，都只需要以上三条命令就可以完整agent程序的安装，
-借助运维管理工具 ansible 和 动态 Inventory，再多的主机管理工作也都可以轻松的完成 
-
+如果后续新增主机也需要安装agent程序，几十台，甚至几百台，都只需要以上三条命令就可以完整agent程序的安装，借助运维管理工具 ansible 和 动态 Inventory，再多的主机管理工作也都可以轻松的完成, 在agent程序完毕之后，打开主机监控信息，检查其他监控指标（如内存、磁盘空间、进程等) 确认完成，如右图所示.
 
 ## 像编写剧本一样管理资源
 
