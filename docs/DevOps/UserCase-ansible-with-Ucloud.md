@@ -57,7 +57,6 @@
 web1                ansible_ssh_host=10.10.33.1
 [db]
 db1                 ansible_ssh_host=10.10.33.5
-
 [k8s]
 k8s-1                ansible_ssh_host=10.10.33.7
 
@@ -68,13 +67,27 @@ ansible_ssh_pass="xxxxxxxxx"
 ```
 
 * 使用动态 Inventory
-  动态 Inventory  需要 ansible.conf 定义的配置 inventory = inventory/ucloud.py, 当ansible 工作的时候，会自动引用`inventory/ucloud.py --list`的输出作为输入，不用额外维护一份 /etc/ansible/hosts 文件，随时可以动态获取，管理控制台能看到云主机资源
-
+  动态 Inventory  需要 ansible.conf 定义的配置 inventory = inventory/ucloud.py, 当ansible 工作的时候，会自动引用`inventory/ucloud.py --list`的输出作为输入，随时可以获取到和https://console.ucloud.cn/控制台上一致的主机资源信息，达到和使用静态 Inventory一样的效果，但不用额外维护一份 /etc/ansible/hosts 文件，减少了重复劳动，可以想象一下，假如维护的是云平台几百台主机，每次资源变化，都要同步一次/etc/ansible/hosts文件的工作量，下面是一个使用动态 Inventory查看云主机信息的示例：
 <center class="half">
 
 <img src="https://github.com/panhaitao/SoldierNote/blob/master/static/ucloud_uhost_webconsole.png"  width="46%" border="2" hspace="20" ><img src="https://github.com/panhaitao/SoldierNote/blob/master/static/ansibe_list_hosts.png" width="46%" border="2" hspace="20" >
 
 </center>
+
+具备了以上条件，这里再使用一个比较实用的场景: 所有主机安装UCloud辅助agent程序，以便可以获取更丰富监控指标（如内存、磁盘空间、进程等）
+
+<img src="https://github.com/panhaitao/SoldierNote/blob/master/static/ucloud_uhost_webconsole.png" align="right"  width="46%" border="2" hspace="20" >
+<img src="https://github.com/panhaitao/SoldierNote/blob/master/static/ansibe_list_hosts.png"align="right"  width="46%" border="2" hspace="20" >
+
+完成web,db,k8s 三个组所有主机agent程序，执行命令如下：
+
+ansible web,db,k8s -m shell -a 'wget http://umon.api.service.ucloud.cn/static/umatest/uma-1.1.5-1.x86_64.rpm'
+ansible web,db,k8s -m shell -a 'yum localinstall uma-1.1.5-1.x86_64.rpm -y'
+ansible web,db,k8s -m shell -a 'service uma start'
+
+如果后续新增主机也需要安装agent程序，几十台，甚至几百台，都只需要以上三条命令就可以完整agent程序的安装，
+借助运维管理工具 ansible 和 动态 Inventory，再多的主机管理工作也都可以轻松的完成 
+
 
 
 ## 像编写剧本一样管理资源
