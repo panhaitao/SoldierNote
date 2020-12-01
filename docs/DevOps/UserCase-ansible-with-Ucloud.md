@@ -55,19 +55,11 @@
 ```
 [web]
 web1                ansible_ssh_host=10.10.33.1
-web2                ansible_ssh_host=10.10.33.2
-web3                ansible_ssh_host=10.10.33.3
-web4                ansible_ssh_host=10.10.33.4
-
 [db]
 db1                 ansible_ssh_host=10.10.33.5
-db2                 ansible_ssh_host=10.10.33.6
 
 [k8s]
 k8s-1                ansible_ssh_host=10.10.33.7
-k8s-2                ansible_ssh_host=10.10.33.8
-k8s-3                ansible_ssh_host=10.10.33.9
-k8s-4                ansible_ssh_host=10.10.33.10
 
 [all:vars]
 ansible_connection=ssh
@@ -79,7 +71,7 @@ ansible_ssh_pass="xxxxxxxxx"
   动态 Inventory  需要 ansible.conf 定义的配置 inventory = inventory/ucloud.py, 当ansible 工作的时候，会自动引用`inventory/ucloud.py --list`的输出作为输入，不用额外维护一份 /etc/ansible/hosts 文件，随时可以动态获取，管理控制台能看到云主机资源
 
 <figure class="half">
-    <img src="http://xxx.jpg">
+    <img src="https://github.com/panhaitao/SoldierNote/blob/master/static/ucloud_uhost_webconsole.png">
     <img src="http://yyy.jpg">
     <img src="http://yyy.jpg">
 </figure>
