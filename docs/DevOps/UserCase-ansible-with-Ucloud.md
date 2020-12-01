@@ -74,9 +74,9 @@ ansible_ssh_pass="xxxxxxxxx"
 
 </center>
 
-具备了以上条件，这里再使用一个比较实用的场景: 所有主机安装UCloud辅助agent程序，以便可以获取更丰富监控指标（如内存、磁盘空间、进程等）
+<img src="https://github.com/panhaitao/SoldierNote/blob/master/static/uhost_with_mem_monitor.png" align="right"  width="30%"  border="2" hspace="20" >
 
-<img src="https://github.com/panhaitao/SoldierNote/blob/master/static/uhost_with_mem_monitor.png" align="right"  width="30%" border="2" hspace="20" >
+具备了以上条件，这里再使用一个比较实用的场景: 所有主机安装UCloud辅助agent程序，以便可以获取更丰富监控指标（如内存、磁盘空间、进程等）
 
 完成web,db,k8s 三个组所有主机agent程序，执行命令如下：
 
@@ -86,7 +86,6 @@ ansible_ssh_pass="xxxxxxxxx"
 
 如果后续新增主机也需要安装agent程序，几十台，甚至几百台，都只需要以上三条命令就可以完整agent程序的安装，
 借助运维管理工具 ansible 和 动态 Inventory，再多的主机管理工作也都可以轻松的完成 
-
 
 
 ## 像编写剧本一样管理资源
