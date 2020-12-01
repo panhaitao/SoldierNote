@@ -91,8 +91,6 @@ ansible_ssh_pass="xxxxxxxxx"
 <br>
 <br>
 <br>
-<br>
-<br>
 
 ## 像编写剧本一样管理资源
 
