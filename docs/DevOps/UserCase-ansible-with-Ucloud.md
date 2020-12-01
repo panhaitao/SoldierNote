@@ -79,6 +79,9 @@ ansible_ssh_pass="xxxxxxxxx"
 
 <img src="https://github.com/panhaitao/SoldierNote/blob/master/static/uhost_with_mem_monitor.png" align="right"  width="30%"  border="2" hspace="20" >
 
+<br>
+<br>
+
 在这里，使用ansible 完成对 web,db,k8s 三个组所有主机agent程序，执行命令如下:
 
 * ansible web,db,k8s -m shell -a 'wget http://umon.api.service.ucloud.cn/static/umatest/uma-1.1.5-1.x86_64.rpm'
@@ -87,7 +90,6 @@ ansible_ssh_pass="xxxxxxxxx"
 
 如果后续新增主机也需要安装agent程序，几十台，甚至几百台，都只需要以上三条命令就可以完整agent程序的安装，借助运维管理工具 ansible 和 动态 Inventory，再多的主机管理工作也都可以轻松的完成, 在agent程序完毕之后，打开主机监控信息，检查其他监控指标（如内存、磁盘空间、进程等) 确认完成，如右图所示.
 
-<br>
 <br>
 <br>
 <br>
@@ -103,32 +105,6 @@ ansible_ssh_pass="xxxxxxxxx"
   |  编写 hosts 文件            | 编写动态Inventory脚本  |
 
 ## 常见场景参考
-
-## 参考资源
-
-阅读本篇需要对ansible有一定的了解，不熟悉ansible的同学请先阅读 [ansible 基础指南]<https://github.com/panhaitao/SoldierNote/blob/master/Archive/DevOps/ansible-base-howto.md>以下是结合ansible的应用场景
-
-2. 初始化压测主机
-  * 初始化nginx/uwsgi 集群
-  * 初始化jmeter压测节点
-  * 初始化wrk压测节点
-  * 初始化ab压测节点
-3. 批量配置docker主机
-4. 批量初始化USMC agent
-5. 批量操作Windows云主机做游戏压测
-6. 启动一个promethus server和grafana
-7. 
-
-## 应用场景
-
-### 场景一: 快速准备需要的主机
-5. 补全参考配置文件 (example/uhost_type_o.yml 是快杰云主机， example/uhost_type_n.yml 是普通云主机)
-  * 修改 auth.public_key auth.private_key 可以登陆 console.ucloud.cn -> 全部产品-> API 产品 查看自己的 API密钥
-  * 修改 os.password 定义新创建的主机登陆密码
-  * 修改 os.maxhosts 定义创建主机数量
-  * 其他根据需要修改
-6. 以创建快杰云主机为例，进入 /data/playbook工作目录，执行命令` sh scripts/create_inventory_file.sh  /data/playbook/example/uhost_type_o.yml `后，会在 hosts目录下生成ansible需要的inventory文件
-7. 测试新创建的主机是否就绪: 进入 /data/playbook工作目录,执行命令` ansible -i hosts/<file_name>  all -m shell -a 'pwd' -o ` 如果都能正确返回，说明主机已经就绪
 
 ### 场景二: 初始化压测主机
 
