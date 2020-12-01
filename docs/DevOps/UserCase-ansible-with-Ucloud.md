@@ -33,13 +33,12 @@
 
   |            |          WebUI+普通操作                  　|                 使用接口+运维工具                                           |
   | ---------- |------------------------------------------- | ----------------------------------------------------------------------------|
-  |  创建主机  | 至少滑动,点击鼠标10~15次(耗时30s)<br> 重复十次:完成100台主机创建(耗时5min) |  编写调用接口脚本(耗时10min～15min)<br> 编写创建主机的配置文件，定义类型, 数量 (耗时1min～3min) <br>
-一次执行API脚本读取配置, 批量创建100台主机(耗时3～5min)                    | 
-  |  初始化    | 依次登陆100台主机，配置压测软件(至少1小时) |  编写调试tasks(耗时10min～15min) <br> ansible执行初始化100台主机tasks (耗时5min) | 
-  |  开始压测  | 使用shell获取其他方式控制100台主机开发开始压测(耗时等同于压测时间) |  使用ansible远程执行命令控制100台主机压测(耗时等同于压测时间)               | 
-  |  修改参数  | 依次登陆100台主机，完成参数修改(至少1小时) |  使用ansible执行playbook重新初始化100台主机配置(耗时5min)                           | 
-  |  重复压测  | 使用shell获取其他方式控制100台主机开发开始压测(耗时等同于压测时间) |  使用ansible远程执行命令控制100台主机压测(耗时等同于压测时间)               | 
-
+  |  创建主机  | 至少滑动,点击鼠标10~15次(耗时30s)<br> 重复十次:完成100台主机创建(耗时5min) |  编写调用接口脚本(耗时10min～15min)<br> 编写创建主机的配置文件，定义类型, 数量 (耗时1min～3min) <br> 一次执行API脚本读取配置, 批量创建100台主机(耗时3～5min)   | 
+  |  初始化    | 依次登陆100台主机，配置压测软件(至少1小时) |  编写调试tasks(耗时10min～15min) <br> ansible执行初始化100台主机tasks (耗时5min)      | 
+  |  开始压测  | 使用shell获取其他方式控制100台主机开发开始压测(耗时等同于压测时间) |  使用ansible远程执行命令控制100台主机压测(耗时等同于压测时间) | 
+  |  修改参数  | 依次登陆100台主机，完成参数修改(至少1小时) |  使用ansible执行playbook重新初始化100台主机配置(耗时5min)                             | 
+  |  重复压测  | 使用shell获取其他方式控制100台主机开发开始压测(耗时等同于压测时间) |  使用ansible远程执行命令控制100台主机压测(耗时等同于压测时间) |
+ 
   使用WebUI的普通操作方式中,一次操作5～10台，比较便捷，当操作量级达到数十数百量级的时候，特别在节点初始化操作，以及特别变更操作工作量比较大
   使用使用API接口和运维工具的操作方式中，在前期编写调用接口脚本,和编写ansible tasks 需要花费些时间,在后续特别是配置变更，批量操作等能突显强大的管理控制能力
   甚至在某些具备运维开发能力的客户，管理资源完全使用API接口来实现业务相关的功能，比如上线或者变更一个边缘节点，扩充某个集群等。
@@ -51,14 +50,37 @@
   * 动态 Inventory 则通过自定义的Inventory脚本获取资源
   运维上一般一般会结合 CMDB 资管系统、云计算平台等获取主机信息。平台资源会根据实际情况动态增减, 如果维护的是一份静态 Inventory(也就是需要同步更新一份ansible 服务端的 hosts 文件)，如果平台资源体量很大，并且变动频繁，那么维护同步更新的静态 Inventory也是一个不轻松的工作，使用到动态获取 inventory 的方法，可以省去这样的麻烦，相当于一处定义，处处引用，对于Ucloud云平台，我们也维护了一份面向ucloud云平台资产管理的动态Inventory（ucloud-ansible-inventory)，借助动态Inventory ansible可以轻松获取云平台主机资源，
 
-  |  静态 Inventory             |    动态 Inventory      |
-  |  -------------------------  | ---------------------- |
-  |  编写 hosts 文件            | 编写动态Inventory脚本  |
-  |  随平台资源变化持续更新     | 动态获取平台资源       |
-      
+* 使用静态 Inventory
+  静态 Inventory 是ansible.conf定义的文件，默认是/etc/ansible/hosts 一个简单的例子如下:
+```
+[web]
+web1                ansible_ssh_host=10.10.33.1
+web2                ansible_ssh_host=10.10.33.2
+web3                ansible_ssh_host=10.10.33.3
+web4                ansible_ssh_host=10.10.33.4
+
+[db]
+db1                 ansible_ssh_host=10.10.33.5
+db2                 ansible_ssh_host=10.10.33.6
+
+[k8s]
+k8s-1                ansible_ssh_host=10.10.33.7
+k8s-2                ansible_ssh_host=10.10.33.8
+k8s-3                ansible_ssh_host=10.10.33.9
+k8s-4                ansible_ssh_host=10.10.33.10
+
+[all:vars]
+ansible_connection=ssh
+ansible_ssh_user=root
+ansible_ssh_pass="xxxxxxxxx"
+```
+
+* 使用动态 Inventory
+  动态 Inventory  需要 ansible.conf 定义的配置 inventory = inventory/ucloud.py, 当ansible 工作的时候，会自动引用`inventory/ucloud.py --list`的输出作为输入，不用额外维护一份 /etc/ansible/hosts 文件，随时可以动态获取，管理控制台能看到云主机资源
 
 <figure class="half">
     <img src="http://xxx.jpg">
+    <img src="http://yyy.jpg">
     <img src="http://yyy.jpg">
 </figure>
 
