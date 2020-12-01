@@ -34,6 +34,7 @@
 <img src="https://github.com/panhaitao/SoldierNote/blob/master/static/cube_run_ansible.png" align="right"  width="30%"  border="2" hspace="20" >
 
 <br>
+
 * 登陆ucloud控制台 https://console.ucloud.cn/ 全部产品 → 容器实例cube，创建容器组
 * cpu 内存 根据需要配置，比如 2核4G
 * 镜像选择→ uhub镜像 仓库名称 ucloud_pts 镜像名称 alpine-ansible 镜像版本 v1.0
@@ -41,6 +42,8 @@
 * 镜像密钥→ 填入你登陆ucloud平台的用户名和密码
 * 自定义网络→ 选择绑定外网IP，选择需要的付费方式，完成cube实例的创建
 * 等cube实例启动完毕后，可以使用步骤1.c中定义的root密码ssh登陆容器
+
+<br>
 <br>
 
 ，还是回到创建100台云主机，配置4核8G, 并部署好游戏压测工具客户端的场景，来对比下使用API脚本加运维工具比起WebUI操作方式带来的时间收益：
