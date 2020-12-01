@@ -77,7 +77,7 @@ ansible_ssh_pass="xxxxxxxxx"
 具备了以上条件，这里再使用一个比较实用的场景: 所有主机安装UCloud辅助agent程序，以便可以获取更丰富监控指标（如内存、磁盘空间、进程等）
 
 <img src="https://github.com/panhaitao/SoldierNote/blob/master/static/ansibe_install_uma.png" align="right"  width="46%" border="2" hspace="20" >
-<img src="https://github.com/panhaitao/SoldierNote/blob/master/static/uhost_with_mem_monitor"align="right"  width="30%" border="2" hspace="20" >
+<img src="https://github.com/panhaitao/SoldierNote/blob/master/static/uhost_with_mem_monitor.png"align="right"  width="30%" border="2" hspace="20" >
 
 完成web,db,k8s 三个组所有主机agent程序，执行命令如下：
 
