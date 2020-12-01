@@ -17,6 +17,14 @@ ansible是基于Python开发的运维工具，功能类同其他运维工具: pu
 
 * rhel/centos  执行命令： yum install ansible sshpass -y 完成软件包的安装
 * debian/ubuntu 执行命令：apt install ansible sshpass -y 完成软件包的安装
+* 使用cube方式启动启动ansible: 
+ * 登陆ucloud控制台 https://console.ucloud.cn/ 全部产品 → 容器实例cube，创建容器组
+ * cpu 内存 根据需要配置，比如 2核4G
+ * 镜像选择→ uhub镜像 仓库名称 ucloud_pts 镜像名称 alpine-ansible 镜像版本 v1.0
+ * 高阶设置-> 环境变量, name: ROOT_PW value: 自定义密码 ( 设置cube实例的root密码)
+ * 镜像密钥→ 填入你登陆ucloud平台的用户名和密码
+ * 自定义网络→ 选择绑定外网IP，选择需要的付费方式，完成cube实例的创建
+ * 等cube实例启动完毕后，可以使用步骤1.c中定义的root密码ssh登陆容器
 
 ### 默认配置 
 
