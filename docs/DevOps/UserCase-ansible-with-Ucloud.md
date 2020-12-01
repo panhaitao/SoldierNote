@@ -72,7 +72,7 @@ ansible_ssh_pass="xxxxxxxxx"
 
 <center class="half">
 
-<img src="https://github.com/panhaitao/SoldierNote/blob/master/static/ucloud_uhost_webconsole.png"  width="48%" border="2"><img src="https://github.com/panhaitao/SoldierNote/blob/master/static/ansibe_list_hosts.png" width="48%" border="2" >
+<img src="https://github.com/panhaitao/SoldierNote/blob/master/static/ucloud_uhost_webconsole.png"  width="48%" border="2" hspace="20" ><img src="https://github.com/panhaitao/SoldierNote/blob/master/static/ansibe_list_hosts.png" width="48%" border="2" hspace="20" >
 
 </center>
 
