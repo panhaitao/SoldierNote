@@ -70,9 +70,12 @@ ansible_ssh_pass="xxxxxxxxx"
 * 使用动态 Inventory
   动态 Inventory  需要 ansible.conf 定义的配置 inventory = inventory/ucloud.py, 当ansible 工作的时候，会自动引用`inventory/ucloud.py --list`的输出作为输入，不用额外维护一份 /etc/ansible/hosts 文件，随时可以动态获取，管理控制台能看到云主机资源
 
-<div style="float:left;border:solid 1px 000;margin:2px;">src="https://github.com/panhaitao/SoldierNote/blob/master/static/ucloud_uhost_webconsole.png"  width="40%" height="260" ></div>
-<div style="float:left;border:solid 1px 000;margin:2px;">src="https://github.com/panhaitao/SoldierNote/blob/master/static/ansibe_list_hosts.png"  
-width="40%" height="260" ></div>
+<div style="float:left;border:solid 1px 000;margin:2px;">
+  <img src="https://github.com/panhaitao/SoldierNote/blob/master/static/ucloud_uhost_webconsole.png"  width="40%" height="260" >
+</div>
+<div style="float:left;border:solid 1px 000;margin:2px;">
+  <img src="https://github.com/panhaitao/SoldierNote/blob/master/static/ansibe_list_hosts.png"  width="40%" height="260" >
+</div>
 
 
 ## 像编写剧本一样管理资源
