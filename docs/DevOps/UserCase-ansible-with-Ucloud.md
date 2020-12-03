@@ -30,7 +30,7 @@
   
   以上只是简单举了两个运维场景的例子，上面的例子有点像Windows视窗操作理念和Linux命令操作理念之争的感觉，实际我表达的就是, 不同场景使用最佳匹配的使用方式，一次简单的创建几台主机，UI向导式简单便捷，批量处理任务，操作API，编写脚本省力。  
 
-  当完成云主机创建后, 一定会有相应的节点初始化操作，比如更改主机名，安装软件包，配置挂在磁盘，分发配置等,传统的操作方式，一台台使用ssh或其他远方式登陆操作，或者借助shell脚本批量操作，除了这种操作方式，还有其他更高效的操作方式，比如选用合适的运维工具，老牌的有Puppet、Chef、后来的SaltStack，以及前些年被RedHat公司收购的ansible等，其中ansible是最灵活高效的，可以让用户轻松配维护从单机，到数十台、数百台，设置更大规模的设施. 准备一台云主机安装好ansible软件包或者一个容器实例启动ansible即可，以下是使用一种更便捷，更高效的方式启用一个ansible工作环境：
+  当完成云主机创建后, 一定会有相应的节点初始化操作，比如更改主机名，安装软件包，配置挂在磁盘，分发配置等,传统的操作方式，一台台使用ssh或其他远方式登陆操作，或者借助shell脚本批量操作，除了这种操作方式，还有其他更高效的操作方式，比如选用合适的运维工具，老牌的有Puppet、Chef、后来的SaltStack，以及前些年被RedHat公司收购的ansible等，其中ansible是最灵活高效的，可以让用户轻松配维护从单机，到数十台、数百台，设置更大规模的设施. 准备一台云主机安装好ansible软件包或者一个容器实例启动ansible即可，以下是使用一种更便捷，更低成本的方式启动一个ansible工作环境：
 
 <img src="https://github.com/panhaitao/SoldierNote/blob/master/static/cube_run_ansible.png" align="right"  width="30%"  border="2" hspace="20" >
 
@@ -121,48 +121,70 @@ ansible_ssh_pass="xxxxxxxxx"
 ```
 ansible-playbook install_uma_agent.yaml -e group='web,db,k8s' 
 ```
-使用Playbook方式比执行
+  这只是一个简单的例子，playbook可以把一项项命令操作汇聚成一个task，如果执行是更复杂的操作，可能需要执行多个task，那么role特性就适合，role定义了playbook的层次性、结构化地组织，对某一机器操作，只需要定义如何引用role，就可以更轻松的完成更复杂的管理任务,下面我用一系列完整的操作示例，来展示如何借助ansible对Ucloud云平台资源进行管理和维护。
 
-，还是回到创建100台云主机，配置4核8G, 并部署好游戏压测工具客户端的场景，来对比下使用API脚本加运维工具比起WebUI操作方式带来的时间收益：
+## 准备一台运行ansible的主机
 
-  |            |          WebUI+普通操作                  　|                 使用接口+运维工具                                           |
-  | ---------- |------------------------------------------- | ----------------------------------------------------------------------------|
-  |  创建主机  | 至少滑动,点击鼠标约15次(耗时30s)<br> 重复十次:至少滑动,点击鼠标150次，完成100台主机创建(耗时5min) |  调用API编写创建主机脚本(耗时5min～10min)<br> 编写创建主机的配置文件，定义类型, 数量 (耗时1min～3min) <br> 一次执行API脚本读取配置, 批量创建100台主机(耗时3～5min)   | 
-  |  初始化    | 依次登陆100台主机，配置压测软件(至少1小时) |  编写调试tasks(耗时10min～15min) <br> ansible执行初始化100台主机tasks (耗时5min)      | 
-  |  开始压测  | 使用shell获取其他方式控制100台主机开发开始压测(耗时等同于压测时间) |  使用ansible控制100台主机远程执行压测(耗时等同于压测时间) | 
-  |  修改参数  | 依次登陆100台主机，完成参数修改(至少1小时) |  使用ansible执行playbook重新初始化100台主机配置(耗时5min)                             | 
-  |  重复压测  | 使用shell获取其他方式控制100台主机开发开始压测(耗时等同于压测时间) |  使用ansible远程执行命令控制100台主机压测(耗时等同于压测时间) |
- 
-  使用WebUI的普通操作方式中,一次操作5～10台，比较便捷，当操作量级达到数十数百量级的时候，特别在节点初始化操作，以及特别变更操作工作量比较大
-  使用使用API接口和运维工具的操作方式中，在前期编写调用接口脚本,和编写ansible tasks 需要花费些时间,在后续特别是配置变更，批量操作等能突显强大的管理控制能力
-  甚至在某些具备运维开发能力的客户，管理资源完全使用API接口来实现业务相关的功能，比如上线或者变更一个边缘节点，扩充某个集群等。
+* 安装软件包 yum install ansible git -y
+* git clone https://github.com/panhaitao/Playbook-Performance-Test.git 获取
+* cd Playbook-Performance-Test
+
+创建 inventory/ucloud.ini 文件，写入如下字段：
+```
+[ucloud]
+public_key = ucloud_PublicKey
+private_key = ucloud_PrivateKey
+base_url = http://api.ucloud.cn/
+region = cn-bj2 # 云平台资源所在地域 
+
+[cache]
+path = tmp/cache/ansible-ucloud.cache
+max_age = 86400
+
+[uhost]
+group = all
+tag = %(Tag)s
+name = %(PrivateIP)s
+host = %(PrivateIP)s
+ssh_port = 22
+ssh_password = Linux主机密码
+winrm_port = 5985
+winrm_password = Windows主机密码
+```
+
+## 测试ansible和其他主机ssh登陆是否正常
+
+* cd Playbook-Performance-Test &&  ansible all -m shell -a 'pwd'
+
+## 场景一: 初始化压测主机
+
+<img src="https://github.com/panhaitao/SoldierNote/blob/master/static/uhost_with_mem_monitor.png" align="right"  width="30%"  border="2" hspace="20" >
+
+在做压测的时候我们经常需要创建批量的主机，并且用后即还，
+
+1. 
+2. 
+```
+- name: set all jmeter bench nodes
+  hosts: jmeter-node
+  user: root
+  gather_facts: yes
+  tasks:
+    - include_role:
+        name: jmeter
+      vars:
+        group: jmeter-node
+        jvm_Xms: "1G"
+        jvm_Xmx: "1G"
+        jvm_MaxMetaspaceSize: "256m"
+        timeout: "6000"
+
+```
+3.
+4
+5.
 
 
-## 常见场景参考
-
-### 场景二: 初始化压测主机
-
-在配合客户做压测的时候我们经常需要创建批量的主机，并且用后即换，我们可以使用<场景一: 快速准备需要的主机>的示例创建好需要数量的主机，然后写好的ansible playbook 完成初始化
-
-1. 初始化 uwsgi 节点,执行命令 ansible-playbook -i hosts/<file_name> todo/init_uwsgi_hosts -D  用做LB web服务测试后端节点
-  * 验证端口 ansible -i hosts/<file_name>  <group_name> -m shell -a "netstat -nat |grep 80"
-  * 验证进程 ansible -i hosts/<file_name>  <group_name> -m shell -a "ps -ef | grep uwsgi"
-  * 确认服务就绪，就可以挂到 ULB 上进行压测
-2. 初始化 jmeter 压测节点, ansible-playbook -i hosts/<file_name> todo/init_jemter_hosts -D 然后根据压测需要，上传压测需要的jmx文件
-  * 开始压测: /home/apache-jmeter-5.2.1/bin/jmeter -n -t other/post_example.jmx -l result/result.jtl -e -o result -R node-1,node-2,node-3...
-  * 终止压测: ansible -i hosts/<file_name> <group_name> -m shell -a "pkill jmeter-server; pkill jmeter"
-3. 初始化 ab 压测节点, 执行命令 ansible-playbook -i hosts/<file_name> todo/init_ab_hosts -D, 根据压测需要，修改要运行的脚本 scripts/run_ab_bench.sh
-  * 开始压测: ansible -i hosts/<file_name> <group_name> -m script -a scripts/run_ab_benc.sh  
-  * 终止压测: ansible -i hosts/<file_name> <group_name> -m shell -a "pkill ab"
-4. 初始化 wrk 压测节点,执行命令 ansible-playbook -i hosts/<file_name> todo/init_wrk_hosts -D, 根据压测需要，修改要运行的脚本 scripts/run_wrk.sh 
-  * 开始压测: ansible -i hosts/<file_name> <group_name> -m script -a scripts/run_wrk.sh  
-  * 终止压测: ansible -i hosts/<file_name> <group_name> -m shell -a "pkill wrk"
-
-### 场景三: 批量配置docker主机
-
-在当下的容器时代，部署容器应用是一个常态的事情，对于快速初始化一批安装的docker主机，或者变更docker配置，使用ansible 可以轻松完成
-
-  * ansible-playbook -i hosts/<file_name> todo/init_docker_hosts -D
 
 ### 场景四: 批量初始化USMC agent
 使用USMC做主机迁移，比如机械的操作是安装USMC agent，如果一次迁移的主机数量比较多，可以借助ansible 来完成批量操作
