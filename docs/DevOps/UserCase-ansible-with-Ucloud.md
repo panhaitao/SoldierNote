@@ -245,9 +245,10 @@ export JAVA_HOME=/home/jdk1.8.0_231
 
 使用USMC做主机迁移，比如机械的操作是安装USMC agent，如果一次迁移的主机数量比较多，可以借助ansible 来完成批量操作
 
+* 服务器迁移中心 USMC → 创建迁移计划，将生成的计划ID usmc-xxxxx 设置为 todo/init_usmc_agent 的usmc_id 值, 将hosts， group 设置要迁移主机所在的业务组名
+
 <img src="https://github.com/panhaitao/SoldierNote/blob/master/static/ansible_install_usmc.png" align="right"  width="40%"  border="2" hspace="20" >
 
-* 服务器迁移中心 USMC → 创建迁移计划，将生成的计划ID usmc-xxxxx 设置为 todo/init_usmc_agent 的usmc_id 值, 将hosts， group 设置要迁移主机所在的业务组名
 ```
 - name: set usmc agent
   hosts: nginx
