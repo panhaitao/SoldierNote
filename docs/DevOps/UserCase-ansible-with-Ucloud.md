@@ -232,6 +232,8 @@ winrm_password = Windows主机密码
 3. cd Playbook-Performance-Test &&  ansible-playbook init_uwsgi_and_jmeter -D
 4. 配置LB，将nginx server 加入vserver
 5. 配置好post.jmx 使用ansible控制一台jemter机器开始压测: `cd Playbook-Performance-Test && ansible jmeter-1 -m copy -a "src=post.jmx dest=/tmp/post.jmx"  && ansible jmeter-1 -m script -a 'start_jmeter_task.sh' `
+<br>
+<br>
 6. post.jmx 可以参考 Playbook-Performance-Test/other/post_example.jmx
 7. start_jmeter_task.sh 参考
 ```
