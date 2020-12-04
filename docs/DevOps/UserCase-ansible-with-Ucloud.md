@@ -299,7 +299,7 @@ node_exporter_promethus_grafana.yaml
 3. 执行命令完成配置初始化 ansible-playbook init_uwsgi_and_jmeter -D
 4. 登陆grafana 导入面板https://grafana.com/grafana/dashboards/8919
 
-<img src="https://github.com/panhaitao/SoldierNote/blob/master/static/prometheus-example-count-hostgroup.png" width="28%"  border="2" hspace="20" ><img src="https://github.com/panhaitao/SoldierNote/blob/master/static/grafana-example-count-hostgroup" width="28%"  border="2" hspace="20" ><img src="https://github.com/panhaitao/SoldierNote/blob/master/static/grafana-example-monitor.png" width="28%"  border="2" hspace="20" >
+<img src="https://github.com/panhaitao/SoldierNote/blob/master/static/prometheus-example-count-hostgroup.png" width="28%"  border="2" hspace="20" ><img src="https://github.com/panhaitao/SoldierNote/blob/master/static/grafana-example-count-hostgroup.png" width="28%"  border="2" hspace="20" ><img src="https://github.com/panhaitao/SoldierNote/blob/master/static/grafana-example-monitor.png" width="28%"  border="2" hspace="20" >
 
 ## 参考资源
 
