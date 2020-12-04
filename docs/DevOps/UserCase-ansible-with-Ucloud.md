@@ -162,8 +162,7 @@ python3 scripts/create_uhost.py --config nodejs-host-cfg.yaml
 python3 scripts/create_uhost.py --config nginx-host-cfg.yaml
 ``` 
 
-<img src="https://github.com/panhaitao/SoldierNote/blob/master/static/uhost_with_group_k8s.png" align="right"  width="30%"  border="2" hspace="20" >
-<img src="https://github.com/panhaitao/SoldierNote/blob/master/static/uhost_with_group_web.png" align="right"  width="30%"  border="2" hspace="20" >
+<img src="https://github.com/panhaitao/SoldierNote/blob/master/static/uhost_with_group_k8s.png"  width="46%"  border="2" hspace="20" ><img src="https://github.com/panhaitao/SoldierNote/blob/master/static/uhost_with_group_web.png" width="46%"  border="2" hspace="20" >
  
 * 配置好ansible运行环境
 
