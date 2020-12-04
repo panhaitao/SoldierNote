@@ -232,8 +232,10 @@ winrm_password = Windows主机密码
 3. cd Playbook-Performance-Test &&  ansible-playbook init_uwsgi_and_jmeter -D
 4. 配置LB，将nginx server 加入vserver
 5. 配置好post.jmx 使用ansible控制一台jemter机器开始压测: `cd Playbook-Performance-Test && ansible jmeter-1 -m copy -a "src=post.jmx dest=/tmp/post.jmx"  && ansible jmeter-1 -m script -a 'start_jmeter_task.sh' `
+
 <br>
 <br>
+
 6. post.jmx 可以参考 Playbook-Performance-Test/other/post_example.jmx
 7. start_jmeter_task.sh 参考
 ```
@@ -242,8 +244,10 @@ export JAVA_HOME=/home/jdk1.8.0_231
 /home/apache-jmeter-5.2.1/bin/jmeter -n -t /tmp/post.jmx -l /data/result/result.jtl -e -o /data/result -R jmeter-1,jmeter-2,jmeter-3,jmeter-4,jmeter-5
 ```
 
+### 场景二: 批量初始化USMC agent
 
-### 场景四: 批量初始化USMC agent
+<img src="https://github.com/panhaitao/SoldierNote/blob/master/static/http_bench_result.png" align="right"  width="40%"  border="2" hspace="20" >
+
 使用USMC做主机迁移，比如机械的操作是安装USMC agent，如果一次迁移的主机数量比较多，可以借助ansible 来完成批量操作
 
 * 手动创建好 ansible inventory 文件，将要迁移的主机IP，登陆密码填入
@@ -251,7 +255,9 @@ export JAVA_HOME=/home/jdk1.8.0_231
 * 执行命令 ansible-playbook -i hosts/k8s todo/init_uwsgi_hosts -D 完成USMC agent的部署，
 * 继续进行迁移计划的其他操作
 
-### 场景五: 使用windows云主机做游戏压测
+### 场景三: 启动Promethus/Grafana系统
+
+<img src="https://github.com/panhaitao/SoldierNote/blob/master/static/http_bench_result.png" align="right"  width="40%"  border="2" hspace="20" >
 
 客户方需要做游戏业务压测，压测工具是运行windows上的GUI程序，需要100+数量级别的windows云主机做并发压测，已经
 
