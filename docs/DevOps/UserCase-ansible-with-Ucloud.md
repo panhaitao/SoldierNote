@@ -217,22 +217,17 @@ winrm_password = Windows主机密码
         jvm_Xmx: "1G"
         jvm_MaxMetaspaceSize: "256m"
         timeout: "6000"
-- name: set all nginx server
+- name: set all uwsgi nodes
   hosts: nginx
   user: root
   gather_facts: yes
   tasks:
     - include_role:
-        name: jmeter
+        name: uwsgi
       vars:
         group: nginx
-        jvm_Xms: "1G"
-        jvm_Xmx: "1G"
-        jvm_MaxMetaspaceSize: "256m"
-        timeout: "6000"
-
 ```
-3. cd Playbook-Performance-Test &&  ansible-playbook init_nginx_and_jmeter -D
+3. cd Playbook-Performance-Test &&  ansible-playbook init_uwsgi_and_jmeter -D
 4. 配置LB，将nginx server 加入vserver
 5. 控制jmeter压测节点进行压测
 
