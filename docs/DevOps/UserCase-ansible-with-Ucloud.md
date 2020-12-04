@@ -161,7 +161,6 @@ python3 scripts/create_uhost.py --config redis-host-cfg.yaml
 python3 scripts/create_uhost.py --config nodejs-host-cfg.yaml
 python3 scripts/create_uhost.py --config nginx-host-cfg.yaml
 ``` 
-
 <img src="https://github.com/panhaitao/SoldierNote/blob/master/static/uhost_with_group_k8s.png"  width="46%"  border="2" hspace="20" ><img src="https://github.com/panhaitao/SoldierNote/blob/master/static/uhost_with_group_web.png" width="46%"  border="2" hspace="20" >
  
 * 配置好ansible运行环境
@@ -228,15 +227,11 @@ winrm_password = Windows主机密码
       vars:
         group: nginx
 ```
-
 <img src="https://github.com/panhaitao/SoldierNote/blob/master/static/http_bench_result.png" align="right"  width="40%"  border="2" hspace="20" >
 
 3. 执行命令完成配置初始化 ansible-playbook init_uwsgi_and_jmeter -D
 4. 配置LB，将nginx server 加入vserver
 5. 配置好post.jmx 使用ansible控制一台jemter机器开始压测: `cd Playbook-Performance-Test && ansible jmeter-1 -m copy -a "src=post.jmx dest=/tmp/post.jmx"  && ansible jmeter-1 -m script -a 'start_jmeter_task.sh' `
-
-<br>
-<br>
 
 6. post.jmx 可以参考 Playbook-Performance-Test/other/post_example.jmx
 7. start_jmeter_task.sh 参考
@@ -247,7 +242,6 @@ export JAVA_HOME=/home/jdk1.8.0_231
 ```
 
 ### 场景二: 批量初始化USMC agent
-
 
 使用USMC做主机迁移，比如机械的操作是安装USMC agent，如果一次迁移的主机数量比较多，可以借助ansible 来完成批量操作
 
@@ -302,7 +296,6 @@ node_exporter_promethus_grafana.yaml
         grafana_image: uhub.service.ucloud.cn/k8srepo/grafana:7.3.0
         prometheus_image: uhub.service.ucloud.cn/k8srepo/prometheus:v2.22.0
 ```
-
 3. 执行命令完成配置初始化 ansible-playbook init_uwsgi_and_jmeter -D
 4. 登陆grafana 导入面板https://grafana.com/grafana/dashboards/8919
 
