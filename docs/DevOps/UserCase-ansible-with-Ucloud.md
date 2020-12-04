@@ -198,11 +198,11 @@ winrm_password = Windows主机密码
 
 ## 场景一: 初始化压测主机
 
-<img src="https://github.com/panhaitao/SoldierNote/blob/master/static/http_bench_init.png" align="right"  width="40%"  border="2" hspace="20" >
-
 在做压测的时候我们经常需要创建批量的主机，并且用后即还，
 
-1. 
+1. 进入工作目录 Playbook-Performance-Test 创建jemter 和 nginx server 需要的playbook配置 init_uwsgi_and_jmeter
+
+<img src="https://github.com/panhaitao/SoldierNote/blob/master/static/http_bench_init.png" align="right"  width="40%"  border="2" hspace="20" >
 ```
 - name: set all jmeter bench nodes
   hosts: jmeter-group
@@ -229,7 +229,7 @@ winrm_password = Windows主机密码
 ```
 <img src="https://github.com/panhaitao/SoldierNote/blob/master/static/http_bench_result.png" align="right"  width="40%"  border="2" hspace="20" >
 
-3. cd Playbook-Performance-Test &&  ansible-playbook init_uwsgi_and_jmeter -D
+3. 执行命令完成配置初始化 ansible-playbook init_uwsgi_and_jmeter -D
 4. 配置LB，将nginx server 加入vserver
 5. 配置好post.jmx 使用ansible控制一台jemter机器开始压测: `cd Playbook-Performance-Test && ansible jmeter-1 -m copy -a "src=post.jmx dest=/tmp/post.jmx"  && ansible jmeter-1 -m script -a 'start_jmeter_task.sh' `
 
@@ -250,10 +250,23 @@ export JAVA_HOME=/home/jdk1.8.0_231
 
 使用USMC做主机迁移，比如机械的操作是安装USMC agent，如果一次迁移的主机数量比较多，可以借助ansible 来完成批量操作
 
-* 手动创建好 ansible inventory 文件，将要迁移的主机IP，登陆密码填入
-* 服务器迁移中心 USMC → 创建迁移计划，将生成的计划ID usmc-xxxxx 设置为 todo/init_usmc_agent 的usmc_id 值
-* 执行命令 ansible-playbook -i hosts/k8s todo/init_uwsgi_hosts -D 完成USMC agent的部署，
-* 继续进行迁移计划的其他操作
+* 服务器迁移中心 USMC → 创建迁移计划，将生成的计划ID usmc-xxxxx 
+  设置为 todo/init_usmc_agent 的usmc_id 值, 将hosts， group 设置
+  要迁移主机所在的业务组名
+```
+- name: set usmc agent
+  hosts: web
+  user: root
+  gather_facts: yes
+  tasks:
+    - include_role:
+        name: usmc
+      vars:
+        group: web
+        usmc_id: usmc-4yyukn2r
+```
+* 执行命令 ansible-playbook web init_uwsgi_hosts -D 
+  完成USMC agent的部署，继续进行迁移计划的其他操作
 
 ### 场景三: 启动Promethus/Grafana系统
 
