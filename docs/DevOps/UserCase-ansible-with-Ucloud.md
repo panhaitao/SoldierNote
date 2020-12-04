@@ -126,6 +126,7 @@ ansible-playbook install_uma_agent.yaml -e group='web,db,k8s'
 ## 准备工作
 
 <img src="https://github.com/panhaitao/SoldierNote/blob/master/static/uhost_with_group_k8s.png" align="right"  width="30%"  border="2" hspace="20" >
+
 <img src="https://github.com/panhaitao/SoldierNote/blob/master/static/uhost_with_group_web.png" align="right"  width="30%"  border="2" hspace="20" >
 
 * 创建好需要的云主机
