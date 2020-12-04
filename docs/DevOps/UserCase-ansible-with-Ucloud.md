@@ -199,7 +199,6 @@ winrm_password = Windows主机密码
 ## 场景一: 初始化压测主机
 
 <img src="https://github.com/panhaitao/SoldierNote/blob/master/static/http_bench_init.png" align="right"  width="40%"  border="2" hspace="20" >
-<img src="https://github.com/panhaitao/SoldierNote/blob/master/static/http_bench_result.png" align="right"  width="40%"  border="2" hspace="20" >
 
 在做压测的时候我们经常需要创建批量的主机，并且用后即还，
 
@@ -228,6 +227,8 @@ winrm_password = Windows主机密码
       vars:
         group: nginx
 ```
+<img src="https://github.com/panhaitao/SoldierNote/blob/master/static/http_bench_result.png" align="right"  width="40%"  border="2" hspace="20" >
+
 3. cd Playbook-Performance-Test &&  ansible-playbook init_uwsgi_and_jmeter -D
 4. 配置LB，将nginx server 加入vserver
 5. 配置好post.jmx 使用ansible控制一台jemter机器开始压测: `cd Playbook-Performance-Test && ansible jmeter-1 -m copy -a "src=post.jmx dest=/tmp/post.jmx"  && ansible jmeter-1 -m script -a 'start_jmeter_task.sh' `
