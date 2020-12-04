@@ -121,12 +121,52 @@ ansible_ssh_pass="xxxxxxxxx"
 ```
 ansible-playbook install_uma_agent.yaml -e group='web,db,k8s' 
 ```
-  这只是一个简单的例子，playbook可以把一项项命令操作汇聚成一个task，如果执行是更复杂的操作，可能需要执行多个task，那么role特性就适合，role定义了playbook的层次性、结构化地组织，对某一机器操作，只需要定义如何引用role，就可以更轻松的完成更复杂的管理任务,下面我用一系列完整的操作示例，来展示如何借助ansible对Ucloud云平台资源进行管理和维护。
+  这只是一个简单的例子，playbook可以把一项项命令操作汇聚成一个task，如果执行是更复杂的操作，可能需要执行多个task，那么role特性就适合，role定义了playbook的层次性、结构化地组织，对某一机器操作，只需要定义如何引用role，就可以更轻松的完成更复杂的管理任务,下面我用一系列完整的操作示例，来展示如何借助API和ansible对Ucloud云平台资源进行管理和维护。
 
-## 准备一台运行ansible的主机
+## 准备工作
 
-* 安装软件包 yum install ansible git -y
-* git clone https://github.com/panhaitao/Playbook-Performance-Test.git 获取
+<img src="https://github.com/panhaitao/SoldierNote/blob/master/static/uhost_with_group_k8s.png" align="right"  width="30%"  border="2" hspace="20" >
+<img src="https://github.com/panhaitao/SoldierNote/blob/master/static/uhost_with_group_web.png" align="right"  width="30%"  border="2" hspace="20" >
+
+* 创建好需要的云主机
+
+1. 安装软件包 yum install git  -y
+2. 获取git clone https://github.com/panhaitao/Playbook-Performance-Test.git 获取
+3. cd Playbook-Performance-Test 创建主机配置文件，例如k8s-host-cfg.yaml
+```
+auth:
+  public_key: 'ucloud_pubick_key'
+  private_key: 'ucloud_private_key'  #(https://console.ucloud.cn/uapi/apikey 处获得)
+rz:
+  region: cn-bj2                     
+  zone: cn-bj2-02                    #选择地域, 可用区，参考https://docs.ucloud.cn/api/summary/regionlist
+  project_id: org-5wakzh             #项目(https://console.ucloud.cn/dashboard 处获得 )
+  securitygroupid: firewall-4fntbzvk #选择预设的防火墙ID
+os:
+  hostname_pre: k8s                  #主机名前缀，批量创建主机会以 k8s-1，k8s-2，k8s-3 ....k8s-N 方式命令
+  password: xxxx                     #主机密码
+  imageid: uimage-idxxx              #镜像ID   
+  type: O                            #主机类型，O 是快杰型，N是普通型号
+  cpu: 2                             #CPU核心数
+  mem: 2048                          #MEM大小 要设置为1024的倍数
+  disk_type: CLOUD_RSSD              #磁盘类型
+  disk_size: 20                      #磁盘
+  net_capability: Ultra              #网络增强模式
+tag: k8s                             #主机分组 
+inventory: 
+  maxhosts: 6                        #创建主机的数量 
+```
+更详细可以参考：https://console.ucloud.cn/uapi/detail?id=CreateUHostInstance
+4. 执行python3 scripts/create_uhost.py --config k8s-host-cfg.yaml，完成主机的创建，如果需要创建更多的不同类型的主机，可以准备好多份配置文件，批量执行即可，例如:
+```
+python3 scripts/create_uhost.py --config redis-host-cfg.yaml
+python3 scripts/create_uhost.py --config nodejs-host-cfg.yaml
+python3 scripts/create_uhost.py --config nginx-host-cfg.yaml
+``` 
+ 
+* 配置好ansible运行环境
+
+* 安装软件包 yum install ansible -y
 * cd Playbook-Performance-Test
 
 创建 inventory/ucloud.ini 文件，写入如下字段：
@@ -163,28 +203,38 @@ winrm_password = Windows主机密码
 在做压测的时候我们经常需要创建批量的主机，并且用后即还，
 
 1. 
-2. 
 ```
 - name: set all jmeter bench nodes
-  hosts: jmeter-node
+  hosts: jmeter-group
   user: root
   gather_facts: yes
   tasks:
     - include_role:
         name: jmeter
       vars:
-        group: jmeter-node
+        group: jmeter-group
+        jvm_Xms: "1G"
+        jvm_Xmx: "1G"
+        jvm_MaxMetaspaceSize: "256m"
+        timeout: "6000"
+- name: set all nginx server
+  hosts: nginx
+  user: root
+  gather_facts: yes
+  tasks:
+    - include_role:
+        name: jmeter
+      vars:
+        group: nginx
         jvm_Xms: "1G"
         jvm_Xmx: "1G"
         jvm_MaxMetaspaceSize: "256m"
         timeout: "6000"
 
 ```
-3.
-4
-5.
-
-
+3. cd Playbook-Performance-Test &&  ansible-playbook init_nginx_and_jmeter -D
+4. 配置LB，将nginx server 加入vserver
+5. 控制jmeter压测节点进行压测
 
 ### 场景四: 批量初始化USMC agent
 使用USMC做主机迁移，比如机械的操作是安装USMC agent，如果一次迁移的主机数量比较多，可以借助ansible 来完成批量操作
