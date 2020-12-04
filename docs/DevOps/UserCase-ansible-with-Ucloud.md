@@ -233,8 +233,13 @@ winrm_password = Windows主机密码
 ```
 cd Playbook-Performance-Test
 ansible jmeter-1 -m copy -a "src=post.jmx dest=/tmp/post.jmx" 
-ansible jmeter-1 -m shell -a `/home/apache-jmeter-5.2.1/bin/jmeter -n -t /tmp/post.jmx -l /data/result/result.jtl -e -o /data/result -R jmeter-1,jmeter-2,jmeter-3,jmeter-4,jmeter-5`
+ansible jmeter-1 -m script -a 'start_jmeter_work.sh'
 ```
+start_jmeter_work.sh 参考
+```
+/home/apache-jmeter-5.2.1/bin/jmeter -n -t /tmp/post.jmx -l /data/result/result.jtl -e -o /data/result -R jmeter-1,jmeter-2,jmeter-3,jmeter-4,jmeter-5
+```
+
 
 ### 场景四: 批量初始化USMC agent
 使用USMC做主机迁移，比如机械的操作是安装USMC agent，如果一次迁移的主机数量比较多，可以借助ansible 来完成批量操作
