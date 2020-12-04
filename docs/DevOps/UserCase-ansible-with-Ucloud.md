@@ -271,7 +271,6 @@ export JAVA_HOME=/home/jdk1.8.0_231
 
 ### 场景三: 启动Promethus/Grafana系统
 
-<img src="https://github.com/panhaitao/SoldierNote/blob/master/static/http_bench_result.png" align="right"  width="40%"  border="2" hspace="20" >
 
 node_exporter_promethus_grafana.yaml
 
@@ -304,8 +303,10 @@ node_exporter_promethus_grafana.yaml
         prometheus_image: uhub.service.ucloud.cn/k8srepo/prometheus:v2.22.0
 ```
 
+<img src="https://github.com/panhaitao/SoldierNote/blob/master/static/prometheus-example-count-hostgroup.png" align="right"  width="28%"  border="2" hspace="20" >
+<img src="https://github.com/panhaitao/SoldierNote/blob/master/static/grafana-example-count-hostgroup" align="right"  width="28%"  border="2" hspace="20" >
+<img src="https://github.com/panhaitao/SoldierNote/blob/master/static/http_bench_result.png" align="right"  width="28%"  border="2" hspace="20" >
 
-客户方需要做游戏业务压测，压测工具是运行windows上的GUI程序，需要100+数量级别的windows云主机做并发压测，已经
 
 ## 参考资源
 
