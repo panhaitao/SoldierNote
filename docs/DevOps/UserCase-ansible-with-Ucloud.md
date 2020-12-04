@@ -248,29 +248,62 @@ export JAVA_HOME=/home/jdk1.8.0_231
 
 ### 场景二: 批量初始化USMC agent
 
-<img src="https://github.com/panhaitao/SoldierNote/blob/master/static/http_bench_result.png" align="right"  width="40%"  border="2" hspace="20" >
 
 使用USMC做主机迁移，比如机械的操作是安装USMC agent，如果一次迁移的主机数量比较多，可以借助ansible 来完成批量操作
+
+<img src="https://github.com/panhaitao/SoldierNote/blob/master/static/ansible_install_usmc.png" align="right"  width="40%"  border="2" hspace="20" >
 
 * 服务器迁移中心 USMC → 创建迁移计划，将生成的计划ID usmc-xxxxx 设置为 todo/init_usmc_agent 的usmc_id 值, 将hosts， group 设置要迁移主机所在的业务组名
 ```
 - name: set usmc agent
-  hosts: web
+  hosts: nginx
   user: root
   gather_facts: yes
   tasks:
     - include_role:
         name: usmc
       vars:
-        group: web
-        usmc_id: usmc-4yyukn2r
+        group: nginx
+        usmc_id: usmc-jypbmkty
 ```
-* 执行命令 ansible-playbook web init_uwsgi_hosts -D 
+* 执行命令 ansible-playbook init_uwsgi_hosts -D 
   完成USMC agent的部署，继续进行迁移计划的其他操作
 
 ### 场景三: 启动Promethus/Grafana系统
 
 <img src="https://github.com/panhaitao/SoldierNote/blob/master/static/http_bench_result.png" align="right"  width="40%"  border="2" hspace="20" >
+
+node_exporter_promethus_grafana.yaml
+
+```
+- name: Set all nodes with node_exporter
+  hosts: all
+  user: root
+  gather_facts: yes
+  tasks:
+    - include_role:
+        name: node_exporter
+      vars:
+        group: all
+- name: init grafana server
+  hosts: monitor
+  user: root
+  gather_facts: yes
+  tasks:
+    - include_role:
+        name: grafana
+      vars:
+        group: monitor
+        ucloud_user: 'xxxx'
+        ucloud_password: 'xxxxx'
+        enable_metrics: true
+        docker_version: '19.03.9'
+        registry:
+          - myhub.com
+        grafana_image: uhub.service.ucloud.cn/k8srepo/grafana:7.3.0
+        prometheus_image: uhub.service.ucloud.cn/k8srepo/prometheus:v2.22.0
+```
+
 
 客户方需要做游戏业务压测，压测工具是运行windows上的GUI程序，需要100+数量级别的windows云主机做并发压测，已经
 
