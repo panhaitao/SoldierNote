@@ -237,6 +237,8 @@ ansible jmeter-1 -m script -a 'start_jmeter_work.sh'
 ```
 start_jmeter_work.sh 参考
 ```
+#!/bin/sh
+export JAVA_HOME=/home/jdk1.8.0_231
 /home/apache-jmeter-5.2.1/bin/jmeter -n -t /tmp/post.jmx -l /data/result/result.jtl -e -o /data/result -R jmeter-1,jmeter-2,jmeter-3,jmeter-4,jmeter-5
 ```
 
