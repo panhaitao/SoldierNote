@@ -94,3 +94,59 @@ PEM格式证书转换为jks文件
 导入到jks中：
 
 ~/tmp/cert# keytool -importkeystore -srckeystore server.p12 -srcstoretype PKCS12 -srcstorepass ${passwd} -alias server -deststorepass ${passwd} -destkeypass ${passwd} -destkeystore ServerCert.jks
+
+
+
+
+## Steps to create RSA key, self-signed certificates, keystore, and truststore for a server
+
+1. Generate a private RSA key  `openssl genrsa -out diagserverCA.key 2048`
+2. Create a x509 certificate   `openssl req -x509 -new -nodes -key diagserverCA.key  -sha256 -days 1024 -out diagserverCA.pem`
+3. Create a PKCS12 keystore from private key and public certificate
+```
+openssl pkcs12 -export -name server-cert \
+               -in diagserverCA.pem -inkey diagserverCA.key \
+               -out serverkeystore.p12
+```
+4.  Convert PKCS12 keystore into a JKS keystore
+```
+keytool -importkeystore -destkeystore server.keystore \
+        -srckeystore serverkeystore.p12 -srcstoretype pkcs12 
+        -alias server-cert
+```
+5. Import a client's certificate to the server's trust store.
+
+keytool -import -alias client-cert -file diagclientCA.pem -keystore server.truststore
+
+6. Import a server's certificate to the server's trust store.
+
+keytool -import -alias server-cert -file diagserverCA.pem -keystore server.truststore
+
+## Steps to create RSA private key, self-signed certificate, keystore, and truststore for a client
+
+1. Generate a private key `openssl genrsa -out diagclientCA.key 2048`
+2. Create a x509 certificate `openssl req -x509 -new -nodes -key diagclientCA.key -sha256 -days 1024 -out diagclientCA.pem`
+3. Create PKCS12 keystore from private key and public certificate.
+```
+openssl pkcs12 -export -name client-cert \
+               -in diagclientCA.pem -inkey diagclientCA.key \
+               -out clientkeystore.p12
+```
+4. Convert a PKCS12 keystore into a JKS keystore
+```
+keytool -importkeystore -destkeystore client.keystore \
+        -srckeystore clientkeystore.p12 -srcstoretype pkcs12 \
+        -alias client-cert
+```
+5. Import a server's certificate to the client's trust store.
+
+```
+keytool -import -alias server-cert -file diagserverCA.pem \
+        -keystore client.truststore
+```
+6. Import a client's certificate to the client's trust store.
+
+```
+keytool -import -alias client-cert -file diagclientCA.pem \
+        -keystore client.truststore
+```
