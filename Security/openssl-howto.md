@@ -1,13 +1,16 @@
 # SSL证书的创建与管理
 
-## 概念与术语
+# 概念与术语
 
 SSL证书属于私钥/公钥的非对称加密方式
-1. ca.key ca.crt 默认约定指 根私钥和根证书
-2. ca 证书链下认证的其他证书 server.key/server.crt
+
+1.  ca.key ca.crt 默认约定指 根私钥和根证书
+2.  ca 证书链下认证的其他证书 server.key/server.crt
 
 ## 数字证书(Subject)含义
+
 常用字段
+
 1.  C（Country Name）所在国家字母简称，如中国：CN 
 2.  ST（State or Province Name), 所在省份简称, 如 Beijing
 3.  L （Locality Name）所在城市
@@ -19,6 +22,7 @@ SSL证书属于私钥/公钥的非对称加密方式
     3.  而对于客户端证书则为证书申请者的姓名
 
 其他常用字段：
+
 7.  E (Email) 电子邮件简称 
 8.  G 多个姓名字段简称 
 9.  Description 字段, 描述介绍 
@@ -72,9 +76,9 @@ SSL证书管理服务支持的“域名类型”有“单域名”、“多域�
 
 数据来源：参考知乎 https://zhuanlan.zhihu.com/p/340074172
 
-![image](https://upload-images.jianshu.io/upload_images/5592768-2dd37162711113e7?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![image](https://upload-images.jianshu.io/upload_images/5592768-ab75aa97b5d59be4?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-![image](https://upload-images.jianshu.io/upload_images/5592768-7fa392cf46c2f3de?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![image](https://upload-images.jianshu.io/upload_images/5592768-41068a699ce71c16?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 # 创建自签名SSL证书
 
@@ -88,21 +92,24 @@ openssl req -new -key root.key          \
             -out root.csr               \
             -passin pass: "ca_key_密码"  \
             -subj "/C=CN/ST=Bejing/L=BJ/O=RD/OU=RDTEAM/CN=hadoop.com"
-openssl x509 -req -sha256         \
-             -extensions v3_ca    \
-             -days 3650           \
-             -in ca.csr           \
-             -signkey ca.key      \
+openssl x509 -req -sha256               \
+             -extensions v3_ca          \
+             -days 3650                 \
+             -in ca.csr                 \
+             -signkey ca.key            \
              -passin pass: "ca_key_密码" \ 
              -out ca.crt
+
 ```
+
 以上也可以简写为
+
 ```
-openssl req -newkey rsa:2048           \
-            -keyout ca.key                        \
-            -out ca.crt                               \
-            -days 3650                             \
-            -x509                                      \
+openssl req -newkey rsa:2048       \
+            -keyout ca.key         \
+            -out ca.crt            \
+            -days 3650             \
+            -x509                  \
             -passout pass:"ca_key_密码" \
             -subj '/C=CN/ST=beijing/L=BJ/O=RD/OU=RDTEAM/CN=hadoop.com'
 
@@ -206,10 +213,21 @@ truststore和keystore的性质是一样的，都是存放key的一个仓库，�
 *   A **KeyStore** consists of a database containing a private key and an associated certificate, or an associated certificate chain. The certificate chain consists of the client certificate and one or more certification authority (CA) certificates.
 *   A **TrustStore** contains only the certificates trusted by the client (a “trust” store). These certificates are CA root certificates, that is, self-signed certificates. The installation of the Logical Host includes a TrustStore file named **cacerts.jks** in the location:
 
+## 常见证书格式对应关系
+
+
+| 用途     |    PEM格式   | PKCS12格式 | JKS格式 |                 备注说明            |
+| -----      |     ----------     |           ---        |       ----     |   --------------------------------- |
+| 根私钥 | ca.key          |   |   | 保护方式：密钥口令(keypass) <br>使用范围：仅限于证书管理端 |
+| 根证书 | ca.cert       | ca.p12        | ca.jks (truststore) | 使用范围：公开 |
+| 服务端 | server.key<br>server.cert | server.p12  | server.jks (keystore) | 保护方式：密钥口令(keypass)<br>密钥库口令(storepass) <br> 使用范围：服务端 |
+|客户端|client.key<br>client.crt| client.p12 | client.jks (keystore) |保护方式：密钥口令(keypass)，密钥库口令(storepass)<br>使用范围：客户端 |
+
+
 
 ## 证书格式互转示意图
 
-![image](https://upload-images.jianshu.io/upload_images/5592768-3f5f2e2c9a33ac64?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![image](https://upload-images.jianshu.io/upload_images/5592768-16bfa62f089936f0?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 ## PEM 格式转为PFX格式
 
@@ -336,7 +354,7 @@ openssl pkcs12 -in client.p12 -passin pass:$passwd -nocerts -out client.crt
 
 # 证书的使用示例
 
-1.  nginx单向认证 SSL证书配置示例
+1.  ## nginx单向认证 SSL证书配置示例
 
 修改nginx配置文件，server字段
 
@@ -361,7 +379,7 @@ curl https://server.hadoop.com:443 --cacert /root/KEY/ca.crt
 
 ```
 
-2.  Nginx双向认证SSL证书 配置示例
+2.  ## Nginx双向认证SSL证书 配置示例
 
 修改nginx配置文件，server字段
 
@@ -390,10 +408,10 @@ curl https://server.hadoop.com:443 \
 
 ```
 
-3.  tomcat应用单向认证 jks格式证书配置示例
+3.  ## tomcat应用单向认证 jks格式证书配置示例
 
-1.  准备好证书: server.jks 
-2.  安装docker部署tomcat服务
+4.  准备好证书: server.jks 
+5.  安装docker部署tomcat服务
 
 ```
 yum-config-manager --add-repo https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
@@ -438,7 +456,7 @@ curl https://server.hadoop.com:443 --cacert /root/KEY/ca.crt
 
 ```
 
-4.  Tomcat应用双向认证 jks格式证书配置示例
+4.  ## Tomcat应用双向认证 jks格式证书配置示例
 
 准备好证书：
 
