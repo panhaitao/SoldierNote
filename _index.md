@@ -22,14 +22,13 @@
 1. [ 容器平台-同城集群多活及弹性扩容 ](ContainerStack/k8s-cluster-ha-with-gtm)
 2. [ 多云容灾以及弹性扩容技术方案 ](ContainerStack/k8s-cluster-ha-with-multicloud)
 
+# Linux 发行版
 
-# Linux 发行版 
-
-1. [ Debian Linux: 定制指南 ](Archived/debian_custom_guide/)
-2. [ Debian Linux: 构建软件包一 ](Archived/deb-package-build/)
-3. [ Debian Linux: 构建软件包二 ](Archived/deb-package-rules/)
-4. [ Debian Linux: 构建安装器 ](Archived/debian-installer-howto/)
-5. [ Debian Linux: 构建ISO ](Archived/debian-cd-howto/)
+1. [ Debian Linux: 定制指南 ](LinuxDistribution/debian_custom_guide)
+2. [ Debian Linux: 构建软件包一 ](LinuxDistribution/deb-package-build)
+3. [ Debian Linux: 构建软件包二 ](LinuxDistribution/deb-package-rules)
+4. [ Debian Linux: 构建安装器 ](LinuxDistribution/debian-installer-howto)
+5. [ Debian Linux: 构建ISO ](LinuxDistribution/debian-cd-howto)
 
 ## 安全
 
