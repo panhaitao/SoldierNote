@@ -7,6 +7,10 @@
 3. [ k8s集群变更 clusterDomain ](k8s-manager-changer-clusterdomain)
 4. [ 使用Rancher 对接已有k8s集群 ](K8s-manager-Rancher-MultiCluster)
 
+## DevOPS
+
+1. [制品库-Harbor的安装部署](Container-Artifact-Deploy-Harbor)
+
 ## 日志系统
 
 1. [ 容器平台-ELK日志系统 ](Container-Logsystem-ELK)
