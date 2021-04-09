@@ -26,6 +26,10 @@
 1. [ 容器平台-同城集群多活及弹性扩容 ](ContainerStack/k8s-cluster-ha-with-gtm)
 2. [ 多云容灾以及弹性扩容技术方案 ](ContainerStack/k8s-cluster-ha-with-multicloud)
 
+## 云平台运维
+
+1. [云品台-使用API批量创建云主机](CloudOPS/topic-manager-cloud-vhosts)
+
 # Linux 发行版
 
 1. [ Debian Linux: 定制指南 ](LinuxDistribution/debian_custom_guide)
