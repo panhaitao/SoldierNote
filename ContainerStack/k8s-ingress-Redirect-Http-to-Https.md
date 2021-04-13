@@ -1,12 +1,12 @@
 # 配置 Nginx-Ingress实现http跳转https功能
 
-# 准备工作
+## 准备工作
 
 1. Kubernetes 1.13 或更高版本的集群 
 2. kubectl 1.13 或者更高版本
 3. Helm v3 或更高版本，安装命令参考
 
-## 1. 安装 Helm 
+## 安装 Helm 
 
 ```
 wget https://get.helm.sh/helm-v3.2.4-linux-amd64.tar.gz #或
@@ -16,38 +16,66 @@ mv linux-amd64/helm /usr/bin/
 chmod 755 /usr/bin/helm
 ```
 
-## 2. 安装nginx-ingress
+## 部署 inginx-ingress
+
+1. 添加 ingress Chart仓库
+```
+helm repo add ingress https://kubernetes.github.io/ingress-nginx
+helm repo update
+```
+如果在国内拉取官方镜像失败，可以将ingress-nginx需要的镜像推送到自有镜像仓库，然后使用自有镜像仓库参考操作如下：
+
+2. 将官方镜像上传的自有镜像仓库,需要上传的镜像列表:
+```
+k8s.gcr.io/ingress-nginx/controller:v0.45.0
+docker.io/jettech/kube-webhook-certgen:v1.5.1
+```
+
+3. 创建  docker-registry类的secrets
+```
+kubectl create namespace ingress-nginx
+kubectl delete secret your-registry-secret -n ingress-nginx
+kubectl create secret docker-registry your-registry-secret \
+--namespace=ingress-nginx             \
+--docker-server=your.registry.domain  \
+--docker-username=${USERNAME}         \
+--docker-password=${PASSWORD}
+```
+
+4. 使用自有仓库来部署ingress-nginx（以仓库地址: uhub.service.ucloud.cn/ucloud_pts为例)
 
 ```
 kubectl create namespace ingress-nginx
-helm repo add ingress https://kubernetes.github.io/ingress-nginx
-helm repo update
-helm upgrade --install ingress-nginx ingress/ingress-nginx  -n ingress-nginx
+cat > ingress-value.yaml << EOF
+controller:
+  image:
+    repository: uhub.service.ucloud.cn/ucloud_pts/controller
+    tag: "v0.45.0"
+    digest: sha256:c892e4e39885a16324d38b213d0dd42f56d183e93836b28d051c5476b1418bc1
+  name: controller
+  ingressClass: nginx
+  admissionWebhooks:
+    patch:
+      enabled: true
+      image:
+        repository: uhub.service.ucloud.cn/ucloud_pts/kube-webhook-certgen
+imagePullSecrets: 
+  - name: your-registry-secret
+EOF
+helm upgrade --install ingress ingress/ingress-nginx -n ingress-nginx --values=ingress-value.yaml
 ```
 
-如果在国内拉取官方镜像失败，可以将ingress-nginx需要的镜像推送到自有镜像仓库，然后使用自有镜像仓库参考操作如下：
+# ingress参考操作
 
-1. 创建  docker-registry类的secrets
+1. 创建一个ingress，需要在annotations中定义nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+2. 本地测试修改 /etc/hosts 添加解析记录: ingress_lb_ip  svc.domain 
+3. curl http://svc.domain  确认服务是否正常
+4. 确认ingress服务正常，可以为svc.domain添加DNS解析记录
 
-```
-kubectl create secret docker-registry your-registry-secret --namespace=ingress-nginx --docker-server=your.registry.domain --docker-username=${USERNAME} --docker-password=${PASSWORD}
-```
+# ingress完整验证示例
 
-2. 如果希望针对整个命名空间生效，可以使patch来设置imagePullSecrets
-```
-kubectl patch serviceaccount ingress-nginx -p '{"imagePullSecrets": [{"name": "your-registry-secret"}]}'
-```
+## 1. 准备SSL/TLS证书，这里使用的自签名证书
 
-3. 如果需要修改某个应用可以修改 spec 字段，添加如下配置
-
-```
-      imagePullSecrets:
-      - name: your-registry-secret
-      containers:
-      - image: your.registry.domain/xxx/xxx:tag
-```
-
-4. 准备SSL/TLS证书，这里使用的自签名证书
 ```
 #!/bin/bash
 openssl req -newkey rsa:2048       \
@@ -78,7 +106,7 @@ do
 done
 ```
 
-5. 创建 nginx 需要的 configmap
+## 2. 创建 nginx 需要的 configmap
 
 ```
 cat > default.conf << EOF
@@ -115,14 +143,14 @@ kubectl delete configmap nginx-configmap -n nginx
 kubectl create configmap nginx-configmap --from-file=default.conf -n nginx
 ```
 
-6. 创建 nginx 需要的 secret
+## 3. 创建 nginx 需要的 secret
 
 ```
 kubectl create ns nginx
 kubectl create secret tls nginx-secret --cert=nginx.crt --key=nginx.key -n nginx
 ```
 
-7. 创建 nginx 服务
+## 4. 创建 nginx 服务
 
 ```
 cat > nginx-deploy-svc.yaml << EOF
@@ -183,7 +211,8 @@ EOF
 kubectl apply -f nginx-deploy-svc.yaml  
 ```
 
-8. 创建 nginx ingress 
+## 5. 创建 ingress 示例 
+
 ```
 cat > nginx-svc-ingress.yaml << EOF
 apiVersion: extensions/v1beta1
@@ -213,12 +242,10 @@ EOF
 kubectl apply -f nginx-svc-ingress.yaml
 ```
 
-## 验证服务
+## 6. 验证 ingress 服务
 
-1. 本地测试修改 /etc/hosts 添加解析记录: ingress_lb_ip  svc.domain 
-2. curl http://svc.domain  确认服务是否正常
-3. 确认ingress服务正常，可以为svc.domain添加DNS解析记录，余下略
+本地测试修改 /etc/hosts 添加解析记录: ingress_lb_ip  svc.domain  curl http://svc.domain  确认服务是否正常
 
-## 参考文档
-1. ingress-nginx官方文档: https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/
-2. 阿里云文档：https://help.aliyun.com/document_detail/86533.html
+# 参考文档
+- ingress-nginx官方文档: https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/
+- 阿里云文档：https://help.aliyun.com/document_detail/86533.html
