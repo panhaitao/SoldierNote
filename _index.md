@@ -19,7 +19,8 @@
 
 ## 负载均衡
 
-1. [ Nginx-ingress的配置使用 ](ContainerStack/k8s-loadbalance-ingress)
+1. [ Nginx-ingress的基础使用 ](ContainerStack/k8s-loadbalance-ingress)
+2. [ Nginx-Ingress配置http跳转https参考 ](ContainerStack/k8s-ingress-Redirect-Http-to-Https)
 
 ## 高可用
 
