@@ -29,7 +29,7 @@
 
 ## 云平台运维
 
-1. [云平台-使用API批量创建云主机](CloudOPS/topic-manager-cloud-vhosts)
+1. [云平台-使用Ucloud云平台API管理云主机](CloudOPS/topic-manager-cloud-vhosts)
 1. [云平台-使用DNS权重轮询实现业务流量灰度切](CloudOPS/topic-DNS-weight-polling-grayscale)
 
 # Linux 发行版
