@@ -254,3 +254,162 @@ WAITER: And what would you like to drink  ?
 CUSTOMER: A cup of coffee, please.
 WAITER: And would you like to order  dessert  now?
 CUSTOMER: No, I'll wait, thank you
+
+
+Could I have the bill, please?	请把账单给我好吗？
+
+We're ready for our check. 	我们可以付账了。
+
+如果不确定餐馆是否接受信用卡，你可以询问。
+ 
+
+Do you take credit cards?  	你们接受信用卡付款吗？
+
+当您讨论 tip*时，用动词leave**。
+ 
+
+A: How much should we leave for a tip?
+B: I think 15% is good. 	小费我们应该给多少？
+我觉得 15% 就可以了。
+ 	 	 
+
+A: Did you leave a tip?    
+B: I left 20 percent. Everything was excellent!	你给小费了吗？
+我留了 20% 的小费。各方面都非常棒！
+
+## 餐具
+* cup 
+* plate
+* fork 
+* knife
+* fork
+* spoon
+* bowl
+* placemat
+* napkin
+* glass
+* Small bowl 
+* chopsticks
+
+Lesson: Setting the table 
+By the end of this lesson, Students will be able to use prepositions and appropriate vocabulary to talk about table settings.
+ 
+Vocabulary: 
+
+1 knife 
+2 Knives
+ 
+1 Fork 
+2 Forks 
+
+
+Lesson: Setting the table 
+By the end of this lesson, Students will be able to use prepositions and appropriate vocabulary to talk about table settings.
+ 
+Vocabulary: 
+
+1 knife 
+2 Knives
+ 
+1 Fork 
+2 Forks 
+
+Dinnerware: fork, knife, spoon, bowl, placemat, plate, napkin, glass
+ 
+Grammar: 
+
+Prepositions of place: on the left of, on the right of, in the corner, in the middle of, around
+ 
+ 
+Example sentences: 
+
+There are glasses 
+
+We put the glasses to the right of the knives 
+ 
+ 
+Pronunciation: 
+ 
+ 
+Corrections: 
+Red - Incorrect
+Green - Correct 
+Viki 
+
+I see forks, knives, plates and food 
+
+the knife of the left of the glasses 
+The knives are to the left of the glasses 
+
+Napkin is on the plate 
+The napkin is on the plate 
+
+the forks are on the right of the plate 
+
+You put forks on the left of the plate. 
+
+You can put it on the right of the plate 
+
+Chen (Arn) 
+
+The bowl are on the table 
+The plates are on the table. 
+The bowls are on the table. 
+
+The napkin is on the plate 
+
+The napkin is inside of the plate 
+
+You put the napkin to the right of the plate 
+
+Put the forks to the right of the plates
+
+put the glasses between the knife and forks 
+put the glasses between the knives and forks 
+
+Haitao 
+
+On the table I see there are two glasses and forks 
+
+The glass between the fork and knife 
+The glasses are between the forks and knives 
+
+The spoons are on the right of the cup/Small bowl 
+
+You should put the plates under the napkins between the forks and spoons 
+
+The glasses should put in front of the plate. 
+You should put the glasses in front of the plates 
+
+In the middle of the table 
+
+
+Teng (Peter) 
+
+There are glasses forks and knives on the table 
+
+The forks on the right of glasses 
+The forks are on the right of the glasses
+
+The glasses are between the forks and knives 
+
+The placemats are under the forks and knives 
+
+Where do I put the forks? 
+
+Where do I put the spoons? 
+
+Hera 
+
+I can see some knives, forks, plates, and glasses 
+
+We put the plates in the middle of the table 
+
+I put the glasses on the table 
+
+I put the glasses on the right of the knife
+I put the glasses on the right of the knives
+
+Tonight, the boss is coming to dinner
+
+Where do I put the napkins
