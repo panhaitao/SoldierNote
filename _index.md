@@ -1,6 +1,10 @@
 # 容器平台
 ---
 
+## 容器平台
+
+1. [ 基于公有云的容器平台建设指南 ](ContainerStack/Container-PaaS-base-cloud)
+
 ##  集群管理
 
 1. [ 使用RKE部署k8s集群 ](ContainerStack/K8s-deploy-Use-RKE)
