@@ -1,5 +1,26 @@
 # 词汇
 
+shoot 射击
+bad acting 拙劣的表演
+black and white 黑白片
+special effects 特效
+brilliant 卓越的，优秀的
+subtitles 字幕
+actress 女演员
+original 原创的，新意
+westerns 西部片
+remake 翻拍，改编
+fun 有趣的
+amazing   惊人的
+famous   著名的
+dreadful 可怕的
+the same 一样的
+simple 简单的
+poor 贫穷的
+good against evil 善与恶的交锋
+dark 黑色的
+
+
 * science fiction 科幻小说 /ˈsaɪəns ˈfɪkʃn/
 a type of book, film/movie, etc. that is based on imagined scientific discoveries of the future, and often deals with space travel and life on other planets
 
@@ -25,14 +46,11 @@ comedy 喜剧 /ˈkɑːmədi/
 a play or film/movie that is intended to be funny, usually with a happy ending
 
 
-
 用'think that' 提出观点
- 
 用think that 的表达提出观点。
  
 
 I think that Brad Pitt is a great actor.	我认为 Brad Pitt 是一位优秀的演员。
-
 I thought that 'Hunger Games' was really good.	我认为'Hunger Games' 真的不错。
 
 A: Do you think that I should watch this horror movie?
@@ -53,37 +71,6 @@ LUCAS: Me, too. I don't usually like  romances, but that's one of my favorite mo
 JENNY: Yeah, it's quite old, but it's still good.
 LUCAS: Mm-hmm. Did you watch it with your kids?
 JENNY: No, but I think I could  show this one to my kids.
-
-
-shoot
-射击
-
-bad acting
-拙劣的表演
-
-black and white
-黑白片
-
-special effects
-特效
-
-brilliant
-卓越的，优秀的
-
-subtitles
-字幕
-
-actress
-女演员
-
-original
-原创的，新意
-
-westerns
-西部片
-
-remake
-翻拍，改编
 
 
 The movie is in French, so there are subtitles.	
@@ -116,8 +103,8 @@ The main character is played by Bruce Willis.	主角由 Bruce Willis 扮演。
 The subtitles are translated into five languages.	字幕被翻译成五种语言。
 
 
-A: What are you in the mood for tonight?                                        您今天晚上想看什么电影？
-B: I'm in the mood for an action movie. What about the new Bond movie?	 	我想看动作片。那部邦德新片怎么样？
+A: What are you in the mood for tonight? 
+B: I'm in the mood for an action movie. What about the new Bond movie?
  
 A: Do you feel like seeing a comedy or a romance?	 	您想看喜剧片还是爱情片？
 B: I'd rather see a comedy. I don't really care for romances.	 	我比较喜欢看喜剧片。我不喜欢爱情片。
@@ -128,3 +115,36 @@ I've already seen it, but I'd see it again.	 	我已经看过了，但我还想�
 I've heard it's not very good.	 	我听说不是很好。
 The reviews were very negative.	 	评论都非常负面。
 People say it's really fabulous.	 	大家说非常精彩。
+
+
+The special effects were created by 23 people.	特效由 23 个人制作。
+The bank manager was shot by the bad guys.	银行经理被坏人开枪击中了。
+ 
+如果完成了事情的人不重要或未知，by +人从句可以省略。
+ 
+A: Guess what? The producer was fired.
+B: Why?
+A: The actors weren't paid.
+B: Oh, no! Was a new producer hired?
+ 
+
+TIM: Wow. Amazing. 'Shaun of the Dead.' I can't believe that movie was made with so little money.
+MEGAN: Oh? How much money did they spend ?
+TIM: $6.1 million. It seemed like it was created for $50 million.
+MEGAN: But $6.1 million is a lot of money!
+TIM: Not really. Most Hollywood films cost, like, $100 million, or more.
+MEGAN: Huh. How did they do it?
+TIM: Well, it was directed by Edgar Wright. He's brilliant.
+MEGAN: Yeah?
+TIM: He said they weren't given much money, and they were told to spend it
+carefully. So he was really careful and worked really hard.
+
+
+用正确的动词过去时被动语态结构填空。
+
+Jen Boothe made the costumes. / The costumes were made by Jen Boothe.
+They called the movie 'Faces.' / The movie was called 'Faces.'
+Cassavetes directed it. / It was directed by Cassavetes.
+He made it in 1968. / It was made in 1968.
+John Marley played the main character. / The main character was played by John Marley.
+
